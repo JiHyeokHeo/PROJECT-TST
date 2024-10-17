@@ -7,7 +7,7 @@ public class ResourceManager
 {
     public Dictionary<string, Object> _resources = new Dictionary<string, Object>(); 
 
-    public T Load<T>(string path) where T : Object
+    T Load<T>(string path) where T : Object
     {
         string name = path;
         int index = name.IndexOf('/');

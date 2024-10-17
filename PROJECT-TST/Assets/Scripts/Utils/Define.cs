@@ -2,17 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class Define
+namespace Define
 {
-    enum ECharactorState
+    public static class Define
     {
+        public enum ECharactorState
+        {
+            Idle,
+            Move,
+            Attack,
+            Skill,
+            Damaged, // 경직을 넣을꺼면 쓰고 아님 말자
+            Die,
+        }
+
+        public enum ESceneType
+        {
+            None = 0,
+
+
+            End = 16,
+        }
     }
 
-    enum ESceneType
-    {
-        None = 0,
-
-
-        End = 16,
-    }
 }
+
