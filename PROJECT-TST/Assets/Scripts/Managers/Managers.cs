@@ -10,15 +10,15 @@ public class Managers : MonoBehaviour
     private static Managers Instance { get { Init(); return s_Instance; } }
 
     #region Contents
-    private PoolingManager _poolingManager = new PoolingManager();
 
-    public static PoolingManager PoolManager { get { return Instance?._poolingManager; } }
     #endregion
 
     #region Core
     private ResourceManager _resourceManager = new ResourceManager();
     private SceneManagerEX _sceneManager = new SceneManagerEX();
-   
+    private PoolingManager _poolingManager = new PoolingManager();
+
+    public static PoolingManager PoolManager { get { return Instance?._poolingManager; } }
     public static ResourceManager Resources { get { return Instance?._resourceManager; } }
     public static SceneManagerEX Scenes { get { return Instance?._sceneManager; } }
     #endregion
