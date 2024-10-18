@@ -9,7 +9,7 @@ public class DevScene : BaseScene
         if (base.Init() == false)
             return false;
 
-        Managers.Resources.Instantiate("Cube");
+        Managers.Resources.Instantiate("Y Bot");
 
 
         return true;
@@ -17,7 +17,7 @@ public class DevScene : BaseScene
 
     private float _elapsedTime = 0.0f;
 
-        private void Update()
+    private void Update()
     {
         _elapsedTime += (Time.deltaTime - _elapsedTime) * 0.1f;
     }

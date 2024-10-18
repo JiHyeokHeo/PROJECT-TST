@@ -14,7 +14,7 @@ public class Creature : BaseObject
     ECharactorState _creatureState;
     Coroutine _fsmState;
 
-    public Animator Animator
+    public Animator CAnimator
     {
         get { return _animator; }
         set { _animator = value; }
@@ -42,8 +42,11 @@ public class Creature : BaseObject
         if (base.Init() == false)
             return false;
 
-        _animator = GetComponent<Animator>();
-        _fsmState = StartCoroutine(ICoroutineAI());
+        CAnimator = GetComponent<Animator>();
+        FsmState = StartCoroutine(ICoroutineAI());
+
+
+        CreatureState = ECharactorState.Idle;
         return true;
     }
 
@@ -121,18 +124,54 @@ public class Creature : BaseObject
         switch (CreatureState) 
         {
             case ECharactorState.Idle:
+                AnimPlayIdle();
                 break;
             case ECharactorState.Move:
+                AnimPlayMove();
                 break;
             case ECharactorState.Attack:
+                AnimPlayAttack();
                 break;
             case ECharactorState.Skill:
+                AnimPlaySkill();
                 break;
             case ECharactorState.Damaged:
+                AnimPlayDamaged();
                 break;
             case ECharactorState.Die:
+                AnimPlayDie();
                 break;
         }
+    }
+
+    protected virtual void AnimPlayIdle()
+    {
+
+    }
+
+    protected virtual void AnimPlayMove()
+    {
+
+    }
+
+    protected virtual void AnimPlayAttack()
+    {
+
+    }
+
+    protected virtual void AnimPlaySkill()
+    {
+
+    }
+
+    protected virtual void AnimPlayDamaged()
+    {
+
+    }
+
+    protected virtual void AnimPlayDie()
+    {
+
     }
 
     public override void Clear() 

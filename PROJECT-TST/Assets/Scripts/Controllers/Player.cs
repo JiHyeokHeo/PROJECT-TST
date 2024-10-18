@@ -1,18 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEditor.Animations;
 using UnityEngine;
 
 public class Player : Creature
 {
-    // Start is called before the first frame update
-    void Start()
+    public override bool Init()
     {
-        
+        if (base.Init() == false)
+            return false;
+
+
+        return true;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Update()
     {
-        
+    }
+
+
+    protected override void AnimPlayIdle()
+    {
+        CAnimator.SetFloat("idle_run_ratio", 1.0f);
+        CAnimator.Play("Idle_Run");
     }
 }
