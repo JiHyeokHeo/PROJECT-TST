@@ -13,6 +13,7 @@ public class Creature : BaseObject
     Animator _animator;
     ECharactorState _creatureState;
     Coroutine _fsmState;
+    Rigidbody _rigidBody;
 
     public Animator CAnimator
     {
@@ -37,6 +38,12 @@ public class Creature : BaseObject
         private set { }
     }
 
+    public Rigidbody RigidBody
+    {
+        get { return _rigidBody; }
+        set { _rigidBody = value; }
+    }
+
     public override bool Init()
     {
         if (base.Init() == false)
@@ -44,7 +51,7 @@ public class Creature : BaseObject
 
         CAnimator = GetComponent<Animator>();
         FsmState = StartCoroutine(ICoroutineAI());
-
+        RigidBody = GetComponent<Rigidbody>();
 
         CreatureState = ECharactorState.Idle;
         return true;

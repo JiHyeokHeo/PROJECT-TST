@@ -9,7 +9,7 @@ public class DevScene : BaseScene
         if (base.Init() == false)
             return false;
 
-        Managers.Resources.Instantiate("Y Bot");
+        //Managers.Resources.Instantiate("Y Bot");
 
 
         return true;
