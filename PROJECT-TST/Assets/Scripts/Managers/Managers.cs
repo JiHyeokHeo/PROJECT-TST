@@ -10,7 +10,9 @@ public class Managers : MonoBehaviour
     private static Managers Instance { get { Init(); return s_Instance; } }
 
     #region Contents
+    private GameManager _gameManager = new GameManager();
 
+    public static GameManager GameManager { get { return Instance?._gameManager; } }
     #endregion
 
     #region Core
