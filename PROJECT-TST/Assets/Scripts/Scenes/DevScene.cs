@@ -9,8 +9,8 @@ public class DevScene : BaseScene
         if (base.Init() == false)
             return false;
 
-        Managers.GameManager.VirtualCamera = Managers.Resources.Instantiate("Virtual Camera");
-        Managers.GameManager.Player = Managers.Resources.Instantiate("Y Bot");
+        //Managers.GameManager.VirtualCamera = Managers.Resources.Instantiate("Virtual Camera");
+        //Managers.GameManager.Player = Managers.Resources.Instantiate("Y Bot");
 
 
         return true;
