@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static Defines.Define;
 
 public interface IController
 {
@@ -11,35 +12,28 @@ public interface IController
     void Move();
 }
 
-public class PlayerController : InitBase, IController
+public class PlayerController : BaseController, IController
 {
-    Creature _owner;
-    Rigidbody _rigidbody;
-
-    float moveSpeed = 10.0f;
-    Vector3 _moveDir;
-
-    public Creature Owner
-    {
-        get { return _owner; } 
-        set { _owner = value; }
-    }
-
-    public InputActionAsset inputActionAsset;
-    private InputAction moveAction;
+    protected float _moveSpeed = 10.0f;
+    //InputAction _moveAction;
     public override bool Init()
     {
         if (base.Init() == false)
             return false;
 
-        moveAction = GetComponent<PlayerInput>().actions["Move"];
+        SetPlayerInputAction("Move");
+        EnableAction("Move");
+        GetPlayerInputAction("Move").BindActions((context) =>
+        {
+            _moveDir = context.ReadValue<Vector2>();
+            Debug.Log("Move input: " + _moveDir);
+        }, EInputActionType.Performed);
 
-        // 추후 액션 관리 매니저가 필요해보임
-        //moveAction = inputActionAsset.FindAction("Inputs/PlayerControls/Move", throwIfNotFound: true);
-        moveAction.Enable();
+        GetPlayerInputAction("Move").BindActions((context) =>
+        {
+            Debug.Log("Movement stopped.");
+        }, EInputActionType.Canceled);
 
-        moveAction.performed += OnMovePerformed;
-        moveAction.canceled += OnMoveCanceled;
         return true;
     }
 
@@ -54,9 +48,9 @@ public class PlayerController : InitBase, IController
         Debug.Log("Movement stopped.");
     }
 
-    private void OnDisable()
+    protected override void OnDisable()
     {
-        moveAction.Disable();
+        GetPlayerInputAction("Move").Disable();
     }
 
     public void SetInfo()
@@ -113,7 +107,7 @@ public class PlayerController : InitBase, IController
 
     public void Move()
     {
-        _rigidbody.velocity = new Vector3(_moveDir.x * moveSpeed, 0,  _moveDir.y * moveSpeed);
+        _rigidbody.velocity = new Vector3(_moveDir.x * _moveSpeed, 0,  _moveDir.y * _moveSpeed);
     }
 
     //private Vector3 ClampForce(Vector3 force, float maxForce)

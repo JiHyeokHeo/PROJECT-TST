@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Define
+namespace Defines
 {
     public static class Define
     {
@@ -22,6 +22,20 @@ namespace Define
 
 
             End = 16,
+        }
+
+        public enum EInputType
+        {
+            KeyBoard,
+            Mouse,
+            None,
+        }
+
+        public enum EInputActionType
+        {
+            Performed,
+            Canceled,
+            None,
         }
     }
 

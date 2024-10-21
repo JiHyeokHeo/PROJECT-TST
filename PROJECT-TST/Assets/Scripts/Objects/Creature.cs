@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-using static Define.Define;
+using static Defines.Define;
 
 public class Creature : BaseObject
 {
