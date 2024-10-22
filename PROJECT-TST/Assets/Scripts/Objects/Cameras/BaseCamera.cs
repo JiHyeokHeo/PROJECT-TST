@@ -3,10 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TCamera : InitBase
+public abstract class BaseCamera : InitBase
 {
-    CinemachineVirtualCamera _virtualCamera;
-    // Start is called before the first frame update
+    protected CinemachineVirtualCamera _virtualCamera;
 
     public override bool Init()
     {
@@ -17,7 +16,9 @@ public class TCamera : InitBase
         return true;
     }
 
-    public void SetFollowTarget(GameObject go)
+    public virtual void SetInfo() { }
+
+    public virtual void SetFollowTarget(GameObject go)
     {
         _virtualCamera.Follow = go.transform;
     }

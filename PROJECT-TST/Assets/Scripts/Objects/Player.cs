@@ -16,11 +16,11 @@ public class Player : Creature
         _controller = this.GetOrAddComponent<PlayerController>();
         _controller.SetInfo();
 
-        Managers.GameManager.SetCameraTarget(gameObject);
+        //Managers.GameManager.SetCameraTarget<TPSCamera>(gameObject);
         return true;
     }
 
-    void FixedUpdate()
+    void Update()
     {
         _controller.Move();
     }

@@ -3,10 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
-{
+public class GameManager
+{ 
     GameObject _vcamera;
     GameObject _player;
+    //private List<GameObject> _virtualCameras = new List<GameObject>();
+
     public GameObject VirtualCamera
     {
         get { return _vcamera; }
@@ -19,25 +21,22 @@ public class GameManager : MonoBehaviour
         set {  _player = value; }
     }
 
-
-    void Start()
+    public T SetCameraTarget<T>(GameObject target) where T : BaseCamera
     {
-        
-    }
+        if (VirtualCamera.IsValid() == false)
+            return null;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+        GameObject followShoulderTarget = Util.FindChild(target, name: "FollowTarget", true);
+        if (followShoulderTarget == null)
+        {
+            GameObject go = new GameObject();
+            go.name = "FollowTarget";
+            go.transform.parent = target.transform;
+        }
 
-    public bool SetCameraTarget(GameObject target)
-    {
-        if (VirtualCamera == null)
-            return false;
-
-        VirtualCamera.GetComponent<TCamera>().SetFollowTarget(target);
-
-        return true;
+        // 추후 1인칭 추가 할때도 문제 없게 하기 위해
+        VirtualCamera.GetComponent<T>().SetFollowTarget(followShoulderTarget);
+        VirtualCamera.GetComponent<T>().SetInfo();
+        return null;
     }
 }

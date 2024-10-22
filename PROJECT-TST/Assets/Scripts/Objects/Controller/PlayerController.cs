@@ -5,6 +5,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static Defines.Define;
+using static UnityEditor.PlayerSettings;
 
 public interface IController
 {
@@ -15,39 +16,49 @@ public interface IController
 public class PlayerController : BaseController, IController
 {
     protected float _moveSpeed = 10.0f;
-    //InputAction _moveAction;
+    GameObject _followTarget;
+    Vector2 _mousePos = Vector2.zero;
+    Vector2 _look = Vector2.zero;
     public override bool Init()
     {
         if (base.Init() == false)
             return false;
 
+        _followTarget = Util.FindChild(gameObject, "FollowTarget", true);
+        _followTarget.transform.SetPositionAndRotation(new Vector3(0, 1, -3), Quaternion.identity); 
         SetPlayerInputAction("Move");
         EnableAction("Move");
         GetPlayerInputAction("Move").BindActions((context) =>
         {
             _moveDir = context.ReadValue<Vector2>();
-            Debug.Log("Move input: " + _moveDir);
-        }, EInputActionType.Performed);
+      
 
-        GetPlayerInputAction("Move").BindActions((context) =>
-        {
-            Debug.Log("Movement stopped.");
-        }, EInputActionType.Canceled);
+        }, EInputActionType.Performed);
 
         return true;
     }
 
-    private void OnMovePerformed(InputAction.CallbackContext context)
+    // InputSystem 활용
+    void OnRotation(InputValue value)
     {
-        _moveDir = context.ReadValue<Vector2>();
-        Debug.Log("Move input: " + _moveDir);
-    }
+        Vector2 mouseDelta = value.Get<Vector2>();
 
-    private void OnMoveCanceled(InputAction.CallbackContext context)
-    {
-        Debug.Log("Movement stopped.");
-    }
+        Vector3 targetVelocity = new Vector3(_moveDir.x * _moveSpeed, _rigidbody.velocity.y, _moveDir.y * _moveSpeed);
+        _rigidbody.velocity = Vector3.Lerp(_rigidbody.velocity, targetVelocity, Time.deltaTime * _moveSpeed);
 
+        // 델타 값이 있을 때만 회전 처리
+        if (mouseDelta != Vector2.zero)
+        {
+            //X축은 수평 회전(yaw), Y축은 수직 회전(pitch)
+            _look.x += mouseDelta.x * 500.0f * Time.deltaTime;
+            _look.y -= mouseDelta.y * 500.0f * Time.deltaTime;
+
+            // 회전 적용 (Euler 방식) 
+            // 카메라 전환을 위해 플레이어 x축만 고정, _followTarget x,y축 자유)
+            _followTarget.transform.rotation = Quaternion.Euler(-_look.y, _look.x, 0);
+            transform.rotation = Quaternion.Euler(0, _look.x, 0);
+        }
+    }
     protected override void OnDisable()
     {
         GetPlayerInputAction("Move").Disable();
@@ -59,63 +70,16 @@ public class PlayerController : BaseController, IController
 
         if (Owner != null)
             _rigidbody = Owner.GetOrAddComponent<Rigidbody>();
-        
     }
 
-    //#region LegacyMoveCode
-    //public void Move()
-    //{
-
-    //    if (Owner == null)
-    //    {
-    //        Debug.Log("Owner is Missing");
-    //        return;
-    //    }
-
-    //    Debug.Log(Owner.RigidBody.velocity.magnitude);
-    //    // AddForce는 물리 업데이트에서 처리되어야 함
-    //    Vector3 force = Vector3.zero;
-
-    //    // 입력에 따른 힘 적용
-    //    if (Input.GetKey(KeyCode.A))
-    //    {
-    //        force += new Vector3(-_force, 0, 0);
-    //    }
-
-    //    if (Input.GetKey(KeyCode.D))
-    //    {
-    //        force += new Vector3(_force, 0, 0);
-    //    }
-
-    //    if (Input.GetKey(KeyCode.W))
-    //    {
-    //        force += new Vector3(0, 0, _force);
-    //    }
-
-    //    if (Input.GetKey(KeyCode.S))
-    //    {
-    //        force += new Vector3(0, 0, -_force);
-    //    }
-
-    //    // 힘을 최대값으로 제한
-    //    force = ClampForce(force, _maxForce);
-
-    //    // 제한된 힘을 Rigidbody에 적용
-    //    Owner.RigidBody.AddRelativeForce(force, ForceMode.VelocityChange);
-    //}
-    //#endregion
-
+    
     public void Move()
     {
-        _rigidbody.velocity = new Vector3(_moveDir.x * _moveSpeed, 0,  _moveDir.y * _moveSpeed);
+        Vector3 movePos = new Vector3(_moveDir.x, 0, _moveDir.y);
+
+        Owner.SetPosition(movePos, _moveSpeed);
     }
 
-    //private Vector3 ClampForce(Vector3 force, float maxForce)
-    //{
-    //    if (force.magnitude > maxForce)
-    //    {
-    //        return force.normalized * maxForce;
-    //    }
-    //    return force;
-    //}
+    public Vector3 _targetVelocity = Vector3.zero;
+
 }

@@ -32,7 +32,6 @@ public class ResourceManager
         GameObject origin = Load<GameObject>($"Prefabs/{path}");
         if (origin == null)
         {
-
             Debug.Log($"Failed to load prefab : {path}");
             return null;
         }
