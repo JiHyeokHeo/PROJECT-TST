@@ -24,6 +24,7 @@ public abstract class BaseController : InitBase
     protected List<InputAction> _activeActions = new List<InputAction>();
 
     protected abstract void OnDisable();
+    protected abstract void OnEnable();
 
     protected InputAction SetPlayerInputAction(string name, EInputType type = EInputType.KeyBoard)
     {
@@ -61,5 +62,43 @@ public abstract class BaseController : InitBase
 
         _activeActions.Add(GetPlayerInputAction(name));
         action.Enable();
+    }
+
+    public void BindActions(InputAction act, Action<InputAction.CallbackContext> action, EInputActionType actionType)
+    {
+        switch (actionType)
+        {
+            case EInputActionType.Performed:
+                act.performed += action;
+                break;
+            case EInputActionType.Canceled:
+                act.canceled += action;
+                break;
+            case EInputActionType.None:
+                break;
+
+        }
+    }
+
+    protected void EnableAllActions()
+    {
+        if (_activeActions.Count == 0)
+            return;
+
+        foreach (InputAction act in _activeActions) 
+        {
+            act.Enable();
+        }
+    }
+
+    protected void DisableAllActions()
+    {
+        if (_activeActions.Count == 0)
+            return;
+
+        foreach (var act in _activeActions)
+        {
+            act.Disable();
+        }
     }
 }

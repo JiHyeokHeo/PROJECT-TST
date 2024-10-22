@@ -14,22 +14,6 @@ public static class Extension
         return Util.GetOrAddComponent<T>(go);
     }
 
-    public static void BindActions(this InputAction act, Action<InputAction.CallbackContext> action, EInputActionType actionType)
-    {
-        switch (actionType)
-        {
-            case EInputActionType.Performed:
-                act.performed += action;
-                break;
-            case EInputActionType.Canceled:
-                act.canceled += action;
-                break;
-            case EInputActionType.None:
-                break;
-
-        }
-    }
-
     public static bool IsValid(this GameObject go) 
     {
         return go != null && go.activeSelf;

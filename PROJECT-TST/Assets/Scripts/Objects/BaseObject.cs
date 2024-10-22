@@ -46,7 +46,7 @@ public class BaseObject : InitBase
 
     }
 
-    public virtual void SetPosition(Vector3 dir, float moveSpeed)
+    public virtual void SetPositionByLocalDirection(Vector3 dir, float moveSpeed)
     {
         Vector3 localDir = transform.TransformDirection(dir);
 
