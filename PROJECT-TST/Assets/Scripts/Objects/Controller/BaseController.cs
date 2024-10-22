@@ -8,6 +8,8 @@ using static Defines.Define;
 
 public abstract class BaseController : InitBase
 {
+    // 여기에 추후 Scriptable 데이터 필요
+
     protected Creature _owner;
     protected Rigidbody _rigidbody;
 
@@ -25,6 +27,15 @@ public abstract class BaseController : InitBase
 
     protected abstract void OnDisable();
     protected abstract void OnEnable();
+
+    public override bool Init()
+    {
+        if (base.Init() == false)
+            return false;
+
+        return true;
+    }
+
 
     protected InputAction SetPlayerInputAction(string name, EInputType type = EInputType.KeyBoard)
     {

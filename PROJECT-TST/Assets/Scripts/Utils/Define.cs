@@ -41,3 +41,14 @@ namespace Defines
 
 }
 
+// HARDCODING 추후 ScriptableObject로 변경 예정    [SerializeField]
+
+public static class HARDCODING
+{
+    public static float MOVESPEEDTEMP = 5.0f;
+    public static float ANGLELIMITTEMP = 60.0f;
+    public static float ROTATIONSPEEDTEMP = 250.0f;
+}
+
+
+

@@ -46,10 +46,10 @@ public class BaseObject : InitBase
 
     }
 
-    public virtual void SetPositionByLocalDirection(Vector3 dir, float moveSpeed)
+    public virtual void SetPositionByLocalDirection(Vector3 dir, float MOVESPEEDTEMP)
     {
         Vector3 localDir = transform.TransformDirection(dir);
 
-        transform.position += moveSpeed * localDir.normalized * Time.deltaTime;
+        transform.position += MOVESPEEDTEMP * localDir.normalized * Time.deltaTime;
     }
 }

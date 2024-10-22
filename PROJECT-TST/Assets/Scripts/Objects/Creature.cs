@@ -90,7 +90,7 @@ public class Creature : BaseObject
             }
 
             // 시간 조절
-            yield return seconds;
+            yield return null;
         }
     }
 

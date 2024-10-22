@@ -35,8 +35,12 @@ public class GameManager
         }
 
         // 추후 1인칭 추가 할때도 문제 없게 하기 위해
-        VirtualCamera.GetComponent<T>().SetFollowTarget(followShoulderTarget);
-        VirtualCamera.GetComponent<T>().SetInfo();
-        return null;
+        BaseCamera camComponent = VirtualCamera.GetComponent<T>();
+        if (camComponent == null)
+            return null;
+      
+        camComponent.SetInfo(followShoulderTarget, target);
+
+        return camComponent as T;
     }
 }

@@ -14,25 +14,23 @@ public class TPSCamera : BaseCamera
         return true;
     }
 
-    public override void SetInfo()
+    public override void SetInfo(GameObject followTarget, GameObject lookatTarget)
     {
-        CinemachineFramingTransposer hardLockToTarget = _virtualCamera.GetCinemachineComponent<CinemachineFramingTransposer>();
+        // 일단 TPS 전용 타겟 설정
+        _followTarget = followTarget;
+        _lookAtTarget = lookatTarget;
+        SetTPSTarget(followTarget, lookatTarget);
+
+        Cinemachine3rdPersonFollow thirdPersonFollow = _virtualCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
+        if (thirdPersonFollow == null)
+        {
+            thirdPersonFollow = _virtualCamera.AddCinemachineComponent<Cinemachine3rdPersonFollow>();
+        }
+
+        CinemachineHardLookAt hardLockToTarget = _virtualCamera.GetCinemachineComponent<CinemachineHardLookAt>();
         if (hardLockToTarget == null)
         {
-            hardLockToTarget = _virtualCamera.AddCinemachineComponent<CinemachineFramingTransposer>();
+            hardLockToTarget = _virtualCamera.AddCinemachineComponent<CinemachineHardLookAt>();
         }
-    }
-
-    Vector2 turn = Vector2.zero;
-    public void LateUpdate()
-    {
-        turn.x += Input.GetAxis("Mouse X");
-        turn.y += Input.GetAxis("Mouse Y");
-        transform.localRotation = Quaternion.Euler(-turn.y, turn.x, 0);
-    }
-
-    public override void SetFollowTarget(GameObject go)
-    {
-        base.SetFollowTarget(go);
     }
 }

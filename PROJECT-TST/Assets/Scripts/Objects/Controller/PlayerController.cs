@@ -6,30 +6,30 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using static Defines.Define;
 using static UnityEditor.PlayerSettings;
+using static HARDCODING;
 
 public interface IController
 {
+    // 각 컨트롤러에 Owner세팅
     void SetInfo();
     void Move();
 }
 
 public class PlayerController : BaseController, IController
 {
-    [SerializeField]
-    protected float _moveSpeed = 5.0f;
-    [SerializeField]
-    protected float AngleLimit = 60.0f;
-    
-
     GameObject _followTarget;
-   
+    Vector2 _look = Vector2.zero;
+
     public override bool Init()
     {
         if (base.Init() == false)
             return false;
 
         _followTarget = Util.FindChild(gameObject, "FollowTarget", true);
-        _followTarget.transform.position = new Vector3(0, 1, -3); 
+        _followTarget.transform.position = new Vector3(0, 1, -3);
+
+        // 0 번 TPS 카메라, 1번 FPS 카메라, 2번 줌 카메라 등등 etc 카메라 매니저가 필요할듯? 임시로 게임 매니저
+        Managers.GameManager.SetCameraTarget<TPSCamera>(gameObject);
 
         SetPlayerInputAction("Move");
         EnableAction("Move");
@@ -41,8 +41,12 @@ public class PlayerController : BaseController, IController
         return true;
     }
 
-    // InputSystem 활용
-    Vector2 _look = Vector2.zero;
+    public void SetInfo()
+    {
+        Owner = GetComponent<Player>();
+    }
+
+    // InputSystem 활용 
     void OnRotation(InputValue value)
     {
         Vector2 mouseDelta = value.Get<Vector2>();
@@ -51,10 +55,10 @@ public class PlayerController : BaseController, IController
         if (mouseDelta != Vector2.zero)
         {
             //X축은 수평 회전(yaw), Y축은 수직 회전(pitch)
-            _look.x += mouseDelta.x * 250.0f * Time.deltaTime;
-            _look.y -= mouseDelta.y * 250.0f * Time.deltaTime;
+            _look.x += mouseDelta.x * ROTATIONSPEEDTEMP * Time.deltaTime;
+            _look.y -= mouseDelta.y * ROTATIONSPEEDTEMP * Time.deltaTime;
 
-            _look.y = Mathf.Clamp(_look.y, -AngleLimit, AngleLimit);
+            _look.y = Mathf.Clamp(_look.y, -ANGLELIMITTEMP, ANGLELIMITTEMP);
             // 회전 적용 (Euler 방식) 
             // 카메라 전환을 위해 플레이어 x축만 고정, _followTarget x,y축 자유)
             _followTarget.transform.rotation = Quaternion.Euler(-_look.y, _look.x, 0);
@@ -74,22 +78,10 @@ public class PlayerController : BaseController, IController
         DisableAllActions();
     }
 
-    public void SetInfo()
-    {
-        Owner = GetComponent<Player>();
-
-        if (Owner != null)
-            _rigidbody = Owner.GetOrAddComponent<Rigidbody>();
-    }
-
-    
     public void Move()
     {
         Vector3 moveDirLocal = new Vector3(_moveDir.x, 0, _moveDir.y);
 
         Owner.SetPositionByLocalDirection(moveDirLocal, 5.0f);
     }
-
-    public Vector3 _targetVelocity = Vector3.zero;
-
 }
