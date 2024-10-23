@@ -12,6 +12,8 @@ public abstract class BaseController : InitBase
 
     protected Creature _owner;
     protected Rigidbody _rigidbody;
+    float _sqrMoveMagnitude = 0.0f;
+    float _sqrinputMagnitude = 0.0f;
 
     public Creature Owner
     {
@@ -19,7 +21,17 @@ public abstract class BaseController : InitBase
         set { _owner = value; }
     }
 
-    protected Vector3 _moveDir;
+    public float SqrMoveManitude
+    {
+        get { return _sqrMoveMagnitude; }
+        set { _sqrMoveMagnitude = value; }
+    }
+
+    public float SqrInputMagnitude
+    {
+        get { return _sqrinputMagnitude; }
+        set { _sqrinputMagnitude = value; }
+    }
 
     protected InputActionAsset _inputActionAsset;
     protected Dictionary<string, InputAction> _playerKeyBoardInputDic = new Dictionary<string, InputAction>();
@@ -36,6 +48,7 @@ public abstract class BaseController : InitBase
         return true;
     }
 
+    public virtual void SetInfo() { }
 
     protected InputAction SetPlayerInputAction(string name, EInputType type = EInputType.KeyBoard)
     {

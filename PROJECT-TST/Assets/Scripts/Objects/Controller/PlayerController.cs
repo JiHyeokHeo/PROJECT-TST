@@ -11,7 +11,6 @@ using static HARDCODING;
 public interface IController
 {
     // 각 컨트롤러에 Owner세팅
-    void SetInfo();
     void Move();
 }
 
@@ -33,15 +32,26 @@ public class PlayerController : BaseController, IController
 
         SetPlayerInputAction("Move");
         EnableAction("Move");
+
+        // 인풋에 관한 이벤트 함수
         BindActions(GetPlayerInputAction("Move"), (context) =>
         {
-            _moveDir = context.ReadValue<Vector2>();
+            Owner.Dir = context.ReadValue<Vector2>();
+            SqrInputMagnitude += context.ReadValue<Vector2>().sqrMagnitude;
+            Debug.Log(Owner.Dir);
         }, EInputActionType.Performed);
 
+        // 플레이어 컨트롤 액션 Interaction Trigger Event 라이프 사이클 관련
+        // https://docs.unity3d.com/Packages/com.unity.inputsystem@1.4/manual/Interactions.html
+        BindActions(GetPlayerInputAction("Move"), (context) =>
+        {
+            SqrInputMagnitude = 0;
+            Debug.Log(SqrInputMagnitude);
+        }, EInputActionType.Canceled);
         return true;
     }
 
-    public void SetInfo()
+    public override void SetInfo()
     {
         Owner = GetComponent<Player>();
     }
@@ -80,8 +90,18 @@ public class PlayerController : BaseController, IController
 
     public void Move()
     {
-        Vector3 moveDirLocal = new Vector3(_moveDir.x, 0, _moveDir.y);
+        Vector3 moveDirLocal = new Vector3(Owner.Dir.x, 0, Owner.Dir.y);
 
-        Owner.SetPositionByLocalDirection(moveDirLocal, 5.0f);
+        // 애니메이션 이동 속도 조절
+        SqrMoveManitude += moveDirLocal.sqrMagnitude * MOVESPEEDTEMP * Time.deltaTime;
+        SqrMoveManitude = Mathf.Clamp(SqrMoveManitude, 0, 1);
+
+        Owner.SetPositionByLocalDirection(moveDirLocal, MOVESPEEDTEMP);
+    }
+
+    public void Idle()
+    {
+        // 멈추면 
+      
     }
 }

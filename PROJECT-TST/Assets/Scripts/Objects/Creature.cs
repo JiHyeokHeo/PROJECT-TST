@@ -15,6 +15,7 @@ public class Creature : BaseObject
     Coroutine _fsmState;
     Rigidbody _rigidBody;
 
+
     public Animator CAnimator
     {
         get { return _animator; }
@@ -53,7 +54,6 @@ public class Creature : BaseObject
         FsmState = StartCoroutine(ICoroutineAI());
         RigidBody = GetComponent<Rigidbody>();
 
-        CreatureState = ECharactorState.Idle;
         return true;
     }
 
