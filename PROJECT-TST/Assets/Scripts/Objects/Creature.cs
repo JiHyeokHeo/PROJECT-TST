@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-using static Define.Define;
+using static Defines.Define;
 
 public class Creature : BaseObject
 {
@@ -13,8 +13,10 @@ public class Creature : BaseObject
     Animator _animator;
     ECharactorState _creatureState;
     Coroutine _fsmState;
+    Rigidbody _rigidBody;
 
-    public Animator Animator
+
+    public Animator CAnimator
     {
         get { return _animator; }
         set { _animator = value; }
@@ -37,13 +39,21 @@ public class Creature : BaseObject
         private set { }
     }
 
+    public Rigidbody RigidBody
+    {
+        get { return _rigidBody; }
+        set { _rigidBody = value; }
+    }
+
     public override bool Init()
     {
         if (base.Init() == false)
             return false;
 
-        _animator = GetComponent<Animator>();
-        _fsmState = StartCoroutine(ICoroutineAI());
+        CAnimator = GetComponent<Animator>();
+        FsmState = StartCoroutine(ICoroutineAI());
+        RigidBody = GetComponent<Rigidbody>();
+
         return true;
     }
 
@@ -80,7 +90,7 @@ public class Creature : BaseObject
             }
 
             // 시간 조절
-            yield return seconds;
+            yield return null;
         }
     }
 
@@ -121,18 +131,54 @@ public class Creature : BaseObject
         switch (CreatureState) 
         {
             case ECharactorState.Idle:
+                AnimPlayIdle();
                 break;
             case ECharactorState.Move:
+                AnimPlayMove();
                 break;
             case ECharactorState.Attack:
+                AnimPlayAttack();
                 break;
             case ECharactorState.Skill:
+                AnimPlaySkill();
                 break;
             case ECharactorState.Damaged:
+                AnimPlayDamaged();
                 break;
             case ECharactorState.Die:
+                AnimPlayDie();
                 break;
         }
+    }
+
+    protected virtual void AnimPlayIdle()
+    {
+
+    }
+
+    protected virtual void AnimPlayMove()
+    {
+
+    }
+
+    protected virtual void AnimPlayAttack()
+    {
+
+    }
+
+    protected virtual void AnimPlaySkill()
+    {
+
+    }
+
+    protected virtual void AnimPlayDamaged()
+    {
+
+    }
+
+    protected virtual void AnimPlayDie()
+    {
+
     }
 
     public override void Clear() 

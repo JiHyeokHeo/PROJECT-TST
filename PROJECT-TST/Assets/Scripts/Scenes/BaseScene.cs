@@ -1,5 +1,7 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -18,6 +20,10 @@ public abstract class BaseScene : InitBase
             go.AddComponent<StandaloneInputModule>();
         }
 
+        if (Camera.main != null)
+            Camera.main.GetOrAddComponent<CinemachineBrain>();
+
+        
         return true;
     }
 
