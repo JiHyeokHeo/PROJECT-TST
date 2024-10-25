@@ -13,6 +13,8 @@ namespace TST
         public float topClampLimit = 80;
         public float bottomClampLimit = -80;
 
+        private float pitch = 0f;
+
         private void Awake()
         {
             linkedCharacter = GetComponent<CharacterBase>();
@@ -25,7 +27,7 @@ namespace TST
 
             float mouseX = Input.GetAxis("Mouse X");
             float mouseY = Input.GetAxis("Mouse Y");
-
+            Debug.Log(mouseY);
             if (Input.GetKeyDown(KeyCode.Tab))
             {
                 CameraSystem.Instance.IsCameraSideOnRight = !CameraSystem.Instance.IsCameraSideOnRight;
@@ -51,10 +53,8 @@ namespace TST
                 linkedCharacter.Shoot();
             }
 
-            cameraPivot.eulerAngles = new Vector3(
-                Mathf.Clamp(cameraPivot.eulerAngles.x - mouseY, bottomClampLimit, topClampLimit),
-                cameraPivot.eulerAngles.y,
-                cameraPivot.eulerAngles.z);
+            pitch -= mouseY;
+            cameraPivot.localRotation = Quaternion.Euler(Mathf.Clamp(pitch, bottomClampLimit, topClampLimit), 0, 0);
 
             linkedCharacter.Move(new Vector2(inputX, inputY));
             linkedCharacter.Rotate(mouseX);
