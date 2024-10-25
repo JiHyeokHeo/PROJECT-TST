@@ -748,7 +748,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   firePoint: {fileID: 569170400}
   fireRate: 0.1
-  clipSize: 30
+  clipSize: 10
   bulletPrefab: {fileID: 1868914696}
   bulletSpeed: 10
   bulletLifeTime: 3
@@ -1661,8 +1661,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   linkedCharacter: {fileID: 0}
   cameraPivot: {fileID: 738264079}
-  topClampLimit: 80
-  bottomClampLimit: -80
+  topClampLimit: 40
+  bottomClampLimit: -40
 --- !u!114 &1740385996
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1680,7 +1680,10 @@ MonoBehaviour:
   weapon: {fileID: 710556743}
   offsetPosition: {x: -0.08, y: 0, z: 0}
   offsetRotation: {x: 0, y: -90, z: 0}
+  walkSpeed: 1
   moveSpeed: 2
+  runSpeed: 2.1
+  sprintSpeed: 3.5
   rotateSpeed: 180
 --- !u!4 &1740385998 stripped
 Transform:

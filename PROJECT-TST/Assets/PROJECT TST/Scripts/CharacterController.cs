@@ -60,12 +60,17 @@ namespace TST
             
             if (Input.GetKeyDown(KeyCode.CapsLock))
             {
-                linkedCharacter.IsAutoMove = !linkedCharacter.IsAutoMove;
+                linkedCharacter.IsWalkMode = !linkedCharacter.IsWalkMode;
             }
 
             if (Input.GetMouseButton(0))
             {
                 linkedCharacter.Shoot();
+            }
+
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                linkedCharacter.Reload();
             }
 
             pitch -= mouseY;

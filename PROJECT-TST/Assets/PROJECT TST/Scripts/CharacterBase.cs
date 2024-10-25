@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace TST
@@ -12,6 +13,7 @@ namespace TST
             set
             {
                 isArmed = value;
+                ResetOptions(); // 추후 바뀔 수 있을듯?
                 weapon.gameObject.SetActive(isArmed);
             }
         }
@@ -25,7 +27,9 @@ namespace TST
         public Vector3 offsetPosition;
         public Vector3 offsetRotation;
 
+        public float walkSpeed = 1f;
         public float moveSpeed = 2f;
+        public float runSpeed = 2.1f;
         public float sprintSpeed = 5f;
         public float rotateSpeed = 5f;
 
@@ -33,12 +37,14 @@ namespace TST
         private float vertical;
         private float speedBlend;
         private float armedBlend;
+        private float reloadBlend;
 
         private float targetSpeed;
         private float targetHorizontal;
         private float targetVertical;
 
         #region Tory
+        // FSM 으로 추후 변경이 필요해보임
         public bool IsSprint
         {
             get => isSprint;
@@ -48,17 +54,28 @@ namespace TST
             }
         }
 
-        public bool IsAutoMove
+        public bool IsWalkMode
         {
-            get => isAutoMove;
+            get => isWalkMode;
             set
             {
-                isAutoMove = value;
+                isWalkMode = value;
+            }
+        }
+
+        // isReload 장전중이냐?
+        public bool IsReload
+        {
+            get => isReload;
+            set
+            {
+                isReload = value;
             }
         }
 
         private bool isSprint = false;
-        private bool isAutoMove = false;
+        private bool isWalkMode = false;
+        private bool isReload = false;
         #endregion
 
         private void Awake()
@@ -81,26 +98,27 @@ namespace TST
             speedBlend = Mathf.Lerp(speedBlend, targetSpeed, Time.deltaTime * 10f);
             horizontal = Mathf.Lerp(horizontal, targetHorizontal, Time.deltaTime * 10f);
             vertical = Mathf.Lerp(vertical, targetVertical, Time.deltaTime * 10f);
+            reloadBlend = Mathf.Lerp(reloadBlend, IsReload ? 1f : 0f, Time.deltaTime * 3f);
 
             animator.SetFloat("Armed", armedBlend);
             animator.SetFloat("Speed", speedBlend);
             animator.SetFloat("Horizontal", horizontal);
             animator.SetFloat("Vertical", vertical);
+            animator.SetFloat("Reload", reloadBlend);
+            animator.SetLayerWeight(1, reloadBlend);
         }
 
         public void Move(Vector2 input)
         {
-            // 입력 or 자동 움직임 On
-            if (input.magnitude > 0f || IsAutoMove)
+            if (input.magnitude > 0f)
             {
-                targetSpeed = IsSprint ? moveSpeed + 0.1f : moveSpeed;
-                targetHorizontal = IsAutoMove ? 1.0f : input.x;
-                targetVertical = IsAutoMove ? 1.0f : input.y;
+                targetSpeed = IsWalkMode ? walkSpeed : runSpeed;
+                targetHorizontal = input.x;
+                targetVertical = input.y;
 
                 // 수정 부분
-                Vector3 movement =  (
-                    ((transform.forward * (IsAutoMove ?  1.0f : input.y)) + transform.right * (IsAutoMove ? 1.0f : input.x)) 
-                    * (IsSprint ? sprintSpeed : moveSpeed) * Time.deltaTime );
+                Vector3 movement =  (transform.forward * input.y + transform.right * input.x) 
+                    * (IsSprint && !IsWalkMode ? sprintSpeed : moveSpeed) * Time.deltaTime;
                 unityCharacterController.Move(movement);
             }
             else
@@ -111,6 +129,12 @@ namespace TST
             }
         }
 
+        private void ResetOptions()
+        {
+            // 기본적으로 달리기 모드 설정
+            isWalkMode = false;
+        }
+
         public void Rotate(float rotation)
         {
             transform.Rotate(Vector3.up * rotation * rotateSpeed * Time.deltaTime);
@@ -118,7 +142,24 @@ namespace TST
 
         public void Shoot()
         {
-            weapon.Fire();
+            // 만약 총알이 0발이라면? Reload 
+            // 리로드 중 아닐때만
+            if (!IsReload)
+                weapon.Fire();
+            
+            if (weapon.CurrentAmmo <= 0)
+                Reload();
+        }
+
+        public void Reload()
+        {
+            weapon.Reload();
+            IsReload = true;
+        }
+
+        private void ReloadComplete()
+        {
+            IsReload = false;
         }
     }
 }

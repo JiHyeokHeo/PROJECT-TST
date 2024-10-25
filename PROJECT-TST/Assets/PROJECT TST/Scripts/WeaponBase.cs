@@ -7,8 +7,14 @@ namespace TST
     public class WeaponBase : MonoBehaviour
     {
         public Transform firePoint; // ÃÑ¾Ë ¹ß»ç À§Ä¡
-        public float fireRate; // ¿¬»ç ¼Óµµ
-        public int clipSize; // ÅºÃ¢ Å©±â[1ÅºÃ¢:ÃÑ¾Ë °¹¼ö]
+        public float fireRate = 0.1f; // ¿¬»ç ¼Óµµ
+        public int clipSize = 10; // ÅºÃ¢ Å©±â[1ÅºÃ¢:ÃÑ¾Ë °¹¼ö]
+
+        public int CurrentAmmo
+        {
+            get => currentAmmo;
+            private set { }
+        }
 
         private int currentAmmo; // ÇöÀç ÅºÃ¢¿¡ ³²Àº ÃÑ¾Ë ¼ö
         private float lastFireTime; // ¸¶Áö¸· ¹ß»ç ½Ã°£
@@ -23,12 +29,17 @@ namespace TST
             currentAmmo = clipSize;
         }
 
+        private void Update()
+        {
+            
+        }
+
         public void Fire()
         {
             if (currentAmmo > 0 && Time.time - lastFireTime >= fireRate)
             {
                 lastFireTime = Time.time;
-                //currentAmmo--;
+                currentAmmo--;
 
                 // TODO : ½ÇÁ¦ ÃÑ¾Ë º¹Á¦/¹ß»ç
                 Rigidbody newBullet = Instantiate(bulletPrefab, firePoint.transform.position, firePoint.transform.rotation);
