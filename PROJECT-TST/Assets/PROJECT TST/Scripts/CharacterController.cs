@@ -13,7 +13,12 @@ namespace TST
         public float topClampLimit = 80;
         public float bottomClampLimit = -80;
 
+        #region Tory
+
+
         private float pitch = 0f;
+
+        #endregion
 
         private void Awake()
         {
@@ -27,7 +32,7 @@ namespace TST
 
             float mouseX = Input.GetAxis("Mouse X");
             float mouseY = Input.GetAxis("Mouse Y");
-            Debug.Log(mouseY);
+            
             if (Input.GetKeyDown(KeyCode.Tab))
             {
                 CameraSystem.Instance.IsCameraSideOnRight = !CameraSystem.Instance.IsCameraSideOnRight;
@@ -48,13 +53,23 @@ namespace TST
                 linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
             }
 
+            if (Input.GetKeyDown(KeyCode.LeftShift))
+            {
+                linkedCharacter.IsSprint = !linkedCharacter.IsSprint;
+            }
+            
+            if (Input.GetKeyDown(KeyCode.CapsLock))
+            {
+                linkedCharacter.IsAutoMove = !linkedCharacter.IsAutoMove;
+            }
+
             if (Input.GetMouseButton(0))
             {
                 linkedCharacter.Shoot();
             }
 
             pitch -= mouseY;
-            cameraPivot.localRotation = Quaternion.Euler(Mathf.Clamp(pitch, bottomClampLimit, topClampLimit), 0, 0);
+            cameraPivot.localRotation = Quaternion.Euler(Mathf.Clamp(cameraPivot.localRotation.x + pitch, bottomClampLimit, topClampLimit), 0, 0);
 
             linkedCharacter.Move(new Vector2(inputX, inputY));
             linkedCharacter.Rotate(mouseX);

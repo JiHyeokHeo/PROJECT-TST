@@ -15,6 +15,7 @@ namespace TST
                 weapon.gameObject.SetActive(isArmed);
             }
         }
+
         private bool isArmed = false;
 
         public Animator animator;
@@ -25,6 +26,7 @@ namespace TST
         public Vector3 offsetRotation;
 
         public float moveSpeed = 2f;
+        public float sprintSpeed = 5f;
         public float rotateSpeed = 5f;
 
         private float horizontal;
@@ -32,8 +34,32 @@ namespace TST
         private float speedBlend;
         private float armedBlend;
 
+        private float targetSpeed;
         private float targetHorizontal;
         private float targetVertical;
+
+        #region Tory
+        public bool IsSprint
+        {
+            get => isSprint;
+            set
+            {
+                isSprint = value;
+            }
+        }
+
+        public bool IsAutoMove
+        {
+            get => isAutoMove;
+            set
+            {
+                isAutoMove = value;
+            }
+        }
+
+        private bool isSprint = false;
+        private bool isAutoMove = false;
+        #endregion
 
         private void Awake()
         {
@@ -51,9 +77,10 @@ namespace TST
 
         private void Update()
         {
+            armedBlend = Mathf.Lerp(armedBlend, IsArmed ? 1f : 0f, Time.deltaTime * 10f);
+            speedBlend = Mathf.Lerp(speedBlend, targetSpeed, Time.deltaTime * 10f);
             horizontal = Mathf.Lerp(horizontal, targetHorizontal, Time.deltaTime * 10f);
             vertical = Mathf.Lerp(vertical, targetVertical, Time.deltaTime * 10f);
-            armedBlend = Mathf.Lerp(armedBlend, IsArmed ? 1f : 0f, Time.deltaTime * 10f);
 
             animator.SetFloat("Armed", armedBlend);
             animator.SetFloat("Speed", speedBlend);
@@ -63,18 +90,22 @@ namespace TST
 
         public void Move(Vector2 input)
         {
-            if (input.magnitude > 0f)
+            // 입력 or 자동 움직임 On
+            if (input.magnitude > 0f || IsAutoMove)
             {
-                speedBlend = 1f;
-                targetHorizontal = input.x;
-                targetVertical = input.y;
+                targetSpeed = IsSprint ? moveSpeed + 0.1f : moveSpeed;
+                targetHorizontal = IsAutoMove ? 1.0f : input.x;
+                targetVertical = IsAutoMove ? 1.0f : input.y;
 
-                Vector3 movement = (transform.forward * input.y + transform.right * input.x) * moveSpeed * Time.deltaTime;
+                // 수정 부분
+                Vector3 movement =  (
+                    ((transform.forward * (IsAutoMove ?  1.0f : input.y)) + transform.right * (IsAutoMove ? 1.0f : input.x)) 
+                    * (IsSprint ? sprintSpeed : moveSpeed) * Time.deltaTime );
                 unityCharacterController.Move(movement);
             }
             else
             {
-                speedBlend = 0f;
+                targetSpeed = 0f;
                 targetHorizontal = 0f;
                 targetVertical = 0f;
             }
