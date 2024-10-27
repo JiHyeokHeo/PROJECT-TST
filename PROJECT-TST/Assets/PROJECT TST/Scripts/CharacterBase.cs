@@ -54,12 +54,25 @@ namespace TST
             }
         }
 
-        public bool IsWalkMode
+        public bool IsAutoRunMode
         {
-            get => isWalkMode;
+            get => isAutoRunMode;
             set
             {
-                isWalkMode = value;
+                if (value == false)
+                    IsWalk = false;
+                isAutoRunMode = value;
+            }
+        }
+
+        public bool IsWalk
+        {
+            get => isWalk;
+            set
+            {
+                // 자동 달리기 모드일 때만
+                if (IsAutoRunMode)
+                    isWalk = value;
             }
         }
 
@@ -74,8 +87,9 @@ namespace TST
         }
 
         private bool isSprint = false;
-        private bool isWalkMode = false;
+        private bool isAutoRunMode = false;
         private bool isReload = false;
+        private bool isWalk = false;
         #endregion
 
         private void Awake()
@@ -110,29 +124,42 @@ namespace TST
 
         public void Move(Vector2 input)
         {
-            if (input.magnitude > 0f)
+            if (IsAutoRunMode)
             {
-                targetSpeed = IsWalkMode ? walkSpeed : runSpeed;
+                targetSpeed = !IsWalk ? runSpeed : walkSpeed;
+                targetHorizontal = 0f;
+                targetVertical = 1.0f;
+
+                // 오직 정면만 돌진 // 이친구는 Run(스프린트 스피드) or Walk(워크스피드) 모드
+                Vector3 movement = (transform.forward * 1.0f)
+                * (!IsWalk ? sprintSpeed : moveSpeed) * Time.deltaTime;
+                unityCharacterController.Move(movement);
+            }
+
+            if (input.magnitude > 0f && !IsAutoRunMode)
+            {
+                // 자동달리기 켜져있으면 일단 스프린트 모드 On
+                targetSpeed = IsSprint ? runSpeed : walkSpeed;
                 targetHorizontal = input.x;
                 targetVertical = input.y;
 
-                // 수정 부분
                 Vector3 movement =  (transform.forward * input.y + transform.right * input.x) 
-                    * (IsSprint && !IsWalkMode ? sprintSpeed : moveSpeed) * Time.deltaTime;
+                    * (IsSprint ? sprintSpeed : moveSpeed) * Time.deltaTime;
                 unityCharacterController.Move(movement);
             }
             else
             {
-                targetSpeed = 0f;
-                targetHorizontal = 0f;
-                targetVertical = 0f;
+                IsSprint = false;
+                targetSpeed = IsAutoRunMode ? targetSpeed : 0f;
+                targetHorizontal = IsAutoRunMode ? targetHorizontal : 0f;
+                targetVertical = IsAutoRunMode ? targetVertical : 0f;
             }
         }
 
         private void ResetOptions()
         {
             // 기본적으로 달리기 모드 설정
-            isWalkMode = false;
+            //isWalk = false;
         }
 
         public void Rotate(float rotation)
@@ -144,9 +171,10 @@ namespace TST
         {
             // 만약 총알이 0발이라면? Reload 
             // 리로드 중 아닐때만
-            if (!IsReload)
-                weapon.Fire();
+            if (IsReload)
+                return;
             
+            weapon.Fire();
             if (weapon.CurrentAmmo <= 0)
                 Reload();
         }

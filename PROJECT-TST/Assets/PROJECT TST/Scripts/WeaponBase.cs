@@ -36,6 +36,9 @@ namespace TST
 
         public void Fire()
         {
+            if (gameObject.activeSelf == false)
+                return;
+
             if (currentAmmo > 0 && Time.time - lastFireTime >= fireRate)
             {
                 lastFireTime = Time.time;
@@ -51,6 +54,9 @@ namespace TST
 
         public void Reload()
         {
+            if (gameObject.activeSelf == false)
+                return;
+
             currentAmmo = clipSize;
         }
     }

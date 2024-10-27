@@ -58,9 +58,14 @@ namespace TST
                 linkedCharacter.IsSprint = !linkedCharacter.IsSprint;
             }
             
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                linkedCharacter.IsAutoRunMode = !linkedCharacter.IsAutoRunMode;
+            }
+
             if (Input.GetKeyDown(KeyCode.CapsLock))
             {
-                linkedCharacter.IsWalkMode = !linkedCharacter.IsWalkMode;
+                linkedCharacter.IsWalk = !linkedCharacter.IsWalk;
             }
 
             if (Input.GetMouseButton(0))
