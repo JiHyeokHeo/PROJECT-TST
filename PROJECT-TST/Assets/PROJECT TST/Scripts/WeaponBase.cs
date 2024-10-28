@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,6 +25,8 @@ namespace TST
         public float bulletSpeed;
         public float bulletLifeTime = 3f;
 
+
+
         private void Awake()
         {
             currentAmmo = clipSize;
@@ -49,6 +52,8 @@ namespace TST
                 newBullet.gameObject.SetActive(true);
                 newBullet.AddForce(firePoint.transform.forward * bulletSpeed, ForceMode.Impulse);
                 Destroy(newBullet.gameObject, bulletLifeTime);
+
+                EffectManager.Instance.effects[0].Activate(firePoint.transform.position, firePoint.transform.rotation);
             }
         }
 
@@ -58,6 +63,18 @@ namespace TST
                 return;
 
             currentAmmo = clipSize;
+        }
+
+        private void OnCollisionEnter(Collision collision)
+        {
+            if (collision == null) 
+                return;
+
+            // 접촉한 정보가 있다면 Effect 발사 & 총알 삭제
+            // 임시로 0번은 MuzzleFlash, 1번은 BrickImpact로 설정
+            EffectManager.Instance.effects[1].Activate(collision.transform.position, collision.transform.rotation);
+            
+            Destroy(this.gameObject);
         }
     }
 }
