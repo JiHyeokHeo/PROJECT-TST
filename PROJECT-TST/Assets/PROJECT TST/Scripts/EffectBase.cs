@@ -8,21 +8,15 @@ namespace TST
 {
     public class EffectBase : MonoBehaviour
     {
-        public float EffectPooledTime = 2.0f;
-
-        IEnumerator PushEffectPoolCoroutine()
-        {
-            yield return new WaitForSeconds(EffectPooledTime);
-            DeActivate();
-            StopCoroutine(PushEffectPoolCoroutine());
-        }
+        // 약간의 오프셋 체크 용 + lifeTime 조절로 Base가 있으면 좋을듯 싶어서 만들었습니다
+        // ProjectileBase Collision 쪽 관련.
+        // 총알이 벽에 닿을 시 총알 자국 남는 거 방향벡터 관련된 공부중..(Collision ContactPoint)
+        public Vector3 offSet = Vector3.zero;
+        public float lifeTime = 2.0f;
   
         public void Activate(Vector3 pos, Quaternion rotation)
         {
-            // 성공적으로 이펙트를 Pop 해왔다면 다시 
-            GameObject popObject = EffectManager.Instance.SpawnEffect(this.gameObject, pos, rotation);
-            if (popObject != null && popObject.activeSelf)
-                popObject.GetComponent<EffectBase>().StartPushEffectPoolCoroutine();
+            EffectManager.Instance.SpawnEffect(this.gameObject, pos + offSet, rotation);
         }
 
         public void Activate(Vector3 pos, Vector3 rotation)
@@ -30,14 +24,13 @@ namespace TST
             Activate(pos, Quaternion.Euler(rotation));
         }
 
-        private void DeActivate()
+        public bool UpdateEffectBase(float deltaTime)
         {
-            EffectManager.Instance.PushEffectToPool(this.gameObject);
-        }
+            lifeTime -= deltaTime;
+            if (lifeTime <= 0)
+                return true;
 
-        private void StartPushEffectPoolCoroutine()
-        {
-            StartCoroutine(PushEffectPoolCoroutine());
+            return false;
         }
     }
 }

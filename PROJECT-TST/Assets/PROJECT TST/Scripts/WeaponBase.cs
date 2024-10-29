@@ -25,8 +25,6 @@ namespace TST
         public float bulletSpeed;
         public float bulletLifeTime = 3f;
 
-
-
         private void Awake()
         {
             currentAmmo = clipSize;
@@ -73,8 +71,6 @@ namespace TST
             // 접촉한 정보가 있다면 Effect 발사 & 총알 삭제
             // 임시로 0번은 MuzzleFlash, 1번은 BrickImpact로 설정
             EffectManager.Instance.effects[1].Activate(collision.transform.position, collision.transform.rotation);
-            
-            Destroy(this.gameObject);
         }
     }
 }

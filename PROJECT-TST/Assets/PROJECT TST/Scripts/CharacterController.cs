@@ -15,7 +15,6 @@ namespace TST
 
         #region Tory
 
-
         private float pitch = 0f;
 
         #endregion
@@ -77,6 +76,7 @@ namespace TST
             {
                 linkedCharacter.Reload();
             }
+
 
             pitch -= mouseY;
             cameraPivot.localRotation = Quaternion.Euler(Mathf.Clamp(cameraPivot.localRotation.x + pitch, bottomClampLimit, topClampLimit), 0, 0);

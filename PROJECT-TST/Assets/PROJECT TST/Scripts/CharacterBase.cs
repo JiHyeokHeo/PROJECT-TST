@@ -185,6 +185,7 @@ namespace TST
             IsReload = true;
         }
 
+        // 애니메이션 이벤트
         private void ReloadComplete()
         {
             IsReload = false;

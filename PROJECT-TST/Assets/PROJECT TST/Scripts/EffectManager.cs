@@ -13,14 +13,12 @@ namespace TST
     //https://docs.unity3d.com/2022.3/Documentation/ScriptReference/Pool.ObjectPool_1.html
     class Pool
     {
-        Transform rootTransform;
         GameObject prefab;
         IObjectPool<GameObject> objectPool;
 
-        public Pool(GameObject prefab, Transform root)
+        public Pool(GameObject prefab)
         {
             this.prefab = prefab;
-            rootTransform = root;
             // bool check, Capacity, maxSize = default값으로 설정
             objectPool = new ObjectPool<GameObject>(CreateObject, OnGetFromPool, OnReleaseToPool, OnDestroyPooledObject);
         }
@@ -34,6 +32,11 @@ namespace TST
         public GameObject Pop()
         {
             return objectPool.Get();
+        }
+
+        public void Clear()
+        {
+            
         }
 
         #region Unity SampleCode
@@ -70,7 +73,6 @@ namespace TST
         {
             GameObject instance = GameObject.Instantiate(this.prefab);
             instance.name = this.prefab.name;
-            instance.transform.parent = this.rootTransform;
 
             return instance;
         }
@@ -97,15 +99,39 @@ namespace TST
     {
         public static EffectManager Instance { get; private set; }
 
+        // 이펙트 데이터 연동 드래그드롭 임시 
+        // 게임 엔진 툴의 강점을 살리기 위해 드래그드롭이 오히려 좋은가? @_@ 모르게똬.. 추후 질문
         public List<EffectBase> effects;
 
+        private List<GameObject> activeEffects = new List<GameObject>();
         private Dictionary<string, Pool> pools = new Dictionary<string, Pool> ();
 
         private void Awake()
         {
             Instance = this;
-            //effects.Add(effectPrefab1);
-            //effects.Add(effectPrefab2);
+        }
+
+        private void Update()
+        {
+            float deltaTime = Time.deltaTime; 
+
+            for (int i = 0; i < activeEffects.Count; i++)
+            {
+                GameObject activeEffect = activeEffects[i];
+                EffectBase effectBase = activeEffect.GetComponent<EffectBase>();
+                if (effectBase == null)
+                {
+                    // 이건 아무리 봐도 시간 복잡도가 N^2 인데에에에에으이에으에에 // 그냥 제거를 빼버리고 마지막에 특정 갯수가 쌓였을 때 Clear를 한다? 
+                    activeEffects.Remove(activeEffect); 
+                    return;
+                }
+                // 0초가 되면 true 반환
+                if (effectBase.UpdateEffectBase(deltaTime))
+                {
+                    pools[activeEffects[i].name].Push(activeEffects[i]);
+                    activeEffects.Remove(activeEffects[i]); 
+                }
+            }
         }
 
         private void Push(GameObject go)
@@ -123,7 +149,7 @@ namespace TST
                 Debug.Log($"Failed to Pop {name}");
                 return null;
             }
-
+            
             return pools[name].Pop();
         }
 
@@ -137,19 +163,12 @@ namespace TST
                 return null;
 
             popObj.transform.SetPositionAndRotation(pos, rotation);
-
             return popObj;
-        }
-
-        public void PushEffectToPool(GameObject go)
-        {
-            Push(go);
         }
 
         private void CreatePool(GameObject go)
         {
-            // 이펙트 매니저 트랜스폼 밑에 붙도록 설정
-            Pool pool = new Pool(go, this.transform);
+            Pool pool = new Pool(go);
 
             pools.Add(go.name, pool);
         }
