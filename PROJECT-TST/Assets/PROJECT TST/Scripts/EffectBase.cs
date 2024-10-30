@@ -12,8 +12,8 @@ namespace TST
         // ProjectileBase Collision 쪽 관련.
         // 총알이 벽에 닿을 시 총알 자국 남는 거 방향벡터 관련된 공부중..(Collision ContactPoint)
         public Vector3 offSet = Vector3.zero;
-        public float lifeTime = 2.0f;
-  
+        private float lifeTime = 2.0f;
+
         public void Activate(Vector3 pos, Quaternion rotation)
         {
             EffectManager.Instance.SpawnEffect(this.gameObject, pos + offSet, rotation);
@@ -24,11 +24,20 @@ namespace TST
             Activate(pos, Quaternion.Euler(rotation));
         }
 
+        // public 으로 열지 말지 고민 Effect매니저에서 처리하는게 옳을지 흠..
+        private void ResetEffectData()
+        {
+            lifeTime = 2.0f;
+        }
+
         public bool UpdateEffectBase(float deltaTime)
         {
             lifeTime -= deltaTime;
             if (lifeTime <= 0)
+            {
+                ResetEffectData();
                 return true;
+            }
 
             return false;
         }

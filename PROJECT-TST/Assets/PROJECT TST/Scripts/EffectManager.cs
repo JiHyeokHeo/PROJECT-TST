@@ -162,6 +162,7 @@ namespace TST
             if (popObj == null)
                 return null;
 
+            activeEffects.Add(popObj);
             popObj.transform.SetPositionAndRotation(pos, rotation);
             return popObj;
         }
