@@ -70,3 +70,13 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# Custom
+
+[Aa]ssets/KriptoFX/
+[Aa]ssets/KriptoFX.meta
+[Aa]ssets/PistolAnimsetPro/
+[Aa]ssets/PistolAnimsetPro.meta
+[Aa]ssets/Rifle_27A2_Pro/
+[Aa]ssets/Rifle_27A2_Pro.meta
+

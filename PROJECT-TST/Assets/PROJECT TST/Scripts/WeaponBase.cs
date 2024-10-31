@@ -6,6 +6,8 @@ namespace TST
 {
     public class WeaponBase : MonoBehaviour
     {
+        public int CurrentAmmo => currentAmmo;
+
         public Transform firePoint; // ÃÑ¾Ë ¹ß»ç À§Ä¡
         public float fireRate; // ¿¬»ç ¼Óµµ
         public int clipSize; // ÅºÃ¢ Å©±â[1ÅºÃ¢:ÃÑ¾Ë °¹¼ö]
@@ -23,19 +25,26 @@ namespace TST
             currentAmmo = clipSize;
         }
 
-        public void Fire()
+        public bool Fire()
         {
             if (currentAmmo > 0 && Time.time - lastFireTime >= fireRate)
             {
                 lastFireTime = Time.time;
-                //currentAmmo--;
+                currentAmmo--;
 
                 // TODO : ½ÇÁ¦ ÃÑ¾Ë º¹Á¦/¹ß»ç
                 Rigidbody newBullet = Instantiate(bulletPrefab, firePoint.transform.position, firePoint.transform.rotation);
                 newBullet.gameObject.SetActive(true);
-                newBullet.AddForce(firePoint.transform.forward * bulletSpeed, ForceMode.Impulse);
+
                 Destroy(newBullet.gameObject, bulletLifeTime);
+
+                var effect = EffectManager.Instance.SpawnEffect(EffectType.Muzzle_6);
+                effect.transform.SetPositionAndRotation(firePoint.position, firePoint.rotation);
+
+                return true;
             }
+
+            return false;
         }
 
         public void Reload()
