@@ -14,6 +14,14 @@ namespace TST
         public Vector3 offSet = Vector3.zero;
         private float lifeTime = 2.0f;
 
+        public EffectBase(Vector3 offSet, float lifeTime)
+        {
+            this.offSet = offSet;
+            this.lifeTime = lifeTime;
+
+            Activate()
+        }
+
         public void Activate(Vector3 pos, Quaternion rotation)
         {
             EffectManager.Instance.SpawnEffect(this.gameObject, pos + offSet, rotation);
@@ -24,7 +32,6 @@ namespace TST
             Activate(pos, Quaternion.Euler(rotation));
         }
 
-        // public 으로 열지 말지 고민 Effect매니저에서 처리하는게 옳을지 흠..
         private void ResetEffectData()
         {
             lifeTime = 2.0f;

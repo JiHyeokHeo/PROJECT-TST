@@ -51,6 +51,7 @@ namespace TST
                 newBullet.AddForce(firePoint.transform.forward * bulletSpeed, ForceMode.Impulse);
                 Destroy(newBullet.gameObject, bulletLifeTime);
 
+                // 멤버변수로 effect를 들고있는 편이 더 나을지..
                 EffectManager.Instance.effects[0].Activate(firePoint.transform.position, firePoint.transform.rotation);
             }
         }

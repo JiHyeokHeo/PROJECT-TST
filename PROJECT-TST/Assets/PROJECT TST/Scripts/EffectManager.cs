@@ -100,7 +100,7 @@ namespace TST
         public static EffectManager Instance { get; private set; }
 
         // 이펙트 데이터 연동 드래그드롭 임시 
-        // 게임 엔진 툴의 강점을 살리기 위해 드래그드롭이 오히려 좋은가? @_@ 모르게똬.. 추후 질문
+        // 게임 엔진 툴의 강점을 살리기 위해 드래그드롭이 오히려 좋은가? @_@ 모르겠다.. 추후 질문
         public List<EffectBase> effects;
 
         private List<GameObject> activeEffects = new List<GameObject>();
@@ -121,7 +121,7 @@ namespace TST
                 EffectBase effectBase = activeEffect.GetComponent<EffectBase>();
                 if (effectBase == null)
                 {
-                    // 이건 아무리 봐도 시간 복잡도가 N^2 인데에에에에으이에으에에 // 그냥 제거를 빼버리고 마지막에 특정 갯수가 쌓였을 때 Clear를 한다? 
+                    // 이건 아무리 봐도 별론데.. 시간복잡도 최악의 경우 N^2 // 그냥 제거를 빼버리고 마지막에 특정 갯수가 쌓였을 때 Clear를 한다? 
                     activeEffects.Remove(activeEffect); 
                     return;
                 }
