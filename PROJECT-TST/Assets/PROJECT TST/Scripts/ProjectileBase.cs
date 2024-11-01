@@ -10,7 +10,7 @@ namespace TST
 
         public void SetInfo()
         {
-            effect = new EffectBase()
+            
         }
 
         private void OnCollisionEnter(Collision collision)
