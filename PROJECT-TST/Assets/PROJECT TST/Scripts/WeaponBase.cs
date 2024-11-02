@@ -34,11 +34,8 @@ namespace TST
             
         }
 
-        public void Fire()
+        public bool Fire()
         {
-            if (gameObject.activeSelf == false)
-                return;
-
             if (currentAmmo > 0 && Time.time - lastFireTime >= fireRate)
             {
                 lastFireTime = Time.time;
@@ -47,10 +44,17 @@ namespace TST
                 // TODO : 실제 총알 복제/발사
                 Rigidbody newBullet = Instantiate(bulletPrefab, firePoint.transform.position, firePoint.transform.rotation);
                 newBullet.gameObject.SetActive(true);
-                newBullet.AddForce(firePoint.transform.forward * bulletSpeed, ForceMode.Impulse);
+
                 Destroy(newBullet.gameObject, bulletLifeTime);
 
+
+                var effect = EffectManager.Instance.SpawnEffect(EffectType.Muzzle_6);
+                effect.transform.SetPositionAndRotation(firePoint.position, firePoint.rotation);
+
+                return true;
             }
+
+            return false;
         }
 
         public void Reload()
@@ -59,15 +63,6 @@ namespace TST
                 return;
 
             currentAmmo = clipSize;
-        }
-
-        private void OnCollisionEnter(Collision collision)
-        {
-            if (collision == null) 
-                return;
-
-            // 접촉한 정보가 있다면 Effect 발사 & 총알 삭제
-            // 임시로 0번은 MuzzleFlash, 1번은 BrickImpact로 설정
         }
     }
 }

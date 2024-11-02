@@ -1,28 +1,43 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 namespace TST
 {
     public class CharacterBase : MonoBehaviour
     {
+        public Vector3 AimingPosition
+        {
+            get => aimingPoint.position;
+            set => aimingPoint.position = value;
+        }
+
         public bool IsArmed 
         {
             get => isArmed;
             set
             {
                 isArmed = value;
-                ResetOptions(); // 추후 바뀔 수 있을듯?
-                weapon.gameObject.SetActive(isArmed);
+                SetEquipWeapon(isArmed); // 추후 바뀔 수 있을듯?
             }
         }
 
         private bool isArmed = false;
+        private bool isArmedCompleted = false;
 
         public Animator animator;
         public UnityEngine.CharacterController unityCharacterController;
         public WeaponBase weapon;
+        public Transform weaponSocket;
+        public Transform weaponHolder;
+        public Transform aimingPoint;
+
+        public RigBuilder rigBuilder;
+        public Rig aimingRig;
+        public Rig lefthandRig;
 
         public Vector3 offsetPosition;
         public Vector3 offsetRotation;
@@ -37,11 +52,16 @@ namespace TST
         private float vertical;
         private float speedBlend;
         private float armedBlend;
-        private float reloadBlend;
+        private float Arm_HeadBlend;
 
         private float targetSpeed;
         private float targetHorizontal;
         private float targetVertical;
+
+        private bool isReloading = false;
+
+        private float aimingRigWeightBlend;
+        private float lefthandRigWeightBlend;
 
         #region Tory
         // FSM 으로 추후 변경이 필요해보임
@@ -76,20 +96,8 @@ namespace TST
             }
         }
 
-        // isReload 장전중이냐?
-        public bool IsReload
-        {
-            get => isReload;
-            set
-            {
-                isReload = value;
-            }
-        }
-
-        
         [field : SerializeField] private bool isSprint = true;
         private bool isAutoRunMode = false;
-        private bool isReload = false;
         private bool isWalk = false;
         #endregion
 
@@ -101,10 +109,7 @@ namespace TST
 
         private void Start()
         {
-            Transform rightHandTransform = animator.GetBoneTransform(HumanBodyBones.RightHand);
-            weapon.transform.SetParent(rightHandTransform);
-            weapon.transform.SetPositionAndRotation(rightHandTransform.position + offsetPosition, rightHandTransform.rotation * Quaternion.Euler(offsetRotation));
-            weapon.gameObject.SetActive(false);
+
         }
 
         private void Update()
@@ -113,28 +118,17 @@ namespace TST
             speedBlend = Mathf.Lerp(speedBlend, targetSpeed, Time.deltaTime * 10f);
             horizontal = Mathf.Lerp(horizontal, targetHorizontal, Time.deltaTime * 10f);
             vertical = Mathf.Lerp(vertical, targetVertical, Time.deltaTime * 10f);
+            //Arm_HeadBlend = Mathf.Lerp(Arm_HeadBlend, isReloadBlend || isEquipBlend || isHolsterBlend ? 1f : 0f, Time.deltaTime * 3f);
 
             animator.SetFloat("Armed", armedBlend);
             animator.SetFloat("Speed", speedBlend);
             animator.SetFloat("Horizontal", horizontal);
             animator.SetFloat("Vertical", vertical);
-            //animator.SetLayerWeight(1, reloadBlend);
+            //animator.SetLayerWeight(1, Arm_HeadBlend);
         }
 
         public void Move(Vector2 input)
         {
-            //if (IsAutoRunMode)
-            //{
-            //    targetSpeed = !IsWalk ? runSpeed : walkSpeed;
-            //    targetHorizontal = 0f;
-            //    targetVertical = 1.0f;
-
-            //    // 오직 정면만 돌진 // 이친구는 Run(스프린트 스피드) or Walk(워크스피드) 모드
-            //    Vector3 movement = (transform.forward * 1.0f)
-            //    * (!IsWalk ? sprintSpeed : moveSpeed) * Time.deltaTime;
-            //    unityCharacterController.Move(movement);
-            //}
-
             if (input.magnitude > 0f && !IsAutoRunMode)
             {
                 // 자동달리기 켜져있으면 일단 스프린트 모드 On
@@ -157,39 +151,74 @@ namespace TST
             animator.SetFloat("Magnitude", input.magnitude);
         }
 
-        private void ResetOptions()
-        {
-            // 기본적으로 달리기 모드 설정
-            //isWalk = false;
-        }
-
         public void Rotate(float rotation)
         {
             transform.Rotate(Vector3.up * rotation * rotateSpeed * Time.deltaTime);
         }
 
+
         public void Shoot()
         {
-            // 만약 총알이 0발이라면? Reload 
-            // 리로드 중 아닐때만
-            if (IsReload)
-                return;
-            
-            weapon.Fire();
-            if (weapon.CurrentAmmo <= 0)
-                Reload();
+            if (IsArmed && isArmedCompleted)
+            {
+                bool isFireSuccess = weapon.Fire();
+                if (!isFireSuccess && weapon.CurrentAmmo <= 0)
+                {
+                    Reload();
+                }
+            }
         }
 
         public void Reload()
         {
-            weapon.Reload();
-            IsReload = true;
+            // # 재장전 애니메이션 Trigger 호출
+            // TODO : 이미 재장전을 하고 있었다면? 재장전을 하지 않도록 예외처리하자.
+            if (!isReloading)
+            {
+                isReloading = true;
+                animator.SetTrigger("Reload Trigger");
+            }
         }
 
-        // 애니메이션 이벤트
-        private void ReloadComplete()
+        public void SetReloadComplete()
         {
-            IsReload = false;
+            // # 재장전 애니메이션 완료시 호출 되는 구역
+            // TODO : WeaponBase에 총알을 다시 가득채운다.
+            weapon.Reload();
+            isReloading = false;
+        }
+
+        private void SetEquipWeapon(bool isArmed)
+        {
+            if (isArmed)
+            {
+                animator.SetTrigger("Equip Trigger");
+            }
+            else
+            {
+                animator.SetTrigger("Holster Trigger");
+            }
+        }
+
+        public void SetEquipmentVisual(int activated)
+        {
+            if (activated == 1)
+            {
+                weapon.transform.SetParent(weaponHolder);
+                weapon.transform.localPosition = offsetPosition;
+                weapon.transform.localRotation = Quaternion.Euler(offsetRotation);
+            }
+            else
+            {
+                weapon.transform.SetParent(weaponSocket);
+                weapon.transform.localPosition = Vector3.zero;
+                weapon.transform.localRotation = Quaternion.identity;
+            }
+        }
+
+        public void SetArmedComplete(int flag)
+        {
+            isArmedCompleted = flag > 0;
         }
     }
 }
