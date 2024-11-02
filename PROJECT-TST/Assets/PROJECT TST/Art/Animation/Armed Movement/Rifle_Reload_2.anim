@@ -44242,7 +44242,7 @@ AnimationClip:
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 2.2
+    m_StopTime: 2.1666667
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
@@ -95112,10 +95112,10 @@ AnimationClip:
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 1
   m_Events:
-  - time: 2.2
-    functionName: ReloadComplete
+  - time: 2.1666667
+    functionName: SetReloadComplete
     data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 11500000, guid: 1e33667fdcc392743b617e5a4a18f519, type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0

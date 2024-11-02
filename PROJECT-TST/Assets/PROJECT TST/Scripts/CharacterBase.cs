@@ -86,7 +86,8 @@ namespace TST
             }
         }
 
-        private bool isSprint = false;
+        
+        [field : SerializeField] private bool isSprint = true;
         private bool isAutoRunMode = false;
         private bool isReload = false;
         private bool isWalk = false;
@@ -112,34 +113,32 @@ namespace TST
             speedBlend = Mathf.Lerp(speedBlend, targetSpeed, Time.deltaTime * 10f);
             horizontal = Mathf.Lerp(horizontal, targetHorizontal, Time.deltaTime * 10f);
             vertical = Mathf.Lerp(vertical, targetVertical, Time.deltaTime * 10f);
-            reloadBlend = Mathf.Lerp(reloadBlend, IsReload ? 1f : 0f, Time.deltaTime * 3f);
 
             animator.SetFloat("Armed", armedBlend);
             animator.SetFloat("Speed", speedBlend);
             animator.SetFloat("Horizontal", horizontal);
             animator.SetFloat("Vertical", vertical);
-            animator.SetFloat("Reload", reloadBlend);
-            animator.SetLayerWeight(1, reloadBlend);
+            //animator.SetLayerWeight(1, reloadBlend);
         }
 
         public void Move(Vector2 input)
         {
-            if (IsAutoRunMode)
-            {
-                targetSpeed = !IsWalk ? runSpeed : walkSpeed;
-                targetHorizontal = 0f;
-                targetVertical = 1.0f;
+            //if (IsAutoRunMode)
+            //{
+            //    targetSpeed = !IsWalk ? runSpeed : walkSpeed;
+            //    targetHorizontal = 0f;
+            //    targetVertical = 1.0f;
 
-                // 오직 정면만 돌진 // 이친구는 Run(스프린트 스피드) or Walk(워크스피드) 모드
-                Vector3 movement = (transform.forward * 1.0f)
-                * (!IsWalk ? sprintSpeed : moveSpeed) * Time.deltaTime;
-                unityCharacterController.Move(movement);
-            }
+            //    // 오직 정면만 돌진 // 이친구는 Run(스프린트 스피드) or Walk(워크스피드) 모드
+            //    Vector3 movement = (transform.forward * 1.0f)
+            //    * (!IsWalk ? sprintSpeed : moveSpeed) * Time.deltaTime;
+            //    unityCharacterController.Move(movement);
+            //}
 
             if (input.magnitude > 0f && !IsAutoRunMode)
             {
                 // 자동달리기 켜져있으면 일단 스프린트 모드 On
-                targetSpeed = IsSprint ? runSpeed : walkSpeed;
+                targetSpeed = IsSprint ? 1.0f : 0.0f;
                 targetHorizontal = input.x;
                 targetVertical = input.y;
 
@@ -149,11 +148,13 @@ namespace TST
             }
             else
             {
-                IsSprint = false;
+                IsSprint = true;
                 targetSpeed = IsAutoRunMode ? targetSpeed : 0f;
                 targetHorizontal = IsAutoRunMode ? targetHorizontal : 0f;
                 targetVertical = IsAutoRunMode ? targetVertical : 0f;
             }
+
+            animator.SetFloat("Magnitude", input.magnitude);
         }
 
         private void ResetOptions()
