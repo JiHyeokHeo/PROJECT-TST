@@ -140,14 +140,14 @@ namespace TST
 
         public void Move(Vector2 input)
         {
-            if (input.magnitude > 0f && !IsAutoRunMode)
+            if (input.magnitude > 0f || IsAutoRunMode)
             {
                 // 자동달리기 켜져있으면 일단 스프린트 모드 On
                 targetSpeed = IsSprint ? 1.0f : 0.0f;
                 targetHorizontal = input.x;
-                targetVertical = input.y;
+                targetVertical = IsAutoRunMode ? 1.0f : input.y;
 
-                Vector3 movement =  (transform.forward * input.y + transform.right * input.x) 
+                Vector3 movement =  (transform.forward * targetVertical + transform.right * targetHorizontal) 
                     * (IsSprint ? sprintSpeed : moveSpeed) * Time.deltaTime;
                 unityCharacterController.Move(movement);
             }
@@ -159,7 +159,10 @@ namespace TST
                 targetVertical = IsAutoRunMode ? targetVertical : 0f;
             }
 
-            animator.SetFloat("Magnitude", input.magnitude);
+            if (!isAutoRunMode)
+                animator.SetFloat("Magnitude", input.magnitude);
+            else
+                animator.SetFloat("Magnitude", 1.0f);
         }
 
         public void Rotate(float rotation)

@@ -78,9 +78,13 @@ namespace TST
                 linkedCharacter.Reload();
             }
 
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                OptionManager.Instance.IsGameStopped = !OptionManager.Instance.IsGameStopped;
+            }
 
-            pitch -= mouseY;
-            cameraPivot.localRotation = Quaternion.Euler(Mathf.Clamp(cameraPivot.localRotation.x + pitch, bottomClampLimit, topClampLimit), 0, 0);
+            pitch = Mathf.Clamp(pitch - mouseY * Time.deltaTime * 400.0f, bottomClampLimit, topClampLimit);
+            cameraPivot.localRotation = Quaternion.Euler(pitch, 0, 0);
 
             linkedCharacter.Move(new Vector2(inputX, inputY));
             linkedCharacter.Rotate(mouseX);
