@@ -1,27 +1,45 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 namespace TST
 {
     public class ProjectileBase : MonoBehaviour
     {
+        public Rigidbody rigid;
+
+        public float bulletForce;
+        public float lifeTime;
+
         public void SetInfo()
         {
-            
+            rigid.AddForce(transform.forward * bulletForce, ForceMode.Impulse);
+            Destroy(gameObject, lifeTime);
         }
 
         private void OnCollisionEnter(Collision collision)
         {
-            if (collision == null)
-                return;
+            GameObject effect = null;
+            if (collision.collider.material.name.Contains("Metal"))
+            {
+                // Metal Effect Spawn
+                effect = EffectManager.Instance.SpawnEffect(EffectType.Impact_Metal);
+            }
+            else if (collision.collider.material.name.Contains("Dirt"))
+            {
+                // Dirt Effect Spawn
+                effect = EffectManager.Instance.SpawnEffect(EffectType.Impact_Brick);
+            }
+            else
+            {
+                // Default Effect Spawn
+                effect = EffectManager.Instance.SpawnEffect(EffectType.Impact_Dirt);
+            }
 
-            ContactPoint contactPoint = collision.contacts[0];
-            // 접촉한 정보가 있다면 Effect 발사 & 총알 삭제
-            // 임시로 0번은 MuzzleFlash, 1번은 BrickImpact로 설정
+            effect.transform.SetPositionAndRotation(collision.contacts[0].point, Quaternion.LookRotation(collision.contacts[0].normal));
 
-            // 임시
-            gameObject.SetActive(false);
+            Destroy(gameObject);
         }
     }
 }

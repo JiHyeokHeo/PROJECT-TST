@@ -109,7 +109,9 @@ namespace TST
 
         private void Start()
         {
-
+            aimingRig.weight = 0f;
+            lefthandRig.weight = 0f;
+            rigBuilder.Build();
         }
 
         private void Update()
@@ -125,6 +127,15 @@ namespace TST
             animator.SetFloat("Horizontal", horizontal);
             animator.SetFloat("Vertical", vertical);
             //animator.SetLayerWeight(1, Arm_HeadBlend);
+        }
+
+        private void LateUpdate()
+        {
+            aimingRigWeightBlend = Mathf.Lerp(aimingRigWeightBlend, isArmedCompleted ? 1f : 0f, Time.deltaTime * 10f);
+            aimingRig.weight = aimingRigWeightBlend;
+
+            lefthandRigWeightBlend = Mathf.Lerp(lefthandRigWeightBlend, isArmedCompleted && !isReloading ? 1f : 0f, Time.deltaTime * 10f);
+            lefthandRig.weight = lefthandRigWeightBlend;
         }
 
         public void Move(Vector2 input)

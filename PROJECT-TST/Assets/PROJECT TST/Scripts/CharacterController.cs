@@ -9,6 +9,7 @@ namespace TST
         public CharacterBase linkedCharacter;
         public Transform cameraPivot;
 
+        public LayerMask aimingLayer;
 
         public float topClampLimit = 80;
         public float bottomClampLimit = -80;
@@ -83,6 +84,18 @@ namespace TST
 
             linkedCharacter.Move(new Vector2(inputX, inputY));
             linkedCharacter.Rotate(mouseX);
+
+            // ºæ≈Õ 0.5f 0.5f
+            Ray screenCenterRay = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
+            Debug.DrawRay(screenCenterRay.origin, screenCenterRay.direction * 100.0f, Color.red);
+            if (Physics.Raycast(screenCenterRay, out RaycastHit hitInfo, 1000f, aimingLayer, QueryTriggerInteraction.Ignore))
+            {
+                linkedCharacter.AimingPosition = hitInfo.point;
+            }
+            else
+            {
+                linkedCharacter.AimingPosition = screenCenterRay.GetPoint(1000f);
+            }
         }
     }
 }
