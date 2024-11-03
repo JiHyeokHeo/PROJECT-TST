@@ -12,7 +12,7 @@ namespace TST
         public float bulletForce;
         public float lifeTime;
 
-        public void SetInfo()
+        public void Start()
         {
             rigid.AddForce(transform.forward * bulletForce, ForceMode.Impulse);
             Destroy(gameObject, lifeTime);
@@ -26,7 +26,7 @@ namespace TST
                 // Metal Effect Spawn
                 effect = EffectManager.Instance.SpawnEffect(EffectType.Impact_Metal);
             }
-            else if (collision.collider.material.name.Contains("Dirt"))
+            else if (collision.collider.material.name.Contains("Brick"))
             {
                 // Dirt Effect Spawn
                 effect = EffectManager.Instance.SpawnEffect(EffectType.Impact_Brick);
