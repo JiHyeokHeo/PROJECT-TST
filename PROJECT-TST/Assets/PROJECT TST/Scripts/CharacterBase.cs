@@ -96,6 +96,13 @@ namespace TST
             }
         }
 
+        public bool IsShooting
+        {
+            get => isShooting;
+            set { isShooting = value; }
+        }
+
+        private bool isShooting = false;
         [field : SerializeField] private bool isSprint = true;
         private bool isAutoRunMode = false;
         private bool isWalk = false;
@@ -175,7 +182,9 @@ namespace TST
         {
             if (IsArmed && isArmedCompleted)
             {
+                
                 bool isFireSuccess = weapon.Fire();
+                isShooting = isFireSuccess;
                 if (!isFireSuccess && weapon.CurrentAmmo <= 0)
                 {
                     Reload();
