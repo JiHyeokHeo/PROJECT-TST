@@ -5,14 +5,16 @@ using UnityEngine;
 
 namespace TST
 {
+    // https://docs.unity3d.com/Packages/com.unity.cinemachine@2.2/manual/CinemachineImpulseNoiseProfiles.html
+    // https://discussions.unity.com/t/running-noise-profile/881047/2
     public class CinemachineGunRecoil : MonoBehaviour
     {
         public CinemachineVirtualCamera virtualCamera;
         public RecoilNoiseSettings recoilNoiseSettings;
         public GameObject player;
 
-        private float recoilTimeX;
-        private float recoilTimeY;
+        //private float recoilTimeX;
+        //private float recoilTimeY;
         private CinemachineBasicMultiChannelPerlin noiseComponent;
         private CharacterBase characterBase;
         void Start()
@@ -38,20 +40,20 @@ namespace TST
             }
             
             // X축 노이즈 계산
-            float noiseX = Mathf.PerlinNoise(recoilTimeX * recoilNoiseSettings.frequencyX, 0f);
+            float noiseX = Mathf.PerlinNoise(recoilNoiseSettings.frequencyX, 0f);
             float offsetX = recoilNoiseSettings.rotationXCurve.Evaluate(noiseX) * recoilNoiseSettings.amplitudeX;
 
             // Y축 노이즈 계산
-            float noiseY = Mathf.PerlinNoise(0f, recoilTimeY * recoilNoiseSettings.frequencyY);
+            float noiseY = Mathf.PerlinNoise(0f, recoilNoiseSettings.frequencyY);
             float offsetY = recoilNoiseSettings.rotationYCurve.Evaluate(noiseY) * recoilNoiseSettings.amplitudeY;
 
             // Cinemachine 노이즈 컴포넌트에 값 적용
             noiseComponent.m_AmplitudeGain = offsetX;  // X축 회전의 진폭을 AmplitudeGain으로 사용
             noiseComponent.m_FrequencyGain = offsetY;  // Y축 회전의 빈도를 FrequencyGain으로 사용
 
-            // 시간 누적
-            recoilTimeX += Time.deltaTime;
-            recoilTimeY += Time.deltaTime;
+            //// 시간 누적
+            //recoilTimeX += Time.deltaTime;
+            //recoilTimeY += Time.deltaTime;
         }
     }
 }
