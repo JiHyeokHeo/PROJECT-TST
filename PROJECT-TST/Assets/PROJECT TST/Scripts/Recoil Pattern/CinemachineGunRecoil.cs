@@ -1,59 +1,97 @@
 using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 namespace TST
 {
-    // https://docs.unity3d.com/Packages/com.unity.cinemachine@2.2/manual/CinemachineImpulseNoiseProfiles.html
-    // https://discussions.unity.com/t/running-noise-profile/881047/2
+     //https://docs.unity3d.com/Packages/com.unity.cinemachine@2.2/manual/CinemachineImpulseNoiseProfiles.html
+     //https://discussions.unity.com/t/running-noise-profile/881047/2
+
     public class CinemachineGunRecoil : MonoBehaviour
     {
         public CinemachineVirtualCamera virtualCamera;
-        public RecoilNoiseSettings recoilNoiseSettings;
-        public GameObject player;
+        public RecoilNoiseSettings recoilSetting;
+        public float curveDuration = 1f;
 
-        //private float recoilTimeX;
-        //private float recoilTimeY;
-        private CinemachineBasicMultiChannelPerlin noiseComponent;
-        private CharacterBase characterBase;
+        private float timeElapsed;
+
+        CinemachineBasicMultiChannelPerlin noiseComponent;
+
+        // Amplitude를 나는 value값으로 설정하는 것이 좋아보인다.
+        // Frequency를 통해 키고 끄는 걸 정해주자.
         void Start()
         {
             // Cinemachine 카메라에서 노이즈 컴포넌트 가져오기
             noiseComponent = virtualCamera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
-            
-            if (noiseComponent == null)
+            NoiseSettings noiseSettings = noiseComponent.m_NoiseProfile;
+
+
+            if (noiseSettings != null)
             {
-                Debug.LogWarning("CinemachineBasicMultiChannelPerlin component not found on the Virtual Camera. Please add it in the Noise section.");
+                // Position X (Index 0)에 접근하여 컴포넌트를 설정
+                var positionXParams = noiseSettings.PositionNoise[0];
+
+                //// 기존 컴포넌트 값 변경
+                //positionXParams.X.Frequency = 1f;
+                //positionXParams.Y.Amplitude = 0.1f;
+
+                //// 새 컴포넌트 추가
+                //if (positionXParams.Components.Length < 2) // 기존 컴포넌트가 2개 미만인 경우
+                //{
+                //    // 배열을 확장하여 새 컴포넌트를 추가
+                //    var newComponents = new NoiseSettings.NoiseParams[positionXParams.Components.Length + 1];
+                //    positionXParams.Components.CopyTo(newComponents, 0);
+                //    newComponents[1] = new NoiseSettings.NoiseParams
+                //    {
+                //        Frequency = 0f,
+                //        Amplitude = 0f
+                //    };
+                //    positionXParams.Components = newComponents;
+                //}
+
+                //// 설정한 값을 다시 Position X에 할당
+                //noiseSettings.PositionNoise[0] = positionXParams;
+            }
+            else
+            {
+                Debug.LogWarning("NoiseSettings가 할당되지 않았습니다.");
             }
 
-            characterBase = player.GetComponent<CharacterBase>();
         }
 
         void Update()
         {
-            if (noiseComponent == null || !characterBase.IsShooting)
+            if (Input.GetKeyDown(KeyCode.Y))
             {
-                //recoilTimeX = 0;
-                //recoilTimeY = 0;
-                return;
+                noiseComponent.m_FrequencyGain = 0.0f;
             }
-            
-            // X축 노이즈 계산
-            float noiseX = Mathf.PerlinNoise(recoilNoiseSettings.frequencyX, 0f);
-            float offsetX = recoilNoiseSettings.rotationXCurve.Evaluate(noiseX) * recoilNoiseSettings.amplitudeX;
+            else if (Input.GetKeyDown(KeyCode.U))
+            {
+                noiseComponent.m_FrequencyGain = 1.0f;
+            }
 
-            // Y축 노이즈 계산
-            float noiseY = Mathf.PerlinNoise(0f, recoilNoiseSettings.frequencyY);
-            float offsetY = recoilNoiseSettings.rotationYCurve.Evaluate(noiseY) * recoilNoiseSettings.amplitudeY;
 
-            // Cinemachine 노이즈 컴포넌트에 값 적용
-            noiseComponent.m_AmplitudeGain = offsetX;  // X축 회전의 진폭을 AmplitudeGain으로 사용
-            noiseComponent.m_FrequencyGain = offsetY;  // Y축 회전의 빈도를 FrequencyGain으로 사용
+            if (virtualCamera != null)
+            {
+                var noise = virtualCamera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
+                if (noise != null)
+                {
+                    // 시간을 curveDuration 내에서 반복하도록 설정
+                    timeElapsed += Time.deltaTime;
+                    float curveTimeY = Mathf.Repeat(timeElapsed, curveDuration);
+                    //AnimationCurve의 값을 PositionNoise에 설정
+                    noise.m_NoiseProfile.PositionNoise[0].X.Frequency = recoilSetting.frequencyX;
+                    noise.m_NoiseProfile.PositionNoise[0].X.Amplitude = recoilSetting.positionXCurve.Evaluate(timeElapsed);
+                    noise.m_NoiseProfile.PositionNoise[0].Y.Frequency = recoilSetting.frequencyY;
 
-            //// 시간 누적
-            //recoilTimeX += Time.deltaTime;
-            //recoilTimeY += Time.deltaTime;
+                    float t = noise.m_NoiseProfile.SignalDuration;
+
+                    noise.m_NoiseProfile.PositionNoise[0].Y.Amplitude = recoilSetting.positionYCurve.Evaluate(timeElapsed);
+                        //noise.m_NoiseProfile.PositionNoise[0].Y.Amplitude = 0f;
+                }
+            }
         }
     }
 }

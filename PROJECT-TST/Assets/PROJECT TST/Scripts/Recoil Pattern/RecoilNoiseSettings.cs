@@ -1,3 +1,4 @@
+using Cinemachine;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,11 +10,11 @@ namespace TST
     {
         public GameObject gun;
         public string gunName = string.Empty;
-        public AnimationCurve rotationXCurve;
-        public AnimationCurve rotationYCurve;
-        public float frequencyX = 1f;
+        public AnimationCurve positionXCurve;
+        public AnimationCurve positionYCurve;
+        public float frequencyX = 1f; 
         public float frequencyY = 1f;
-        public float amplitudeX = 1f;
-        public float amplitudeY = 1f;
+        public float amplitudeX = 1f; // Recoil Èçµé¸² ¼öÄ¡
+        public float amplitudeY = 1f; // Recoil Èçµé¸² ¼öÄ¡
     }
 }
