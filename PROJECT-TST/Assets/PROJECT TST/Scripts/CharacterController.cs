@@ -73,6 +73,11 @@ namespace TST
                 linkedCharacter.Shoot();
             }
 
+            if (Input.GetMouseButtonUp(0))
+            {
+                linkedCharacter.ShootFinished();
+            }
+
             if (Input.GetKeyDown(KeyCode.R))
             {
                 linkedCharacter.Reload();

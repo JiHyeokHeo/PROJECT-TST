@@ -5459,6 +5459,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 0}
   unityCharacterController: {fileID: 0}
+  cameraGunRecoilComponent: {fileID: 769642680}
   weapon: {fileID: 710556743}
   weaponSocket: {fileID: 928664618}
   weaponHolder: {fileID: 621712828}

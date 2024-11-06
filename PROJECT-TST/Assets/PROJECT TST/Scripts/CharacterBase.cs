@@ -30,6 +30,7 @@ namespace TST
 
         public Animator animator;
         public UnityEngine.CharacterController unityCharacterController;
+        public CinemachineGunRecoil cameraGunRecoilComponent;
         public WeaponBase weapon;
         public Transform weaponSocket;
         public Transform weaponHolder;
@@ -96,13 +97,6 @@ namespace TST
             }
         }
 
-        public bool IsShooting
-        {
-            get => isShooting;
-            set { isShooting = value; }
-        }
-
-        private bool isShooting = false;
         [field : SerializeField] private bool isSprint = true;
         private bool isAutoRunMode = false;
         private bool isWalk = false;
@@ -182,14 +176,22 @@ namespace TST
         {
             if (IsArmed && isArmedCompleted)
             {
-                
                 bool isFireSuccess = weapon.Fire();
-                isShooting = isFireSuccess;
                 if (!isFireSuccess && weapon.CurrentAmmo <= 0)
                 {
                     Reload();
+                    cameraGunRecoilComponent.PauseRecoil();
+                    return;
                 }
+
+                if (isFireSuccess)
+                    cameraGunRecoilComponent.StartRecoil();
             }
+        }
+
+        public void ShootFinished()
+        {
+            cameraGunRecoilComponent.PauseRecoil();
         }
 
         public void Reload()
