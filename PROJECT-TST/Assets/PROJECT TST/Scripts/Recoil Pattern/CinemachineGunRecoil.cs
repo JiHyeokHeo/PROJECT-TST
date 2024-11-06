@@ -15,7 +15,7 @@ namespace TST
         public RecoilNoiseSettings recoilSetting;
         public float curveDuration = 1f;
 
-        private float timeElapsed;
+        private float timeElapsed = 0f;
 
         CinemachineBasicMultiChannelPerlin noiseComponent;
 
@@ -63,13 +63,17 @@ namespace TST
 
         void Update()
         {
+
             if (Input.GetKeyDown(KeyCode.Y))
             {
+                timeElapsed = 0;
                 noiseComponent.m_FrequencyGain = 0.0f;
+                noiseComponent.m_AmplitudeGain = 0.0f;
             }
             else if (Input.GetKeyDown(KeyCode.U))
             {
                 noiseComponent.m_FrequencyGain = 1.0f;
+                noiseComponent.m_AmplitudeGain = 1.0f;
             }
 
 
@@ -85,11 +89,7 @@ namespace TST
                     noise.m_NoiseProfile.PositionNoise[0].X.Frequency = recoilSetting.frequencyX;
                     noise.m_NoiseProfile.PositionNoise[0].X.Amplitude = recoilSetting.positionXCurve.Evaluate(timeElapsed);
                     noise.m_NoiseProfile.PositionNoise[0].Y.Frequency = recoilSetting.frequencyY;
-
-                    float t = noise.m_NoiseProfile.SignalDuration;
-
                     noise.m_NoiseProfile.PositionNoise[0].Y.Amplitude = recoilSetting.positionYCurve.Evaluate(timeElapsed);
-                        //noise.m_NoiseProfile.PositionNoise[0].Y.Amplitude = 0f;
                 }
             }
         }
