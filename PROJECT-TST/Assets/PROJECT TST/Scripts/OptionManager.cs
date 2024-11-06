@@ -25,6 +25,7 @@ namespace TST
         public GameObject usingCrossHair;
         public static OptionManager Instance { get; private set; }
         public List<CrossHairData> crossHairContainer = new List<CrossHairData>();
+        public GameObject UICanvas;
 
         public bool IsGameStopped
         {
@@ -47,8 +48,8 @@ namespace TST
         {
             Instance = this;
             // 초기값 크로스헤어 A 
-            //usingCrossHair = crossHairContainer[0].prefab;
-            //usingCrossHair.SetActive(true);
+            usingCrossHair = crossHairContainer[0].prefab;
+            usingCrossHair.SetActive(true);
         }
 
         public GameObject ChangeCrossHair(CrossHairType crossHairType)
@@ -69,7 +70,7 @@ namespace TST
 
         private void ShowOption()
         {
-            
+            UICanvas.SetActive(!UICanvas.activeSelf);
         }
     }
 }

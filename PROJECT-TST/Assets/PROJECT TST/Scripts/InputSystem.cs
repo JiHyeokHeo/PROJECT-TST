@@ -27,6 +27,12 @@ namespace TST
 
         private void Update()
         {
+            if (OptionManager.Instance.IsGameStopped)
+            {
+                SetCursorVisible(true);
+                return;
+            }
+
             if (Input.GetKey(KeyCode.LeftAlt))
             {
                 SetCursorVisible(true);

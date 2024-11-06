@@ -31,12 +31,23 @@ namespace TST
 
         public void PauseRecoil()
         {
+            shotCnt = 0;
             isFire = false;
             timeElapsed = 0;
         }
 
+        int shotCnt = 0;
         public void StartRecoil()
         {
+            // 첫발부터 recoil 시작
+            shotCnt++;
+            if (shotCnt == 1)
+            {
+                noiseComponent.m_NoiseProfile.PositionNoise[0].X.Amplitude = 0.0f;
+                noiseComponent.m_NoiseProfile.PositionNoise[0].Y.Amplitude = 0.0f;
+                timeElapsed = 0.0f;
+            }
+
             isFire = true;
             noiseComponent.m_FrequencyGain = 1.0f;
             noiseComponent.m_AmplitudeGain = 1.0f;
@@ -47,9 +58,6 @@ namespace TST
             if (noiseComponent == null)
                 return;
 
-            noiseComponent.m_FrequencyGain = Mathf.Lerp(noiseComponent.m_FrequencyGain, isFire ? 1.0f : 0.0f, Time.deltaTime * 10.0f);
-            noiseComponent.m_AmplitudeGain = Mathf.Lerp(noiseComponent.m_AmplitudeGain, isFire ? 1.0f : 0.0f, Time.deltaTime * 10.0f);
-
             RecoilCheck();
         }
 
@@ -57,8 +65,7 @@ namespace TST
         {
             if (virtualCamera != null)
             {
-                if (isFire)
-                    timeElapsed += Time.deltaTime;
+                timeElapsed += Time.deltaTime;
 
                 noisePositionSet(timeElapsed);
             }
@@ -67,9 +74,9 @@ namespace TST
         void noisePositionSet(float timeElapsed)
         {
             noiseComponent.m_NoiseProfile.PositionNoise[0].X.Frequency = recoilSetting.frequencyX;
-            noiseComponent.m_NoiseProfile.PositionNoise[0].X.Amplitude = Mathf.Lerp(noiseComponent.m_NoiseProfile.PositionNoise[0].X.Amplitude, recoilSetting.positionXCurve.Evaluate(timeElapsed), Time.deltaTime * 10.0f);
+            noiseComponent.m_NoiseProfile.PositionNoise[0].X.Amplitude = Mathf.Lerp(noiseComponent.m_NoiseProfile.PositionNoise[0].X.Amplitude, isFire ? recoilSetting.positionXCurve.Evaluate(timeElapsed) : 0.0f, Time.deltaTime * 10.0f);
             noiseComponent.m_NoiseProfile.PositionNoise[0].Y.Frequency = recoilSetting.frequencyY;
-            noiseComponent.m_NoiseProfile.PositionNoise[0].Y.Amplitude = Mathf.Lerp(noiseComponent.m_NoiseProfile.PositionNoise[0].Y.Amplitude, recoilSetting.positionYCurve.Evaluate(timeElapsed), Time.deltaTime * 10.0f); 
+            noiseComponent.m_NoiseProfile.PositionNoise[0].Y.Amplitude = Mathf.Lerp(noiseComponent.m_NoiseProfile.PositionNoise[0].Y.Amplitude, isFire ? recoilSetting.positionYCurve.Evaluate(timeElapsed) : 0.0f, Time.deltaTime * 10.0f); 
         }
 
         
