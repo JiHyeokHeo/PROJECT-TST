@@ -100,12 +100,16 @@ namespace TST
         [field : SerializeField] private bool isSprint = true;
         private bool isAutoRunMode = false;
         private bool isWalk = false;
+        private bool isRollFinished = true;
         #endregion
 
         private void Awake()
         {
             animator = GetComponent<Animator>();
             unityCharacterController = GetComponent<UnityEngine.CharacterController>();
+
+            // 구르기
+            rollCoroutine = StartRollCoroutine();
         }
 
         private void Start()
@@ -115,19 +119,20 @@ namespace TST
             rigBuilder.Build();
         }
 
+        public float Whole_Body_Weight_Blend = 0.0f;
         private void Update()
         {
             armedBlend = Mathf.Lerp(armedBlend, IsArmed ? 1f : 0f, Time.deltaTime * 10f);
             speedBlend = Mathf.Lerp(speedBlend, targetSpeed, Time.deltaTime * 10f);
             horizontal = Mathf.Lerp(horizontal, targetHorizontal, Time.deltaTime * 10f);
             vertical = Mathf.Lerp(vertical, targetVertical, Time.deltaTime * 10f);
-            //Arm_HeadBlend = Mathf.Lerp(Arm_HeadBlend, isReloadBlend || isEquipBlend || isHolsterBlend ? 1f : 0f, Time.deltaTime * 3f);
+            Whole_Body_Weight_Blend = Mathf.Lerp(Whole_Body_Weight_Blend, isRollFinished ? 0f : 1f, Time.deltaTime * 10f);
 
             animator.SetFloat("Armed", armedBlend);
             animator.SetFloat("Speed", speedBlend);
             animator.SetFloat("Horizontal", horizontal);
             animator.SetFloat("Vertical", vertical);
-            //animator.SetLayerWeight(1, Arm_HeadBlend);
+            animator.SetLayerWeight(2, Whole_Body_Weight_Blend);
         }
 
         private void LateUpdate()
@@ -141,6 +146,9 @@ namespace TST
 
         public void Move(Vector2 input)
         {
+            if (!isRollFinished)
+                return;
+
             if (input.magnitude > 0f || IsAutoRunMode)
             {
                 // 자동달리기 켜져있으면 일단 스프린트 모드 On
@@ -162,19 +170,50 @@ namespace TST
 
             if (!isAutoRunMode)
                 animator.SetFloat("Magnitude", input.magnitude);
-            else
+            else 
                 animator.SetFloat("Magnitude", 1.0f);
+
+        }
+
+        public float rollSpeed = 4.0f;
+        private IEnumerator rollCoroutine;
+        IEnumerator StartRollCoroutine()
+        {
+            while (true)
+            {
+                if (isRollFinished)
+                    StopCoroutine(rollCoroutine);
+
+                Vector3 movement = (transform.forward * 1.0f + transform.right * 0.0f)
+                    * rollSpeed * Time.deltaTime;
+                unityCharacterController.Move(movement);
+                yield return null;
+            }
+        }
+
+        public void Roll()
+        {
+            if (isRollFinished)
+            {
+                animator.SetTrigger("Roll Trigger");
+                isRollFinished = false;
+
+                StartCoroutine(rollCoroutine);
+            }
         }
 
         public void Rotate(float rotation)
         {
+            if (!isRollFinished)
+                return;
+
             transform.Rotate(Vector3.up * rotation * rotateSpeed * Time.deltaTime);
         }
 
 
         public void Shoot()
         {
-            if (IsArmed && isArmedCompleted)
+            if (IsArmed && isArmedCompleted && isRollFinished)
             {
                 bool isFireSuccess = weapon.Fire();
                 if (!isFireSuccess && weapon.CurrentAmmo <= 0)
@@ -198,7 +237,7 @@ namespace TST
         {
             // # 재장전 애니메이션 Trigger 호출
             // TODO : 이미 재장전을 하고 있었다면? 재장전을 하지 않도록 예외처리하자.
-            if (!isReloading)
+            if (!isReloading && weapon.CurrentAmmo != weapon.clipSize)
             {
                 isReloading = true;
                 animator.SetTrigger("Reload Trigger");
@@ -239,6 +278,11 @@ namespace TST
                 weapon.transform.localPosition = Vector3.zero;
                 weapon.transform.localRotation = Quaternion.identity;
             }
+        }
+
+        public void RollingFinished(int flag)
+        {
+            isRollFinished = flag > 0;
         }
 
         public void SetArmedComplete(int flag)

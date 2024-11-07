@@ -83,6 +83,11 @@ namespace TST
                 linkedCharacter.Reload();
             }
 
+            if (Input.GetKeyDown(KeyCode.V))
+            {
+                linkedCharacter.Roll();
+            }
+
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 OptionManager.Instance.IsGameStopped = !OptionManager.Instance.IsGameStopped;
