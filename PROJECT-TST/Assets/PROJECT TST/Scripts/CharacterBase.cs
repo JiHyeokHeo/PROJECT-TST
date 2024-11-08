@@ -33,7 +33,11 @@ namespace TST
         private bool isWalk = false;
 
         public Animator animator;
-        public UnityEngine.CharacterController unityCharacterController;
+        public UnityEngine.CharacterController unityCharacterController;        
+        public Transform cameraPivot;
+        public Rigidbody[] ragdollRigidbodies;
+
+
         public WeaponBase weapon;
         public Transform weaponSocket;
         public Transform weaponHolder;
@@ -69,6 +73,19 @@ namespace TST
         {
             animator = GetComponent<Animator>();
             unityCharacterController = GetComponent<UnityEngine.CharacterController>();
+            ragdollRigidbodies = GetComponentsInChildren<Rigidbody>();
+            SetRagdollActive(false);
+        }
+
+        public void SetRagdollActive(bool isActive)
+        {
+            foreach (var rb in ragdollRigidbodies)
+            {
+                rb.isKinematic = !isActive;
+            }
+
+            animator.enabled = !isActive;
+            unityCharacterController.enabled = !isActive;
         }
 
         private void Start()
@@ -76,6 +93,13 @@ namespace TST
             aimingRig.weight = 0f;
             lefthandRig.weight = 0f;
             rigBuilder.Build();
+
+            StartCoroutine(DelayedActiveRagdoll());
+            IEnumerator DelayedActiveRagdoll()
+            {
+                yield return new WaitForSeconds(3f);
+                SetRagdollActive(true);
+            }
         }
 
         private void Update()
@@ -100,14 +124,32 @@ namespace TST
             lefthandRig.weight = lefthandRigWeightBlend;
         }
 
-        public void Move(Vector2 input)
+        private float targetRotation = 0f;
+
+        public void Move(Vector2 input, float yAxisAngle)
         {
             if (input.magnitude > 0f)
             {
-                targetHorizontal = input.x;
-                targetVertical = input.y;
+                if (!IsArmed)
+                {
+                    Vector3 inputDirection = new Vector3(input.x, 0f, input.y);
+                    targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + yAxisAngle;
+                    transform.rotation = Quaternion.Euler(0f, targetRotation, 0f);
+                }
 
-                Vector3 movement = (transform.forward * input.y + transform.right * input.x) * moveSpeed * Time.deltaTime;
+                Vector3 movement = Vector3.zero;
+                if (IsArmed)
+                {
+                    targetHorizontal = input.x;
+                    targetVertical = input.y;
+                    movement = (transform.forward * input.y + transform.right * input.x) * moveSpeed * Time.deltaTime;
+                }
+                else
+                {
+                    targetVertical = 1f;
+                    movement = transform.forward * moveSpeed * Time.deltaTime;
+                }
+
                 unityCharacterController.Move(movement);
             }
             else
@@ -119,9 +161,17 @@ namespace TST
             animator.SetFloat("Magnitude", input.magnitude);
         }
 
-        public void Rotate(float rotation)
+        public void Rotate(Vector3 targetPoint)
         {
-            transform.Rotate(Vector3.up * rotation * rotateSpeed * Time.deltaTime);
+            if (IsArmed)
+            {
+                Vector3 target = targetPoint;
+                target.y = transform.position.y;
+                Vector3 pos = transform.position;
+                Vector3 direction = (target - pos).normalized;
+
+                transform.forward = Vector3.Lerp(transform.forward, direction, Time.deltaTime * 10f);
+            }
         }
 
         public void Shoot()
