@@ -5348,6 +5348,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 0}
   unityCharacterController: {fileID: 0}
+  cameraPivot: {fileID: 738264079}
   cameraGunRecoilComponent: {fileID: 769642680}
   weapon: {fileID: 710556743}
   weaponSocket: {fileID: 928664618}
@@ -5365,7 +5366,6 @@ MonoBehaviour:
   rotateSpeed: 180
   isSprint: 0
   Whole_Body_Weight_Blend: 0
-  rollSpeed: 4
 --- !u!4 &1740385998 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400326, guid: 8f0565f23a2b58541a475bd3c1393052, type: 3}

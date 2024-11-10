@@ -55,7 +55,6 @@ namespace TST
         private float vertical;
         private float speedBlend;
         private float armedBlend;
-        private float Arm_HeadBlend;
 
         private float targetSpeed;
         private float targetHorizontal;
@@ -102,7 +101,7 @@ namespace TST
         [field : SerializeField] private bool isSprint = true;
         private bool isAutoRunMode = false;
         private bool isWalk = false;
-        private bool isRollFinished = true;
+        private bool isRolling = false;
         #endregion
 
         private void Awake()
@@ -136,10 +135,10 @@ namespace TST
 
         private void LateUpdate()
         {
-            aimingRigWeightBlend = Mathf.Lerp(aimingRigWeightBlend, isArmedCompleted ? 1f : 0f, Time.deltaTime * 10f);
+            aimingRigWeightBlend = Mathf.Lerp(aimingRigWeightBlend, isArmedCompleted && !isRolling ? 1f : 0f, Time.deltaTime * 10f);
             aimingRig.weight = aimingRigWeightBlend;
 
-            lefthandRigWeightBlend = Mathf.Lerp(lefthandRigWeightBlend, isArmedCompleted && !isReloading ? 1f : 0f, Time.deltaTime * 10f);
+            lefthandRigWeightBlend = Mathf.Lerp(lefthandRigWeightBlend, isArmedCompleted && !isReloading && !isRolling ? 1f : 0f, Time.deltaTime * 10f);
             lefthandRig.weight = lefthandRigWeightBlend;
         }
 
@@ -147,8 +146,8 @@ namespace TST
 
         public void Move(Vector2 input, float yAxisAngle)
         {
-            if (!isRollFinished)
-                return;
+            //if (isRolling)
+            //    return;
 
             if (input.magnitude > 0f)
             {
@@ -225,16 +224,16 @@ namespace TST
 
         public void Roll()
         {
-            if (isRollFinished)
+            if (!isRolling)
             {
                 animator.SetTrigger("Roll Trigger");
-                isRollFinished = false;
+                isRolling = true;
             }
         }
 
         public void Rotate(Vector3 targetPoint)
         {
-            if (!isRollFinished)
+            if (isRolling)
                 return;
 
             if (IsArmed)
@@ -251,7 +250,10 @@ namespace TST
 
         public void Shoot()
         {
-            if (IsArmed && isArmedCompleted && isRollFinished)
+            if (isRolling)
+                return;
+
+            if (IsArmed && isArmedCompleted)
             {
                 bool isFireSuccess = weapon.Fire();
                 if (!isFireSuccess && weapon.CurrentAmmo <= 0)
@@ -320,7 +322,7 @@ namespace TST
 
         public void RollingFinished(int flag)
         {
-            isRollFinished = flag > 0;
+            isRolling = false;
         }
 
         public void SetArmedComplete(int flag)
