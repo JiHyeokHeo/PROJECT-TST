@@ -92742,8 +92742,7 @@ AnimationClip:
   - time: 1.3333334
     functionName: RollingFinished
     data: 
-    objectReferenceParameter: {fileID: 11500000, guid: 56c852b44594e884f83809d9a0259568,
-      type: 3}
+    objectReferenceParameter: {fileID: 0}
     floatParameter: 0
-    intParameter: 0
+    intParameter: 1
     messageOptions: 0

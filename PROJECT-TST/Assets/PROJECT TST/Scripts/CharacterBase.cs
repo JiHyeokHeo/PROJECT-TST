@@ -30,6 +30,8 @@ namespace TST
 
         public Animator animator;
         public UnityEngine.CharacterController unityCharacterController;
+        public Transform cameraPivot;
+
         public CinemachineGunRecoil cameraGunRecoilComponent;
         public WeaponBase weapon;
         public Transform weaponSocket;
@@ -109,7 +111,6 @@ namespace TST
             unityCharacterController = GetComponent<UnityEngine.CharacterController>();
 
             // 구르기
-            rollCoroutine = StartRollCoroutine();
         }
 
         private void Start()
@@ -126,13 +127,11 @@ namespace TST
             speedBlend = Mathf.Lerp(speedBlend, targetSpeed, Time.deltaTime * 10f);
             horizontal = Mathf.Lerp(horizontal, targetHorizontal, Time.deltaTime * 10f);
             vertical = Mathf.Lerp(vertical, targetVertical, Time.deltaTime * 10f);
-            Whole_Body_Weight_Blend = Mathf.Lerp(Whole_Body_Weight_Blend, isRollFinished ? 0f : 1f, Time.deltaTime * 10f);
 
             animator.SetFloat("Armed", armedBlend);
             animator.SetFloat("Speed", speedBlend);
             animator.SetFloat("Horizontal", horizontal);
             animator.SetFloat("Vertical", vertical);
-            animator.SetLayerWeight(2, Whole_Body_Weight_Blend);
         }
 
         private void LateUpdate()
@@ -144,29 +143,62 @@ namespace TST
             lefthandRig.weight = lefthandRigWeightBlend;
         }
 
-        public void Move(Vector2 input)
+        private float targetRotation = 0f;
+
+        public void Move(Vector2 input, float yAxisAngle)
         {
             if (!isRollFinished)
                 return;
 
-            if (input.magnitude > 0f || IsAutoRunMode)
+            if (input.magnitude > 0f)
             {
-                // 자동달리기 켜져있으면 일단 스프린트 모드 On
-                targetSpeed = IsSprint ? 1.0f : 0.0f;
-                targetHorizontal = input.x;
-                targetVertical = IsAutoRunMode ? 1.0f : input.y;
+                if (!IsArmed)
+                {
+                    Vector3 inputDirection = new Vector3(input.x, 0f, input.y);
+                    targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + yAxisAngle;
+                    transform.rotation = Quaternion.Euler(0f, targetRotation, 0f);
+                }
 
-                Vector3 movement =  (transform.forward * targetVertical + transform.right * targetHorizontal) 
-                    * (IsSprint ? sprintSpeed : moveSpeed) * Time.deltaTime;
+                Vector3 movement = Vector3.zero;
+
+                if (IsArmed)
+                {
+                    targetHorizontal = input.x;
+                    targetVertical = input.y;
+                    movement = (transform.forward * input.y + transform.right * input.x) * moveSpeed * Time.deltaTime;
+                }
+                else
+                {
+                    targetVertical = 1f;
+                    movement = transform.forward * moveSpeed * Time.deltaTime;
+                }
+
                 unityCharacterController.Move(movement);
             }
             else
             {
-                IsSprint = true;
-                targetSpeed = IsAutoRunMode ? targetSpeed : 0f;
-                targetHorizontal = IsAutoRunMode ? targetHorizontal : 0f;
-                targetVertical = IsAutoRunMode ? targetVertical : 0f;
+                targetHorizontal = 0f;
+                targetVertical = 0f;
             }
+
+            //if (input.magnitude > 0f || IsAutoRunMode)
+            //{
+            //    // 자동달리기 켜져있으면 일단 스프린트 모드 On
+            //    targetSpeed = IsSprint ? 1.0f : 0.0f;
+            //    targetHorizontal = input.x;
+            //    targetVertical = IsAutoRunMode ? 1.0f : input.y;
+
+            //    Vector3 movement =  (transform.forward * targetVertical + transform.right * targetHorizontal) 
+            //        * (IsSprint ? sprintSpeed : moveSpeed) * Time.deltaTime;
+            //    unityCharacterController.Move(movement);
+            //}
+            //else
+            //{
+            //    IsSprint = true;
+            //    targetSpeed = IsAutoRunMode ? targetSpeed : 0f;
+            //    targetHorizontal = IsAutoRunMode ? targetHorizontal : 0f;
+            //    targetVertical = IsAutoRunMode ? targetVertical : 0f;
+            //}
 
             if (!isAutoRunMode)
                 animator.SetFloat("Magnitude", input.magnitude);
@@ -175,21 +207,21 @@ namespace TST
 
         }
 
-        public float rollSpeed = 4.0f;
-        private IEnumerator rollCoroutine;
-        IEnumerator StartRollCoroutine()
-        {
-            while (true)
-            {
-                if (isRollFinished)
-                    StopCoroutine(rollCoroutine);
+        //public float rollSpeed = 4.0f;
+        //private IEnumerator rollCoroutine;
+        //IEnumerator StartRollCoroutine()
+        //{
+        //    while (true)
+        //    {
+        //        if (isRollFinished)
+        //            StopCoroutine(rollCoroutine);
 
-                Vector3 movement = (transform.forward * 1.0f + transform.right * 0.0f)
-                    * rollSpeed * Time.deltaTime;
-                unityCharacterController.Move(movement);
-                yield return null;
-            }
-        }
+        //        Vector3 movement = (transform.forward * 1.0f + transform.right * 0.0f)
+        //            * rollSpeed * Time.deltaTime;
+        //        unityCharacterController.Move(movement);
+        //        yield return null;
+        //    }
+        //}
 
         public void Roll()
         {
@@ -197,17 +229,23 @@ namespace TST
             {
                 animator.SetTrigger("Roll Trigger");
                 isRollFinished = false;
-
-                StartCoroutine(rollCoroutine);
             }
         }
 
-        public void Rotate(float rotation)
+        public void Rotate(Vector3 targetPoint)
         {
             if (!isRollFinished)
                 return;
 
-            transform.Rotate(Vector3.up * rotation * rotateSpeed * Time.deltaTime);
+            if (IsArmed)
+            {
+                Vector3 target = targetPoint;
+                target.y = transform.position.y;
+                Vector3 pos = transform.position;
+                Vector3 direction = (target - pos).normalized;
+
+                transform.forward = Vector3.Lerp(transform.forward, direction, Time.deltaTime * 10f);
+            }
         }
 
 

@@ -11,9 +11,6 @@ namespace TST
 
         public LayerMask aimingLayer;
 
-        public float topClampLimit = 80;
-        public float bottomClampLimit = -80;
-
         #region Tory
 
         private float pitch = 0f;
@@ -30,9 +27,6 @@ namespace TST
             float inputX = Input.GetAxis("Horizontal");
             float inputY = Input.GetAxis("Vertical");
 
-            float mouseX = Input.GetAxis("Mouse X");
-            float mouseY = Input.GetAxis("Mouse Y");
-            
             if (Input.GetKeyDown(KeyCode.Tab))
             {
                 CameraSystem.Instance.IsCameraSideOnRight = !CameraSystem.Instance.IsCameraSideOnRight;
@@ -93,23 +87,69 @@ namespace TST
                 OptionManager.Instance.IsGameStopped = !OptionManager.Instance.IsGameStopped;
             }
 
-            pitch = Mathf.Clamp(pitch - mouseY * Time.deltaTime * 400.0f, bottomClampLimit, topClampLimit);
-            cameraPivot.localRotation = Quaternion.Euler(pitch, 0, 0);
+            //pitch = Mathf.Clamp(pitch - mouseY * Time.deltaTime * 400.0f, bottomClampLimit, topClampLimit);
+            //cameraPivot.localRotation = Quaternion.Euler(pitch, 0, 0);
 
-            linkedCharacter.Move(new Vector2(inputX, inputY));
-            linkedCharacter.Rotate(mouseX);
-
-            // ¼¾ÅÍ 0.5f 0.5f
+            Vector3 aimingPoint = Vector3.zero;
             Ray screenCenterRay = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
             Debug.DrawRay(screenCenterRay.origin, screenCenterRay.direction * 100.0f, Color.red);
             if (Physics.Raycast(screenCenterRay, out RaycastHit hitInfo, 1000f, aimingLayer, QueryTriggerInteraction.Ignore))
             {
-                linkedCharacter.AimingPosition = hitInfo.point;
+                aimingPoint = hitInfo.point;
             }
             else
             {
-                linkedCharacter.AimingPosition = screenCenterRay.GetPoint(1000f);
+                aimingPoint = screenCenterRay.GetPoint(1000f);
             }
+
+            linkedCharacter.Move(new Vector2(inputX, inputY), Camera.main.transform.eulerAngles.y);
+            linkedCharacter.Rotate(aimingPoint);
+            linkedCharacter.AimingPosition = aimingPoint;
+        }
+
+        private void LateUpdate()
+        {
+            CameraRotation();
+        }
+
+        public float topClampLimit = 80;
+        public float bottomClampLimit = -80;
+
+        private float threshold = 0.01f;
+        private float targetYaw;
+        private float targetPitch;
+
+        private void CameraRotation()
+        {
+            float mouseX = Input.GetAxis("Mouse X");
+            float mouseY = Input.GetAxis("Mouse Y");
+            Vector2 look = new Vector2(mouseX, mouseY);
+
+            if (look.sqrMagnitude > threshold)
+            {
+                float yaw = look.x;
+                float pitch = -look.y;
+
+                targetYaw = ClampAngle(targetYaw + yaw, float.MinValue, float.MaxValue);
+                targetPitch = ClampAngle(targetPitch + pitch, bottomClampLimit, topClampLimit);
+            }
+
+            linkedCharacter.cameraPivot.transform.rotation = Quaternion.Euler(targetPitch, targetYaw, 0f);
+        }
+
+        private static float ClampAngle(float angle, float min, float max)
+        {
+            if (angle < -360)
+            {
+                angle += 360;
+            }
+
+            if (angle > 360)
+            {
+                angle -= 360;
+            }
+
+            return Mathf.Clamp(angle, min, max);
         }
     }
 }
