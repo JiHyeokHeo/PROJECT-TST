@@ -131,6 +131,9 @@ namespace TST
             animator.SetFloat("Speed", speedBlend);
             animator.SetFloat("Horizontal", horizontal);
             animator.SetFloat("Vertical", vertical);
+
+            if (isRolling)
+                StartRoll();
         }
 
         private void LateUpdate()
@@ -146,8 +149,8 @@ namespace TST
 
         public void Move(Vector2 input, float yAxisAngle)
         {
-            //if (isRolling)
-            //    return;
+            if (isRolling)
+                return;
 
             if (input.magnitude > 0f)
             {
@@ -221,6 +224,17 @@ namespace TST
         //        yield return null;
         //    }
         //}
+
+        public float rollSpeed = 4.0f;
+        private float rollTime;
+        public AnimationCurve rollSpeedCurve;
+        private void StartRoll()
+        {
+            rollTime += Time.deltaTime;
+            Vector3 movement = (transform.forward * 1.0f + transform.right * 0.0f)
+                    * (rollSpeed * rollSpeedCurve.Evaluate(rollTime) * Time.deltaTime);
+            unityCharacterController.Move(movement);
+        }
 
         public void Roll()
         {
@@ -323,6 +337,7 @@ namespace TST
         public void RollingFinished(int flag)
         {
             isRolling = false;
+            rollTime = 0.0f;
         }
 
         public void SetArmedComplete(int flag)
