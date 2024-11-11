@@ -82,6 +82,14 @@ namespace TST
                 linkedCharacter.Roll();
             }
 
+            if (Input.GetKeyDown(KeyCode.F))
+            {
+                for (int i = 0; i < currentInteractables.Count; i++)
+                {
+                    currentInteractables[i].Interact();
+                }
+            }
+
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 OptionManager.Instance.IsGameStopped = !OptionManager.Instance.IsGameStopped;
@@ -105,6 +113,25 @@ namespace TST
             linkedCharacter.Move(new Vector2(inputX, inputY), Camera.main.transform.eulerAngles.y);
             linkedCharacter.Rotate(aimingPoint);
             linkedCharacter.AimingPosition = aimingPoint;
+        }
+
+
+        public float interactionRange = 2f;
+        public List<IInteractable> currentInteractables = new List<IInteractable>();
+
+        private void FixedUpdate()
+        {
+            Collider[] overlappedObjects = Physics.OverlapSphere(transform.position, interactionRange);
+            for (int i = 0; i < overlappedObjects.Length; i++)
+            {
+                if (overlappedObjects[i].TryGetComponent(out IInteractable interactable))
+                {
+                    if (false == currentInteractables.Contains(interactable))
+                    {
+                        currentInteractables.Add(interactable);
+                    }
+                }
+            }
         }
 
         private void LateUpdate()

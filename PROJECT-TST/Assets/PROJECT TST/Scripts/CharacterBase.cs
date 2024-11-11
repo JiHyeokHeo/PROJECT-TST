@@ -31,6 +31,7 @@ namespace TST
         public Animator animator;
         public UnityEngine.CharacterController unityCharacterController;
         public Transform cameraPivot;
+        public Rigidbody[] ragdollRigidbodies;
 
         public CinemachineGunRecoil cameraGunRecoilComponent;
         public WeaponBase weapon;
@@ -108,8 +109,20 @@ namespace TST
         {
             animator = GetComponent<Animator>();
             unityCharacterController = GetComponent<UnityEngine.CharacterController>();
-
+            ragdollRigidbodies = GetComponentsInChildren<Rigidbody>();
+            SetRagdollActive(false);
             // ±¸¸£±â
+        }
+
+        public void SetRagdollActive(bool isActive)
+        {
+            foreach (var rb in ragdollRigidbodies)
+            {
+                rb.isKinematic = !isActive;
+            }
+
+            animator.enabled = !isActive;
+            unityCharacterController.enabled = !isActive;
         }
 
         private void Start()
@@ -117,6 +130,13 @@ namespace TST
             aimingRig.weight = 0f;
             lefthandRig.weight = 0f;
             rigBuilder.Build();
+
+            //StartCoroutine(DelayedActiveRagdoll());
+            //IEnumerator DelayedActiveRagdoll()
+            //{
+            //    yield return new WaitForSeconds(3f);
+            //    SetRagdollActive(true);
+            //}
         }
 
         public float Whole_Body_Weight_Blend = 0.0f;
