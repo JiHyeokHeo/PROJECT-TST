@@ -31,8 +31,8 @@ namespace TST
 
         public void PauseRecoil()
         {
-            shotCnt = 0;
             isFire = false;
+            shotCnt = 0;
             timeElapsed = 0;
         }
 
@@ -40,6 +40,7 @@ namespace TST
         public void StartRecoil()
         {
             // 첫발부터 recoil 시작
+            isFire = true;
             shotCnt++;
             if (shotCnt == 1)
             {
@@ -48,7 +49,6 @@ namespace TST
                 timeElapsed = 0.0f;
             }
 
-            isFire = true;
             noiseComponent.m_FrequencyGain = 1.0f;
             noiseComponent.m_AmplitudeGain = 1.0f;
         }
@@ -58,17 +58,26 @@ namespace TST
             if (noiseComponent == null)
                 return;
 
-            RecoilCheck();
+            if (virtualCamera == null)
+                return;
+
+            RecoilStart();
+            CrossHairRecoilStart();
         }
 
-        void RecoilCheck()
+        void CrossHairRecoilStart()
         {
-            if (virtualCamera != null)
-            {
-                timeElapsed += Time.deltaTime;
+            if (isFire)
+                OptionManager.Instance.usingCrossHairComponent.IsRecoilChange = true;
+            else
+                OptionManager.Instance.usingCrossHairComponent.IsRecoilChange = false;
+        }
 
-                noisePositionSet(timeElapsed);
-            }
+        void RecoilStart()
+        {
+            timeElapsed += Time.deltaTime;
+
+            noisePositionSet(timeElapsed);
         }
 
         void noisePositionSet(float timeElapsed)

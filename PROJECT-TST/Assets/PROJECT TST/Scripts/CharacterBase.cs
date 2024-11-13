@@ -281,7 +281,6 @@ namespace TST
             }
         }
 
-
         public void Shoot()
         {
             if (isRolling)

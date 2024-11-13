@@ -8,7 +8,7 @@ namespace TST
 {
     public class UITest : MonoBehaviour, IPointerClickHandler
     {
-        public GameObject crossHair;
+        public UITest crossHair;
         public event Action<PointerEventData> OnClickHandler;
 
         void OnEnable()
@@ -17,9 +17,7 @@ namespace TST
             {
                 if (OptionManager.Instance.usingCrossHair != crossHair)
                 {
-                    OptionManager.Instance.usingCrossHair.SetActive(false);
-                    OptionManager.Instance.usingCrossHair = crossHair;
-                    crossHair.SetActive(true);
+                    OptionManager.Instance.ChangeCrossHair(crossHair);
                 }
             };
         }
@@ -28,7 +26,5 @@ namespace TST
         {
             OnClickHandler?.Invoke(eventData);
         }
-
-     
     }
 }

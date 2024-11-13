@@ -1161,6 +1161,7 @@ MonoBehaviour:
     prefab: {fileID: 767994967}
     UIButtonOrder: 2
   UICanvas: {fileID: 1190821125}
+  usingCrossHairComponent: {fileID: 0}
 --- !u!4 &424626274
 Transform:
   m_ObjectHideFlags: 0
@@ -2818,6 +2819,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 720457291}
+  - component: {fileID: 720457292}
   m_Layer: 5
   m_Name: CrossHair A
   m_TagString: Untagged
@@ -2849,6 +2851,24 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &720457292
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 720457290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 57e548b593f3ca547b39cc38b0b89be2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxPosX: 0
+  maxPosY: 0
+  initPosX: []
+  initPosY: []
+  maxPosDivideRatio: 0
+  ratio: 1.5
 --- !u!4 &729267190 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400014, guid: 8f0565f23a2b58541a475bd3c1393052, type: 3}
