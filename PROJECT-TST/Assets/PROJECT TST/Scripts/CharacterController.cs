@@ -111,8 +111,8 @@ namespace TST
             }
 
             linkedCharacter.Move(new Vector2(inputX, inputY), Camera.main.transform.eulerAngles.y);
-            linkedCharacter.Rotate(aimingPoint);
-            linkedCharacter.AimingPosition = aimingPoint;
+            bool rotateSuccess = linkedCharacter.Rotate(aimingPoint);
+            linkedCharacter.AimingPosition = rotateSuccess ? aimingPoint : screenCenterRay.GetPoint(1000f);
         }
 
 

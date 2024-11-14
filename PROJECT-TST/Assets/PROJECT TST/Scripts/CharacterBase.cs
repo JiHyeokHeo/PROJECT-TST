@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
+using System.Net;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
@@ -265,11 +267,14 @@ namespace TST
             }
         }
 
-        public void Rotate(Vector3 targetPoint)
+        public bool Rotate(Vector3 targetPoint)
         {
+            // 타겟은 일단 에이밍 걸린 포인트이다
             if (isRolling)
-                return;
+                return false;
 
+            // 내적 = 각 벡터의 길이 * cos세타
+            
             if (IsArmed)
             {
                 Vector3 target = targetPoint;
@@ -277,8 +282,22 @@ namespace TST
                 Vector3 pos = transform.position;
                 Vector3 direction = (target - pos).normalized;
 
+                Vector3 viewForward = Camera.main.transform.forward;
+                viewForward.y = transform.position.y;
+
+                float dotResult = Vector3.Dot(viewForward, direction);
+                // 내적값이 음수가 나오면 forward를 카메라 정면 방향으로 변경
+                // targetPoint와 플레이어의 거리에 따라 예외처리가 필요할지..?
+                if (dotResult < 0.9)
+                {
+                    transform.forward = Vector3.Lerp(transform.forward, viewForward, Time.deltaTime * 10f);
+                    return false;
+                }
+
                 transform.forward = Vector3.Lerp(transform.forward, direction, Time.deltaTime * 10f);
             }
+
+            return true;
         }
 
         public void Shoot()
