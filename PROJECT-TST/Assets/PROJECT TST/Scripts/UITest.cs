@@ -8,7 +8,7 @@ namespace TST
 {
     public class UITest : MonoBehaviour, IPointerClickHandler
     {
-        public UITest crossHair;
+        public GameObject crossHair;
         public event Action<PointerEventData> OnClickHandler;
 
         void OnEnable()

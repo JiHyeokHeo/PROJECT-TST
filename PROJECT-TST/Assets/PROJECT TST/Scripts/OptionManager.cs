@@ -71,7 +71,7 @@ namespace TST
             return crossHair;
         }
 
-        public bool ChangeCrossHair(UITest crossHair)
+        public bool ChangeCrossHair(GameObject crossHair)
         {
             usingCrossHair.SetActive(false);
             usingCrossHair = crossHair.gameObject;
