@@ -336,6 +336,11 @@ namespace TST
             }
         }
 
+        //public void ZipLine()
+        //{
+
+        //}
+
         public void SetReloadComplete()
         {
             // # 재장전 애니메이션 완료시 호출 되는 구역

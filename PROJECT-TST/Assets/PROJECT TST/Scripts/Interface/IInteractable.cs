@@ -7,6 +7,6 @@ namespace TST
     public interface IInteractable 
     {
         public string Message { get; }
-        public void Interact();
+        public void Interact(GameObject go);
     }
 }

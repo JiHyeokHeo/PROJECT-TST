@@ -86,7 +86,7 @@ namespace TST
             {
                 for (int i = 0; i < currentInteractables.Count; i++)
                 {
-                    currentInteractables[i].Interact();
+                    currentInteractables[i].Interact(linkedCharacter.gameObject);
                 }
             }
 
