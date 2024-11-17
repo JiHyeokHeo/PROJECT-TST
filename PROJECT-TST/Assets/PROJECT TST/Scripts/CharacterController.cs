@@ -65,6 +65,7 @@ namespace TST
             if (Input.GetMouseButton(0))
             {
                 linkedCharacter.Shoot();
+                AddRecoil();
             }
 
             if (Input.GetMouseButtonUp(0))
@@ -146,6 +147,15 @@ namespace TST
         private float targetYaw;
         private float targetPitch;
 
+        private float recoilAmount = 1.0f; 
+        private float recoilSpeed = 10.0f; 
+        private float currentRecoil = 0.0f;
+
+        public void AddRecoil()
+        {
+            currentRecoil += recoilAmount;
+        }
+
         private void CameraRotation()
         {
             float mouseX = Input.GetAxis("Mouse X");
@@ -161,7 +171,15 @@ namespace TST
                 targetPitch = ClampAngle(targetPitch + pitch, bottomClampLimit, topClampLimit);
             }
 
+            // Recoil 적용
+            targetPitch -= currentRecoil * Time.deltaTime;
+            targetPitch = ClampAngle(targetPitch, bottomClampLimit, topClampLimit);
+
+            // 카메라 회전 적용
             linkedCharacter.cameraPivot.transform.rotation = Quaternion.Euler(targetPitch, targetYaw, 0f);
+
+            // Recoil 감소 (자연스럽게 원래 위치로 돌아가기)
+            currentRecoil = Mathf.Lerp(currentRecoil, 0f, Time.deltaTime * recoilSpeed);
         }
 
         private static float ClampAngle(float angle, float min, float max)

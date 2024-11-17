@@ -18,6 +18,8 @@ namespace TST
         public string Message => "집라인 연결";
 
         private bool zipping = false;
+
+        // 매달리고 있는 구체
         private GameObject localZip;
 
         void Awake()
