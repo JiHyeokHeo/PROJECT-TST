@@ -21,10 +21,14 @@ namespace TST
         private float blendCameraSide;
         private float blendCameraDistance;
 
+        private CinemachineCameraOffset cameraCrouchOffset;
+        Vector3 cameraoffSetTarget;
+
         private void Awake()
         {
             Instance = this;
             tpsCameraFollow = tpsCamera.GetCinemachineComponent<Cinemachine3rdPersonFollow>();
+            cameraCrouchOffset = tpsCamera.gameObject.GetComponent<CinemachineCameraOffset>();
         }
 
         private void Update()
@@ -34,6 +38,14 @@ namespace TST
 
             tpsCameraFollow.CameraDistance = blendCameraDistance;
             tpsCameraFollow.CameraSide = blendCameraSide;
+
+            // Ä«¸Þ¶ó offset
+            cameraCrouchOffset.m_Offset = Vector3.Lerp(cameraCrouchOffset.m_Offset, cameraoffSetTarget, Time.deltaTime * 10.0f);
+        }
+
+        public void SetCrouchOffSet(Vector3 offSet)
+        {
+            cameraoffSetTarget = offSet;
         }
     }
 }

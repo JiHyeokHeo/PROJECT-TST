@@ -67,6 +67,7 @@ namespace TST
             player.GetComponent<Rigidbody>().isKinematic = true;
             player.GetComponent<Rigidbody>().velocity = Vector3.zero;
             player.GetComponent<CharacterBase>().IsZip = true;
+            player.GetComponent<UnityEngine.CharacterController>().enabled = false;
             player.transform.parent = localZip.transform;
             zipping = true;
         }
@@ -81,6 +82,7 @@ namespace TST
             player.GetComponent<Rigidbody>().isKinematic = true;
             player.GetComponent<Rigidbody>().velocity = Vector3.zero;
             player.GetComponent<CharacterBase>().IsZip = false;
+            player.GetComponent<UnityEngine.CharacterController>().enabled = true;
             player.transform.parent = null;
             Destroy(localZip);
             localZip = null ;

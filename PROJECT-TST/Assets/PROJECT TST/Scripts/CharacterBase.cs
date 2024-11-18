@@ -35,7 +35,7 @@ namespace TST
         public Transform cameraPivot;
         public Rigidbody[] ragdollRigidbodies;
 
-        public CinemachineGunRecoil cameraGunRecoilComponent;
+        public CinemachineGunRecoil cameraGunRecoilComponent; // 관련 함수 없애도 문제없음. 추후 리팩토링 작업에서 지우자
         public WeaponBase weapon;
         public Transform weaponSocket;
         public Transform weaponHolder;
@@ -58,6 +58,7 @@ namespace TST
         private float vertical;
         private float speedBlend;
         private float armedBlend;
+        private float crouchBlend;
 
         private float targetSpeed;
         private float targetHorizontal;
@@ -148,11 +149,13 @@ namespace TST
             speedBlend = Mathf.Lerp(speedBlend, targetSpeed, Time.deltaTime * 10f);
             horizontal = Mathf.Lerp(horizontal, targetHorizontal, Time.deltaTime * 10f);
             vertical = Mathf.Lerp(vertical, targetVertical, Time.deltaTime * 10f);
+            crouchBlend = Mathf.Lerp(crouchBlend, isCrouch ? 1f : 0f, Time.deltaTime * 10.0f);
 
             animator.SetFloat("Armed", armedBlend);
             animator.SetFloat("Speed", speedBlend);
             animator.SetFloat("Horizontal", horizontal);
             animator.SetFloat("Vertical", vertical);
+            animator.SetFloat("Crouch", crouchBlend);
 
             if (isRolling)
                 StartRoll();
@@ -173,6 +176,12 @@ namespace TST
         {
             if (isRolling)
                 return;
+
+            if (isZip)
+            {
+                animator.SetFloat("Magnitude", 0.0f);
+                return;
+            }
 
             if (input.magnitude > 0f)   
             {
@@ -228,9 +237,6 @@ namespace TST
                 animator.SetFloat("Magnitude", input.magnitude);
             else
                 animator.SetFloat("Magnitude", 1.0f);
-
-            if (isZip)
-                animator.SetFloat("Magnitude", 0.0f);
         }
 
 
@@ -251,6 +257,25 @@ namespace TST
             }
         }
 
+        private bool isCrouch = false;
+        [SerializeField]
+        Vector3 crouchOffset;
+
+        public void Crouch()
+        {
+            // 카메라 위치를 조금 낮춥시다
+            if (!isCrouch)
+            {
+                CameraSystem.Instance.SetCrouchOffSet(crouchOffset);
+            }
+            else
+            {
+                CameraSystem.Instance.SetCrouchOffSet(Vector3.zero);
+            }
+
+            isCrouch = !isCrouch;
+        }
+
         public bool Rotate(Vector3 targetPoint)
         {
             // 타겟은 일단 에이밍 걸린 포인트이다
@@ -267,18 +292,18 @@ namespace TST
                 Vector3 direction = (target - pos).normalized;
 
                 Vector3 viewForward = Camera.main.transform.forward;
+                viewForward.y = 0.0f;
 
                 float dotResult = Vector3.Dot(viewForward, direction);
                 // 내적값이 음수가 나오면 forward를 카메라 정면 방향으로 변경
                 // targetPoint와 플레이어의 거리에 따라 예외처리가 필요할지..?
                 if (dotResult < 0.9)
                 {
-                    viewForward.x = 0.0f;
-                    transform.forward = Vector3.Lerp(transform.forward, viewForward, Time.deltaTime * 10f);
+                    transform.rotation = Quaternion.LookRotation(Vector3.Lerp(transform.forward, viewForward, Time.deltaTime * 10f));
                     return false;
                 }
 
-                transform.forward = Vector3.Lerp(transform.forward, direction, Time.deltaTime * 10f);
+                transform.rotation = Quaternion.LookRotation(Vector3.Lerp(transform.forward, viewForward, Time.deltaTime * 10f));
             }
 
             return true;
@@ -295,18 +320,18 @@ namespace TST
                 if (!isFireSuccess && weapon.CurrentAmmo <= 0)
                 {
                     Reload();
-                    cameraGunRecoilComponent.PauseRecoil();
+                    //cameraGunRecoilComponent.PauseRecoil();
                     return;
                 }
 
-                if (isFireSuccess)
-                    cameraGunRecoilComponent.StartRecoil();
+                //if (isFireSuccess)
+                    //cameraGunRecoilComponent.StartRecoil();
             }
         }
 
         public void ShootFinished()
         {
-            cameraGunRecoilComponent.PauseRecoil();
+            //cameraGunRecoilComponent.PauseRecoil();
         }
 
         public void Reload()

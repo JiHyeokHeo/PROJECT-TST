@@ -3629,6 +3629,7 @@ GameObject:
   - component: {fileID: 769642678}
   - component: {fileID: 769642679}
   - component: {fileID: 769642680}
+  - component: {fileID: 769642681}
   m_Layer: 0
   m_Name: TPS Camera
   m_TagString: Untagged
@@ -3706,6 +3707,21 @@ MonoBehaviour:
   virtualCamera: {fileID: 769642679}
   recoilSetting: {fileID: 11400000, guid: e052d3acbf51ff343b88e60f61a20335, type: 2}
   curveDuration: 1
+--- !u!114 &769642681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769642677}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44d70cc20219cd84593f67d248eafe36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Offset: {x: 0, y: 0, z: 0}
+  m_ApplyAfter: 1
+  m_PreserveComposition: 0
 --- !u!1 &799201252
 GameObject:
   m_ObjectHideFlags: 0
@@ -7516,8 +7532,6 @@ MonoBehaviour:
   runSpeed: 2.1
   sprintSpeed: 3.5
   rotateSpeed: 180
-  isSprint: 0
-  Whole_Body_Weight_Blend: 0
   rollSpeed: 4
   rollSpeedCurve:
     serializedVersion: 2
@@ -7561,6 +7575,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  isSprint: 0
+  Whole_Body_Weight_Blend: 0
+  crouchOffset: {x: 0, y: -0.3, z: 0}
 --- !u!4 &1740385998 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400326, guid: 8f0565f23a2b58541a475bd3c1393052, type: 3}
@@ -7659,7 +7676,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!1 &1756328514 stripped
 GameObject:

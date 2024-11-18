@@ -11,12 +11,6 @@ namespace TST
 
         public LayerMask aimingLayer;
 
-        #region Tory
-
-        private float pitch = 0f;
-
-        #endregion
-
         private void Awake()
         {
             linkedCharacter = GetComponent<CharacterBase>();
@@ -81,6 +75,11 @@ namespace TST
             if (Input.GetKeyDown(KeyCode.V))
             {
                 linkedCharacter.Roll();
+            }
+
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                linkedCharacter.Crouch();
             }
 
             if (Input.GetKeyDown(KeyCode.F))
@@ -153,7 +152,8 @@ namespace TST
 
         public void AddRecoil()
         {
-            currentRecoil += recoilAmount;
+            if (linkedCharacter.IsArmed && linkedCharacter.weapon.CurrentAmmo > 0)
+                currentRecoil += recoilAmount;
         }
 
         private void CameraRotation()
@@ -176,10 +176,10 @@ namespace TST
             targetPitch = ClampAngle(targetPitch, bottomClampLimit, topClampLimit);
 
             // 카메라 회전 적용
-            linkedCharacter.cameraPivot.transform.rotation = Quaternion.Euler(targetPitch, targetYaw, 0f);
+            linkedCharacter.cameraPivot.transform.rotation = Quaternion.Euler(targetPitch, targetYaw , 0f);
 
-            // Recoil 감소 (자연스럽게 원래 위치로 돌아가기)
-            currentRecoil = Mathf.Lerp(currentRecoil, 0f, Time.deltaTime * recoilSpeed);
+            //// Recoil 감소 (자연스럽게 원래 위치로 돌아가기) 추후 컨텐츠에 따라 선택하자 아직은 비활성화
+            //currentRecoil = Mathf.Lerp(currentRecoil, 0f, Time.deltaTime * recoilSpeed);
         }
 
         private static float ClampAngle(float angle, float min, float max)
