@@ -146,14 +146,23 @@ namespace TST
         private float targetYaw;
         private float targetPitch;
 
+        [SerializeField]
         private float recoilAmount = 1.0f; 
         private float recoilSpeed = 10.0f; 
         private float currentRecoil = 0.0f;
 
+        private float recoilMaxThreshold = 20.0f;
         public void AddRecoil()
         {
             if (linkedCharacter.IsArmed && linkedCharacter.weapon.CurrentAmmo > 0)
-                currentRecoil += recoilAmount;
+                currentRecoil += recoilAmount * Time.deltaTime;
+
+            currentRecoil = Mathf.Clamp(currentRecoil, 0.0f, recoilMaxThreshold);
+        }
+
+        public void PauseRecoil()
+        {
+            currentRecoil = 0.0f;
         }
 
         private void CameraRotation()
@@ -172,7 +181,7 @@ namespace TST
             }
 
             // Recoil 적용
-            targetPitch -= currentRecoil * Time.deltaTime;
+            targetPitch -= currentRecoil;
             targetPitch = ClampAngle(targetPitch, bottomClampLimit, topClampLimit);
 
             // 카메라 회전 적용

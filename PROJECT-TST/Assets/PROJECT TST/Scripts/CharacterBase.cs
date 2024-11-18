@@ -32,6 +32,7 @@ namespace TST
 
         public Animator animator;
         public UnityEngine.CharacterController unityCharacterController;
+        public CharacterController characterController;
         public Transform cameraPivot;
         public Rigidbody[] ragdollRigidbodies;
 
@@ -120,6 +121,7 @@ namespace TST
         {
             animator = GetComponent<Animator>();
             unityCharacterController = GetComponent<UnityEngine.CharacterController>();
+            characterController = GetComponent<CharacterController>();
             ragdollRigidbodies = GetComponentsInChildren<Rigidbody>();
             SetRagdollActive(false);
         }
@@ -267,10 +269,12 @@ namespace TST
             if (!isCrouch)
             {
                 CameraSystem.Instance.SetCrouchOffSet(crouchOffset);
+                animator.SetFloat("Crouch", 1.0f);
             }
             else
             {
                 CameraSystem.Instance.SetCrouchOffSet(Vector3.zero);
+                animator.SetFloat("Crouch", 0.0f);
             }
 
             isCrouch = !isCrouch;
@@ -320,18 +324,18 @@ namespace TST
                 if (!isFireSuccess && weapon.CurrentAmmo <= 0)
                 {
                     Reload();
-                    //cameraGunRecoilComponent.PauseRecoil();
+                    characterController.PauseRecoil();
                     return;
                 }
 
-                //if (isFireSuccess)
-                    //cameraGunRecoilComponent.StartRecoil();
+                if (isFireSuccess)
+                    characterController.AddRecoil();
             }
         }
 
         public void ShootFinished()
         {
-            //cameraGunRecoilComponent.PauseRecoil();
+            characterController.PauseRecoil();
         }
 
         public void Reload()
