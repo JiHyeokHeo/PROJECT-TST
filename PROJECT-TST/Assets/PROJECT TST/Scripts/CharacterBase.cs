@@ -23,7 +23,7 @@ namespace TST
             set
             {
                 isArmed = value;
-                SetEquipWeapon(isArmed); // 추후 바뀔 수 있을듯?
+                SetEquipWeapon(isArmed); 
             }
         }
 
@@ -68,8 +68,10 @@ namespace TST
         private float aimingRigWeightBlend;
         private float lefthandRigWeightBlend;
 
-        #region Tory
-        // FSM 으로 추후 변경이 필요해보임
+        public float rollSpeed = 4.0f;
+        private float rollTime;
+        public AnimationCurve rollSpeedCurve;
+
         public bool IsSprint
         {
             get => isSprint;
@@ -101,11 +103,17 @@ namespace TST
             }
         }
 
+        public bool IsZip
+        {
+            get => isZip;
+            set => isZip = value;
+        }
+
         [field : SerializeField] private bool isSprint = true;
         private bool isAutoRunMode = false;
         private bool isWalk = false;
         private bool isRolling = false;
-        #endregion
+        private bool isZip = false;
 
         private void Awake()
         {
@@ -113,7 +121,6 @@ namespace TST
             unityCharacterController = GetComponent<UnityEngine.CharacterController>();
             ragdollRigidbodies = GetComponentsInChildren<Rigidbody>();
             SetRagdollActive(false);
-            // 구르기
         }
 
         public void SetRagdollActive(bool isActive)
@@ -132,13 +139,6 @@ namespace TST
             aimingRig.weight = 0f;
             lefthandRig.weight = 0f;
             rigBuilder.Build();
-
-            //StartCoroutine(DelayedActiveRagdoll());
-            //IEnumerator DelayedActiveRagdoll()
-            //{
-            //    yield return new WaitForSeconds(3f);
-            //    SetRagdollActive(true);
-            //}
         }
 
         public float Whole_Body_Weight_Blend = 0.0f;
@@ -174,7 +174,7 @@ namespace TST
             if (isRolling)
                 return;
 
-            if (input.magnitude > 0f)
+            if (input.magnitude > 0f)   
             {
                 if (!IsArmed)
                 {
@@ -226,30 +226,14 @@ namespace TST
 
             if (!isAutoRunMode)
                 animator.SetFloat("Magnitude", input.magnitude);
-            else 
+            else
                 animator.SetFloat("Magnitude", 1.0f);
 
+            if (isZip)
+                animator.SetFloat("Magnitude", 0.0f);
         }
 
-        //public float rollSpeed = 4.0f;
-        //private IEnumerator rollCoroutine;
-        //IEnumerator StartRollCoroutine()
-        //{
-        //    while (true)
-        //    {
-        //        if (isRollFinished)
-        //            StopCoroutine(rollCoroutine);
 
-        //        Vector3 movement = (transform.forward * 1.0f + transform.right * 0.0f)
-        //            * rollSpeed * Time.deltaTime;
-        //        unityCharacterController.Move(movement);
-        //        yield return null;
-        //    }
-        //}
-
-        public float rollSpeed = 4.0f;
-        private float rollTime;
-        public AnimationCurve rollSpeedCurve;
         private void StartRoll()
         {
             rollTime += Time.deltaTime;
@@ -283,13 +267,13 @@ namespace TST
                 Vector3 direction = (target - pos).normalized;
 
                 Vector3 viewForward = Camera.main.transform.forward;
-                viewForward.y = transform.position.y;
 
                 float dotResult = Vector3.Dot(viewForward, direction);
                 // 내적값이 음수가 나오면 forward를 카메라 정면 방향으로 변경
                 // targetPoint와 플레이어의 거리에 따라 예외처리가 필요할지..?
                 if (dotResult < 0.9)
                 {
+                    viewForward.x = 0.0f;
                     transform.forward = Vector3.Lerp(transform.forward, viewForward, Time.deltaTime * 10f);
                     return false;
                 }
@@ -327,8 +311,6 @@ namespace TST
 
         public void Reload()
         {
-            // # 재장전 애니메이션 Trigger 호출
-            // TODO : 이미 재장전을 하고 있었다면? 재장전을 하지 않도록 예외처리하자.
             if (!isReloading && weapon.CurrentAmmo != weapon.clipSize)
             {
                 isReloading = true;
@@ -336,15 +318,8 @@ namespace TST
             }
         }
 
-        //public void ZipLine()
-        //{
-
-        //}
-
         public void SetReloadComplete()
         {
-            // # 재장전 애니메이션 완료시 호출 되는 구역
-            // TODO : WeaponBase에 총알을 다시 가득채운다.
             weapon.Reload();
             isReloading = false;
         }
