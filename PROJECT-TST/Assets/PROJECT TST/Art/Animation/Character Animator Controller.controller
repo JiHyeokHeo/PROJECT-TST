@@ -105,14 +105,6 @@ BlendTree:
     m_Mirror: 0
   - serializedVersion: 2
     m_Motion: {fileID: 4760223578015166084}
-    m_Threshold: 0.5
-    m_Position: {x: 0, y: 0}
-    m_TimeScale: 1
-    m_CycleOffset: 0
-    m_DirectBlendParameter: Idle Blend
-    m_Mirror: 0
-  - serializedVersion: 2
-    m_Motion: {fileID: 0}
     m_Threshold: 1
     m_Position: {x: 0, y: 0}
     m_TimeScale: 1
@@ -123,7 +115,7 @@ BlendTree:
   m_BlendParameterY: Idle Blend
   m_MinThreshold: 0
   m_MaxThreshold: 1
-  m_UseAutomaticThresholds: 1
+  m_UseAutomaticThresholds: 0
   m_NormalizedBlendValues: 0
   m_BlendType: 0
 --- !u!1101 &-7652277682379337554
@@ -1366,12 +1358,12 @@ BlendTree:
   - serializedVersion: 2
     m_Motion: {fileID: 4328255585798501670}
     m_Threshold: 1
-    m_Position: {x: 0, y: 0}
+    m_Position: {x: 1, y: 0}
     m_TimeScale: 1
     m_CycleOffset: 0
     m_DirectBlendParameter: Idle Blend
     m_Mirror: 0
-  m_BlendParameter: Idle Blend
+  m_BlendParameter: Crouch
   m_BlendParameterY: Armed
   m_MinThreshold: 0
   m_MaxThreshold: 1

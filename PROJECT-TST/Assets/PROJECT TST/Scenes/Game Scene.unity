@@ -188,7 +188,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 1
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 122
   m_CollisionDetection: 0
 --- !u!65 &80061496
 BoxCollider:
@@ -1222,8 +1222,8 @@ LineRenderer:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0
-        value: 1
+        time: 0.027210236
+        value: 0.99500084
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -7501,6 +7501,7 @@ MonoBehaviour:
   interactionRange: 2
   topClampLimit: 40
   bottomClampLimit: -40
+  recoilAmount: 0.1
 --- !u!114 &1740385996
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7515,6 +7516,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 0}
   unityCharacterController: {fileID: 0}
+  characterController: {fileID: 0}
   cameraPivot: {fileID: 738264079}
   ragdollRigidbodies: []
   cameraGunRecoilComponent: {fileID: 769642680}
