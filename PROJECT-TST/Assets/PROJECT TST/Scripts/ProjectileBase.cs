@@ -8,8 +8,9 @@ namespace TST
     public abstract class ProjectileBase : MonoBehaviour
     {
         public Rigidbody rigid;
+        public Transform startPosition;
 
-        public float bulletForce;
+        public float moveForce;
         public float lifeTime;
 
         public void Start()

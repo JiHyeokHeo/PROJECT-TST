@@ -8,7 +8,7 @@ namespace TST
     {
         protected override void Init()
         {
-            rigid.AddForce(transform.forward * bulletForce, ForceMode.Impulse);
+            rigid.AddForce(transform.forward * moveForce, ForceMode.Impulse);
             Destroy(gameObject, lifeTime);
         }
 
