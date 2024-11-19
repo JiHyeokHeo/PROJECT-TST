@@ -95,9 +95,6 @@ namespace TST
                 OptionManager.Instance.IsGameStopped = !OptionManager.Instance.IsGameStopped;
             }
 
-            //pitch = Mathf.Clamp(pitch - mouseY * Time.deltaTime * 400.0f, bottomClampLimit, topClampLimit);
-            //cameraPivot.localRotation = Quaternion.Euler(pitch, 0, 0);
-
             Vector3 aimingPoint = Vector3.zero;
             Ray screenCenterRay = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
             Debug.DrawRay(screenCenterRay.origin, screenCenterRay.direction * 100.0f, Color.red);
