@@ -7,6 +7,8 @@ namespace TST
 {
     public class WeaponBase : MonoBehaviour
     {
+        // 클래스 분할이 필요할까요?
+        #region Bullet
         public Transform firePoint; // 총알 발사 위치
         public float fireRate = 0.1f; // 연사 속도
         public int clipSize = 10; // 탄창 크기[1탄창:총알 갯수]
@@ -23,8 +25,14 @@ namespace TST
         public Rigidbody bulletPrefab;
         public float bulletSpeed;
         public float bulletLifeTime = 3f;
+        #endregion
 
+        #region Bomb
         public BombProjectile bombProjectilePrefab;
+        public Transform bombHoldPoint;
+        public Vector3 offSet;
+        #endregion
+
 
         private void Awake()
         {
@@ -64,13 +72,23 @@ namespace TST
         public BombProjectile throwReadyGrenade;
         public bool ThrowReady()
         {
-            if (currentAmmo > 0 && Time.time - lastFireTime >= fireRate)
+            if (Time.time - lastFireTime >= fireRate)
             {
                 lastFireTime = Time.time;
-                currentAmmo--;
+                //currentAmmo--;
 
                 // 수류탄 발사
-                throwReadyGrenade = Instantiate(bombProjectilePrefab);
+
+                Vector3 offset = new Vector3(0, 60, 0); // 추가하고 싶은 오프셋 (X, Y, Z 각도 단위)
+                Quaternion originalRotation = bombHoldPoint.transform.rotation; // 원래 회전
+                Quaternion offsetRotation = Quaternion.Euler(offset); // 오프셋을 Quaternion으로 변환
+
+                // 원래 회전에 오프셋 적용
+                Quaternion finalRotation = originalRotation * offsetRotation;
+
+                throwReadyGrenade = Instantiate(bombProjectilePrefab, bombHoldPoint.transform.position, finalRotation);
+                throwReadyGrenade.gameObject.SetActive(true);
+                throwReadyGrenade.gameObject.transform.SetParent(bombHoldPoint);
 
                 return true;
             }
@@ -85,7 +103,7 @@ namespace TST
 
             // 앞으로 날라가도록
             throwReadyGrenade.Throw();
-
+            throwReadyGrenade.gameObject.transform.SetParent(null);
             return true;
         }
         #endregion

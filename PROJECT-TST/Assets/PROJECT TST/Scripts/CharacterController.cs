@@ -38,27 +38,27 @@ namespace TST
 
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
                 linkedCharacter.CharacterSocket = ECharacterSocket.Gun;
+                linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
             }
 
             if (Input.GetKeyDown(KeyCode.Alpha2))
             {
-                linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
                 linkedCharacter.CharacterSocket = ECharacterSocket.Pistol;
+                linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
             }
 
             if (Input.GetKeyDown(KeyCode.Alpha3))
             {
-                linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
                 linkedCharacter.CharacterSocket = ECharacterSocket.Knife;
+                linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
             }
 
             if (Input.GetKeyDown(KeyCode.Alpha4))
             {
+                linkedCharacter.CharacterSocket = ECharacterSocket.Grenade;
                 linkedCharacter.ThrowReady();
                 linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
-                linkedCharacter.CharacterSocket = ECharacterSocket.Grenade;
             }
 
             if (Input.GetKeyDown(KeyCode.LeftShift))
@@ -82,11 +82,9 @@ namespace TST
                 {
                     case ECharacterSocket.Gun:
                         linkedCharacter.Shoot();
-                        AddRecoil();
                         break;
                     case ECharacterSocket.Pistol:
                         linkedCharacter.Shoot();
-                        AddRecoil();
                         break;
                     case ECharacterSocket.Knife:
                         linkedCharacter.MeleeAttack();
@@ -181,7 +179,7 @@ namespace TST
         private float targetPitch;
 
         [SerializeField]
-        private float recoilAmount = 1.0f; 
+        private float recoilAmount = 10.0f; 
         private float recoilSpeed = 10.0f; 
         private float currentRecoil = 0.0f;
 
@@ -189,13 +187,17 @@ namespace TST
         public void AddRecoil()
         {
             if (linkedCharacter.IsArmed && linkedCharacter.gunWeapon.CurrentAmmo > 0)
+            {
                 currentRecoil += recoilAmount * Time.deltaTime;
+                OptionManager.Instance.usingCrossHairComponent.IsRecoilChange = true;
+            }
 
             currentRecoil = Mathf.Clamp(currentRecoil, 0.0f, recoilMaxThreshold);
         }
 
         public void PauseRecoil()
         {
+            OptionManager.Instance.usingCrossHairComponent.IsRecoilChange = false;
             currentRecoil = 0.0f;
         }
 

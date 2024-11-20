@@ -57,7 +57,6 @@ namespace TST
                 {
                     UpdateLineRender(i, (i - 1, hit.point));
                     //MoveHitMarker(hit);
-                    break;
                 }
 
                 //If nothing is hit, continue rendering the arc without a visual marker

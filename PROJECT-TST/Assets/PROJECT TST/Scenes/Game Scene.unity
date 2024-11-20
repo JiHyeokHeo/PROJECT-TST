@@ -3034,6 +3034,8 @@ MonoBehaviour:
   bulletSpeed: 10
   bulletLifeTime: 3
   bombProjectilePrefab: {fileID: 0}
+  bombHoldPoint: {fileID: 0}
+  offSet: {x: 0, y: 0, z: 0}
   throwReadyGrenade: {fileID: 0}
 --- !u!1 &710748047
 GameObject:
@@ -5792,12 +5794,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1280205332}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: 0, z: 0}
+  m_LocalRotation: {x: 2.8376232e-10, y: 0.00000007916241, z: 0.000000005238689, w: 1}
+  m_LocalPosition: {x: 4.441677, y: -1.1665328, z: 0.017057538}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1380318076}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1280205335
 MonoBehaviour:
@@ -6117,6 +6119,38 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1380318075
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1380318076}
+  m_Layer: 0
+  m_Name: BombHolder
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1380318076
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1380318075}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.0018002888, y: 0.70718956, z: 0.7070137, w: -0.0033797931}
+  m_LocalPosition: {x: -0.2271, y: -0.0073, z: -0.0165}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1280205334}
+  m_Father: {fileID: 1849030142}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1445799636
 GameObject:
@@ -7469,7 +7503,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -7496,6 +7530,7 @@ MonoBehaviour:
     initialSpeed: 0
     mass: 0
     drag: 0
+  offSetDireciton: {x: 0, y: 66, z: 0}
 --- !u!114 &1711914963
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7515,6 +7550,8 @@ MonoBehaviour:
   bulletSpeed: 0
   bulletLifeTime: 3
   bombProjectilePrefab: {fileID: 1711914962}
+  bombHoldPoint: {fileID: 1380318076}
+  offSet: {x: -45, y: 235, z: -205}
   throwReadyGrenade: {fileID: 0}
 --- !u!1001 &1740385993
 PrefabInstance:
@@ -7694,6 +7731,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 400128, guid: 8f0565f23a2b58541a475bd3c1393052, type: 3}
       insertIndex: -1
       addedObject: {fileID: 928664618}
+    - targetCorrespondingSourceObject: {fileID: 400072, guid: 8f0565f23a2b58541a475bd3c1393052, type: 3}
+      insertIndex: 1
+      addedObject: {fileID: 1380318076}
     - targetCorrespondingSourceObject: {fileID: 400074, guid: 8f0565f23a2b58541a475bd3c1393052, type: 3}
       insertIndex: -1
       addedObject: {fileID: 621712828}
@@ -7835,7 +7875,7 @@ MonoBehaviour:
   interactionRange: 2
   topClampLimit: 40
   bottomClampLimit: -40
-  recoilAmount: 0.1
+  recoilAmount: 2
 --- !u!114 &1740385996
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7853,7 +7893,6 @@ MonoBehaviour:
   characterController: {fileID: 0}
   cameraPivot: {fileID: 738264079}
   ragdollRigidbodies: []
-  cameraGunRecoilComponent: {fileID: 769642680}
   gunWeapon: {fileID: 710556743}
   grenadeWeapon: {fileID: 1711914963}
   weaponSocket: {fileID: 928664618}
@@ -7913,7 +7952,6 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   isSprint: 0
-  Whole_Body_Weight_Blend: 0
   crouchOffset: {x: 0, y: -0.3, z: 0}
 --- !u!4 &1740385998 stripped
 Transform:
@@ -8268,6 +8306,11 @@ CapsuleCollider:
   m_Height: 0.30936807
   m_Direction: 0
   m_Center: {x: -0.15468404, y: 0, z: 0}
+--- !u!4 &1849030142 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400072, guid: 8f0565f23a2b58541a475bd3c1393052, type: 3}
+  m_PrefabInstance: {fileID: 1740385993}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1865177709
 GameObject:
   m_ObjectHideFlags: 0
@@ -8474,7 +8517,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rigid: {fileID: 1868914696}
   startPosition: {fileID: 0}
-  moveForce: 0
+  moveForce: 30
   lifeTime: 5
 --- !u!1 &1871234133
 GameObject:
@@ -9297,5 +9340,4 @@ SceneRoots:
   - {fileID: 799201256}
   - {fileID: 128245365}
   - {fileID: 734559290}
-  - {fileID: 1280205334}
   - {fileID: 1711914960}

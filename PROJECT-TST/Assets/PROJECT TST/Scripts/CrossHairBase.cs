@@ -78,7 +78,6 @@ namespace TST
                 // 비율만큼 곱해준다
                 Vector3 pos = gameObjects[i].anchoredPosition3D;
 
-
                 if (isRecoilStart)
                 {
                     pos.x = Mathf.Lerp(pos.x, pos.x * recoilStartRatio, Time.deltaTime * 10.0f);

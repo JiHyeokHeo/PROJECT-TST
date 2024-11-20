@@ -143925,10 +143925,10 @@ AnimationClip:
     floatParameter: 0
     intParameter: 1
     messageOptions: 0
-  - time: 1.7666667
+  - time: 1.4666667
     functionName: SetArmedComplete
     data: 
-    objectReferenceParameter: {fileID: 0}
+    objectReferenceParameter: {fileID: 11500000, guid: 1e33667fdcc392743b617e5a4a18f519, type: 3}
     floatParameter: 0
     intParameter: 1
     messageOptions: 0

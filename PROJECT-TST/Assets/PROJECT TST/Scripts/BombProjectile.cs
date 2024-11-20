@@ -24,6 +24,8 @@ namespace TST
         [SerializeField]
         ProjectileProperties projectileProperties;
 
+        public Vector3 offSetDireciton;
+
         protected override void Init()
         {
             rigid = GetComponent<Rigidbody>();
@@ -42,6 +44,7 @@ namespace TST
 
         public void Throw()
         {
+            rigid.isKinematic = false;
             rigid.AddForce(transform.forward * moveForce, ForceMode.Impulse);
         }
 

@@ -73,10 +73,7 @@ namespace TST
 
         void CrossHairRecoilStart()
         {
-            if (isFire)
-                OptionManager.Instance.usingCrossHairComponent.IsRecoilChange = true;
-            else
-                OptionManager.Instance.usingCrossHairComponent.IsRecoilChange = false;
+         
         }
 
         void RecoilStart()

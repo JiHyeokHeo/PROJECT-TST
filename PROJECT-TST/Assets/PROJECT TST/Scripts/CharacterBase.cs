@@ -28,12 +28,15 @@ namespace TST
             set => aimingPoint.position = value;
         }
 
+        private ECharacterSocket lastEquippedSocket;
         public bool IsArmed 
         {
             get => isArmed;
             set
             {
+                // 만약 내가 장착중인 상태에서 다른 장비로 변경을 한다면?
                 isArmed = value;
+
                 if (IsArmed == false)
                     CharacterSocket = ECharacterSocket.None;
 
@@ -46,15 +49,21 @@ namespace TST
             get => eCurrentCharacterSocket;
             set
             {
+                // 과거에 꼈던 장비 기억
+                if (eCurrentCharacterSocket != value)
+                    lastEquippedSocket = eCurrentCharacterSocket;
+
                 eCurrentCharacterSocket = value;
-                switch (eCurrentCharacterSocket)
-                {
-                    case ECharacterSocket.Gun:
+                //switch (eCurrentCharacterSocket)
+                //{
+                //    case ECharacterSocket.Gun:
+                //        animator.SetFloat("Armed Type", 0.0f);
+                //        break;
+                //    case ECharacterSocket.Grenade:
+                //        animator.SetFloat("Armed Type", 1.0f);
+                //        break;
 
-                        break;
-
-
-                };
+                //};
             }
         }
 
@@ -68,14 +77,12 @@ namespace TST
         public Transform cameraPivot;
         public Rigidbody[] ragdollRigidbodies;
 
-        public CinemachineGunRecoil cameraGunRecoilComponent; // 관련 함수 없애도 문제없음. 추후 리팩토링 작업에서 지우자
         public WeaponBase gunWeapon;
         public WeaponBase grenadeWeapon;
         public Transform weaponSocket;
         public Transform weaponHolder;
         public Transform aimingPoint;
         ECharacterSocket eCurrentCharacterSocket = ECharacterSocket.None;
-
 
         public RigBuilder rigBuilder;
         public Rig aimingRig;
@@ -179,7 +186,6 @@ namespace TST
             rigBuilder.Build();
         }
 
-        public float Whole_Body_Weight_Blend = 0.0f;
         private void Update()
         {
             armedBlend = Mathf.Lerp(armedBlend, IsArmed ? 1f : 0f, Time.deltaTime * 10f);
@@ -200,7 +206,7 @@ namespace TST
 
         private void LateUpdate()
         {
-            aimingRigWeightBlend = Mathf.Lerp(aimingRigWeightBlend, isArmedCompleted && !isRolling ? 1f : 0f, Time.deltaTime * 10f);
+            aimingRigWeightBlend = Mathf.Lerp(aimingRigWeightBlend, (isArmedCompleted && !isRolling ) || isGrenadeArmedComplete ? 1f : 0f, Time.deltaTime * 10f);
             aimingRig.weight = aimingRigWeightBlend;
 
             lefthandRigWeightBlend = Mathf.Lerp(lefthandRigWeightBlend, isArmedCompleted && !isReloading && !isRolling ? 1f : 0f, Time.deltaTime * 10f);
@@ -368,6 +374,11 @@ namespace TST
             }
         }
 
+        private void CheckRecoilSystem()
+        {
+            
+        }
+
         public void MeleeAttack()
         {
 
@@ -385,7 +396,6 @@ namespace TST
 
             grenadeWeapon.ThrowReady();
             animator.SetFloat("Armed Type", 1.0f);
-            isThrowReady = true;
         }
 
         public void Throw()
