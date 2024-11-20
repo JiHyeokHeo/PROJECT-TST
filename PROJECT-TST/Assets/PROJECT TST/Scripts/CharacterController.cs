@@ -39,6 +39,26 @@ namespace TST
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
                 linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
+                linkedCharacter.CharacterSocket = ECharacterSocket.Gun;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
+                linkedCharacter.CharacterSocket = ECharacterSocket.Pistol;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
+                linkedCharacter.CharacterSocket = ECharacterSocket.Knife;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha4))
+            {
+                linkedCharacter.ThrowReady();
+                linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
+                linkedCharacter.CharacterSocket = ECharacterSocket.Grenade;
             }
 
             if (Input.GetKeyDown(KeyCode.LeftShift))
@@ -58,12 +78,29 @@ namespace TST
 
             if (Input.GetMouseButton(0))
             {
-                linkedCharacter.Shoot();
-                AddRecoil();
+                switch (linkedCharacter.CharacterSocket)
+                {
+                    case ECharacterSocket.Gun:
+                        linkedCharacter.Shoot();
+                        AddRecoil();
+                        break;
+                    case ECharacterSocket.Pistol:
+                        linkedCharacter.Shoot();
+                        AddRecoil();
+                        break;
+                    case ECharacterSocket.Knife:
+                        linkedCharacter.MeleeAttack();
+                        break;
+                    case ECharacterSocket.Grenade:
+                        break;
+                }
             }
 
             if (Input.GetMouseButtonUp(0))
             {
+                if (linkedCharacter.CharacterSocket == ECharacterSocket.Grenade)
+                    linkedCharacter.Throw();
+
                 linkedCharacter.ShootFinished();
             }
 
@@ -151,7 +188,7 @@ namespace TST
         private float recoilMaxThreshold = 20.0f;
         public void AddRecoil()
         {
-            if (linkedCharacter.IsArmed && linkedCharacter.weapon.CurrentAmmo > 0)
+            if (linkedCharacter.IsArmed && linkedCharacter.gunWeapon.CurrentAmmo > 0)
                 currentRecoil += recoilAmount * Time.deltaTime;
 
             currentRecoil = Mathf.Clamp(currentRecoil, 0.0f, recoilMaxThreshold);

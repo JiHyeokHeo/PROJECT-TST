@@ -24,6 +24,8 @@ namespace TST
         public float bulletSpeed;
         public float bulletLifeTime = 3f;
 
+        public BombProjectile bombProjectilePrefab;
+
         private void Awake()
         {
             currentAmmo = clipSize;
@@ -56,5 +58,38 @@ namespace TST
         {
             currentAmmo = clipSize;
         }
+
+        #region Grenade
+        // 수류탄 추후 클래스 분할 리팩토링 필요해보임
+        public BombProjectile throwReadyGrenade;
+        public bool ThrowReady()
+        {
+            if (currentAmmo > 0 && Time.time - lastFireTime >= fireRate)
+            {
+                lastFireTime = Time.time;
+                currentAmmo--;
+
+                // 수류탄 발사
+                throwReadyGrenade = Instantiate(bombProjectilePrefab);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool Throw()
+        {
+            if (throwReadyGrenade == null)
+                return false;
+
+            // 앞으로 날라가도록
+            throwReadyGrenade.Throw();
+
+            return true;
+        }
+        #endregion
+
+        
     }
 }

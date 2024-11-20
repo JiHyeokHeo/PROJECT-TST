@@ -32,14 +32,17 @@ namespace TST
 
             startPosition = transform;
 
-            rigid.AddForce(transform.forward * moveForce, ForceMode.Impulse);
-
         }
 
         void Update()
         {
             if (trajectoryPredictor != null)
                 trajectoryPredictor.PredictTrajectory(ProjectileData());
+        }
+
+        public void Throw()
+        {
+            rigid.AddForce(transform.forward * moveForce, ForceMode.Impulse);
         }
 
         ProjectileProperties ProjectileData()

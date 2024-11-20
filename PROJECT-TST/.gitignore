@@ -73,6 +73,8 @@ crashlytics-build.properties
 
 # Custom
 
+[Aa]ssets/FemaleMovementAnimsetPro/
+[Aa]ssets/FemaleMovementAnimsetPro.meta
 [Aa]ssets/KriptoFX/
 [Aa]ssets/KriptoFX.meta
 [Aa]ssets/PistolAnimsetPro/
@@ -81,3 +83,6 @@ crashlytics-build.properties
 [Aa]ssets/Rifle_27A2_Pro.meta
 [Aa]ssets/EffectCore/
 [Aa]ssets/EffectCore.meta
+[Aa]ssets/PolygonMilitary/
+[Aa]ssets/PolygonMilitary.meta
+

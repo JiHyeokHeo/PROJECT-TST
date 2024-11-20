@@ -7,8 +7,19 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
+
+
 namespace TST
 {
+    public enum ECharacterSocket
+    {
+        Gun,
+        Pistol,
+        Grenade,
+        Knife,
+        None,
+    }
+
     public class CharacterBase : MonoBehaviour
     {
         public Vector3 AimingPosition
@@ -23,12 +34,33 @@ namespace TST
             set
             {
                 isArmed = value;
+                if (IsArmed == false)
+                    CharacterSocket = ECharacterSocket.None;
+
                 SetEquipWeapon(isArmed); 
+            }
+        }
+
+        public ECharacterSocket CharacterSocket
+        {
+            get => eCurrentCharacterSocket;
+            set
+            {
+                eCurrentCharacterSocket = value;
+                switch (eCurrentCharacterSocket)
+                {
+                    case ECharacterSocket.Gun:
+
+                        break;
+
+
+                };
             }
         }
 
         private bool isArmed = false;
         private bool isArmedCompleted = false;
+        private bool isGrenadeArmedComplete = false;
 
         public Animator animator;
         public UnityEngine.CharacterController unityCharacterController;
@@ -37,10 +69,13 @@ namespace TST
         public Rigidbody[] ragdollRigidbodies;
 
         public CinemachineGunRecoil cameraGunRecoilComponent; // 관련 함수 없애도 문제없음. 추후 리팩토링 작업에서 지우자
-        public WeaponBase weapon;
+        public WeaponBase gunWeapon;
+        public WeaponBase grenadeWeapon;
         public Transform weaponSocket;
         public Transform weaponHolder;
         public Transform aimingPoint;
+        ECharacterSocket eCurrentCharacterSocket = ECharacterSocket.None;
+
 
         public RigBuilder rigBuilder;
         public Rig aimingRig;
@@ -320,8 +355,8 @@ namespace TST
 
             if (IsArmed && isArmedCompleted)
             {
-                bool isFireSuccess = weapon.Fire();
-                if (!isFireSuccess && weapon.CurrentAmmo <= 0)
+                bool isFireSuccess = gunWeapon.Fire();
+                if (!isFireSuccess && gunWeapon.CurrentAmmo <= 0)
                 {
                     Reload();
                     characterController.PauseRecoil();
@@ -333,6 +368,37 @@ namespace TST
             }
         }
 
+        public void MeleeAttack()
+        {
+
+        }
+
+        private bool isThrowReady = false;
+        public void ThrowReady()
+        {
+            if (isThrowReady)
+            {
+                animator.SetFloat("Armed Type", 0.0f);
+                isThrowReady = false;
+                return;
+            }
+
+            grenadeWeapon.ThrowReady();
+            animator.SetFloat("Armed Type", 1.0f);
+            isThrowReady = true;
+        }
+
+        public void Throw()
+        {
+            grenadeWeapon.Throw();
+            // 던졌으면 Armed 해제 Animator 적용 복구
+            IsArmed = false;
+
+            // 조건이 추가적으로 더 붙을듯 TODO : 폭탄이 없다면? 0.0f 폭탄이 아직도 소지중이라면 1.0f
+            animator.SetFloat("Armed Type", 0.0f); // 임시로 일단 끄는 식으로
+            animator.SetTrigger("Throw Trigger");
+        }
+
         public void ShootFinished()
         {
             characterController.PauseRecoil();
@@ -340,7 +406,7 @@ namespace TST
 
         public void Reload()
         {
-            if (!isReloading && weapon.CurrentAmmo != weapon.clipSize)
+            if (!isReloading && gunWeapon.CurrentAmmo != gunWeapon.clipSize)
             {
                 isReloading = true;
                 animator.SetTrigger("Reload Trigger");
@@ -349,7 +415,7 @@ namespace TST
 
         public void SetReloadComplete()
         {
-            weapon.Reload();
+            gunWeapon.Reload();
             isReloading = false;
         }
 
@@ -369,15 +435,15 @@ namespace TST
         {
             if (activated == 1)
             {
-                weapon.transform.SetParent(weaponHolder);
-                weapon.transform.localPosition = offsetPosition;
-                weapon.transform.localRotation = Quaternion.Euler(offsetRotation);
+                gunWeapon.transform.SetParent(weaponHolder);
+                gunWeapon.transform.localPosition = offsetPosition;
+                gunWeapon.transform.localRotation = Quaternion.Euler(offsetRotation);
             }
             else
             {
-                weapon.transform.SetParent(weaponSocket);
-                weapon.transform.localPosition = Vector3.zero;
-                weapon.transform.localRotation = Quaternion.identity;
+                gunWeapon.transform.SetParent(weaponSocket);
+                gunWeapon.transform.localPosition = Vector3.zero;
+                gunWeapon.transform.localRotation = Quaternion.identity;
             }
         }
 
@@ -390,6 +456,11 @@ namespace TST
         public void SetArmedComplete(int flag)
         {
             isArmedCompleted = flag > 0;
+        }
+
+        public void SetGrenadeArmedComplete(int flag)
+        {
+            isGrenadeArmedComplete = flag > 0;
         }
     }
 }
