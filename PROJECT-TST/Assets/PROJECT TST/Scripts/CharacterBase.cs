@@ -28,7 +28,7 @@ namespace TST
             set => aimingPoint.position = value;
         }
 
-        private ECharacterSocket lastEquippedSocket;
+        private ECharacterSocket eLastEquippedSocket;
         public bool IsArmed 
         {
             get => isArmed;
@@ -37,10 +37,23 @@ namespace TST
                 // 만약 내가 장착중인 상태에서 다른 장비로 변경을 한다면?
                 isArmed = value;
 
-                if (IsArmed == false)
-                    CharacterSocket = ECharacterSocket.None;
+                if (eLastEquippedSocket != eCurrentCharacterSocket && eLastEquippedSocket == ECharacterSocket.None)
+                    SetEquipWeapon(isArmed);
+                else
+                {
+                    // 마지막에 낀 친구를 일단 홀스터에 넣고
+                    SetAnimatorArmedType(eLastEquippedSocket);
+                    SetEquipWeapon(false);
 
-                SetEquipWeapon(isArmed); 
+                    // 최근에 장착한 친구를 장착
+                    SetAnimatorArmedType(eCurrentCharacterSocket);
+                    SetEquipWeapon(true);
+                    isArmed = true;
+                }
+
+                // 장착식 다 끝났고 IsArmed = false면 소켓 해제
+                if (IsArmed == false)
+                    eCurrentCharacterSocket = ECharacterSocket.None;
             }
         }
 
@@ -51,20 +64,24 @@ namespace TST
             {
                 // 과거에 꼈던 장비 기억
                 if (eCurrentCharacterSocket != value)
-                    lastEquippedSocket = eCurrentCharacterSocket;
+                    eLastEquippedSocket = eCurrentCharacterSocket;
 
                 eCurrentCharacterSocket = value;
-                //switch (eCurrentCharacterSocket)
-                //{
-                //    case ECharacterSocket.Gun:
-                //        animator.SetFloat("Armed Type", 0.0f);
-                //        break;
-                //    case ECharacterSocket.Grenade:
-                //        animator.SetFloat("Armed Type", 1.0f);
-                //        break;
-
-                //};
+                SetAnimatorArmedType(eCurrentCharacterSocket);
             }
+        }
+
+        private void SetAnimatorArmedType(ECharacterSocket socket)
+        {
+            switch (socket)
+            {
+                case ECharacterSocket.Gun:
+                    animator.SetFloat("Armed Type", 0.0f);
+                    break;
+                case ECharacterSocket.Grenade:
+                    animator.SetFloat("Armed Type", 1.0f);
+                    break;
+            };
         }
 
         private bool isArmed = false;
@@ -209,7 +226,7 @@ namespace TST
             aimingRigWeightBlend = Mathf.Lerp(aimingRigWeightBlend, (isArmedCompleted && !isRolling ) || isGrenadeArmedComplete ? 1f : 0f, Time.deltaTime * 10f);
             aimingRig.weight = aimingRigWeightBlend;
 
-            lefthandRigWeightBlend = Mathf.Lerp(lefthandRigWeightBlend, isArmedCompleted && !isReloading && !isRolling ? 1f : 0f, Time.deltaTime * 10f);
+            lefthandRigWeightBlend = Mathf.Lerp(lefthandRigWeightBlend, isArmedCompleted && !isReloading && !isRolling && !isGrenadeArmedComplete ? 1f : 0f, Time.deltaTime * 10f);
             lefthandRig.weight = lefthandRigWeightBlend;
         }
 
@@ -391,10 +408,11 @@ namespace TST
             {
                 animator.SetFloat("Armed Type", 0.0f);
                 isThrowReady = false;
+                isGrenadeArmedComplete = false;
                 return;
             }
 
-            grenadeWeapon.ThrowReady();
+            isThrowReady = grenadeWeapon.ThrowReady();
             animator.SetFloat("Armed Type", 1.0f);
         }
 
@@ -402,13 +420,14 @@ namespace TST
         {
             grenadeWeapon.Throw();
             // 던졌으면 Armed 해제 Animator 적용 복구
-            IsArmed = false;
 
             // 조건이 추가적으로 더 붙을듯 TODO : 폭탄이 없다면? 0.0f 폭탄이 아직도 소지중이라면 1.0f
             animator.SetFloat("Armed Type", 0.0f); // 임시로 일단 끄는 식으로
             animator.SetTrigger("Throw Trigger");
 
-            // 임시
+            // 임시 Animator로 관리 할 필요 있음
+            isArmed = false;
+            isArmedCompleted = false;
             isGrenadeArmedComplete = false;
         }
 
@@ -473,6 +492,7 @@ namespace TST
 
         public void SetGrenadeArmedComplete(int flag)
         {
+            isArmedCompleted = flag > 0;
             isGrenadeArmedComplete = flag > 0;
         }
     }

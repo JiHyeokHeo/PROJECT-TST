@@ -86,7 +86,7 @@ namespace TST
                 // 원래 회전에 오프셋 적용
                 Quaternion finalRotation = originalRotation * offsetRotation;
 
-                throwReadyGrenade = Instantiate(bombProjectilePrefab, bombHoldPoint.transform.position, finalRotation);
+                throwReadyGrenade = Instantiate(bombProjectilePrefab, bombHoldPoint.transform.position + offSet, finalRotation);
                 throwReadyGrenade.gameObject.SetActive(true);
                 throwReadyGrenade.gameObject.transform.SetParent(bombHoldPoint);
                 throwReadyGrenade.ThrowReady();

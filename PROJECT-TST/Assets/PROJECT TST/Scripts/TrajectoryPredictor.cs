@@ -43,7 +43,7 @@ namespace TST
             velocity = CalculateNewVelocity(velocity, projectile.drag, increment);
             nextPosition = position + velocity * increment;
 
-            for (int i = 6; i < maxPoints; i++)
+            for (int i = 0; i < maxPoints; i++)
             {
                 // Estimate velocity and update next predicted position
                 velocity = CalculateNewVelocity(velocity, projectile.drag, increment);
