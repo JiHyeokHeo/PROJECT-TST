@@ -43,7 +43,7 @@ namespace TST
             velocity = CalculateNewVelocity(velocity, projectile.drag, increment);
             nextPosition = position + velocity * increment;
 
-            for (int i = 1; i < maxPoints; i++)
+            for (int i = 6; i < maxPoints; i++)
             {
                 // Estimate velocity and update next predicted position
                 velocity = CalculateNewVelocity(velocity, projectile.drag, increment);
@@ -53,10 +53,12 @@ namespace TST
                 overlap = Vector3.Distance(position, nextPosition) * rayOverlap;
 
                 //When hitting a surface we want to show the surface marker and stop updating our line
-                if (Physics.Raycast(position, velocity.normalized, out RaycastHit hit, overlap))
+
+                if (Physics.Raycast(position, velocity.normalized, out RaycastHit hit, overlap, 0))
                 {
                     UpdateLineRender(i, (i - 1, hit.point));
                     //MoveHitMarker(hit);
+                    return;
                 }
 
                 //If nothing is hit, continue rendering the arc without a visual marker

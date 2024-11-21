@@ -407,6 +407,9 @@ namespace TST
             // 조건이 추가적으로 더 붙을듯 TODO : 폭탄이 없다면? 0.0f 폭탄이 아직도 소지중이라면 1.0f
             animator.SetFloat("Armed Type", 0.0f); // 임시로 일단 끄는 식으로
             animator.SetTrigger("Throw Trigger");
+
+            // 임시
+            isGrenadeArmedComplete = false;
         }
 
         public void ShootFinished()

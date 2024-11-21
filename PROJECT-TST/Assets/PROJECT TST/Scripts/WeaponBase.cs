@@ -89,6 +89,7 @@ namespace TST
                 throwReadyGrenade = Instantiate(bombProjectilePrefab, bombHoldPoint.transform.position, finalRotation);
                 throwReadyGrenade.gameObject.SetActive(true);
                 throwReadyGrenade.gameObject.transform.SetParent(bombHoldPoint);
+                throwReadyGrenade.ThrowReady();
 
                 return true;
             }

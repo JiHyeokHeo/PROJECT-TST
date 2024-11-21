@@ -26,6 +26,8 @@ namespace TST
 
         public Vector3 offSetDireciton;
 
+        private bool isThrown = false;
+
         protected override void Init()
         {
             rigid = GetComponent<Rigidbody>();
@@ -38,7 +40,7 @@ namespace TST
 
         void Update()
         {
-            if (trajectoryPredictor != null)
+            if (trajectoryPredictor != null && !isThrown)
                 trajectoryPredictor.PredictTrajectory(ProjectileData());
         }
 
@@ -46,6 +48,13 @@ namespace TST
         {
             rigid.isKinematic = false;
             rigid.AddForce(transform.forward * moveForce, ForceMode.Impulse);
+            trajectoryPredictor.SetTrajectoryVisible(false);
+            isThrown = true;
+        }
+
+        public void ThrowReady()
+        {
+            trajectoryPredictor.SetTrajectoryVisible(true);
         }
 
         ProjectileProperties ProjectileData()
