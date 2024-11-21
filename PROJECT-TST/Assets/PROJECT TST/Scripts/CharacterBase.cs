@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -25,6 +26,32 @@ namespace TST
         private bool isArmed = false;
         private bool isArmedCompleted = false;
 
+        public bool IsThrowMode
+        {
+            get => isThrowMode;
+            set
+            {
+                isThrowMode = value;
+                animator.SetBool("IsThrowMode", isThrowMode);
+
+                if (isThrowMode)
+                {
+                    Transform handTransform = animator.GetBoneTransform(HumanBodyBones.LeftHand);
+                    CurrentThrowObject = Instantiate(throwObject, handTransform);
+                    CurrentThrowObject.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+                    CurrentThrowObject.gameObject.SetActive(true);
+                }
+                else
+                {
+                    Destroy(CurrentThrowObject);
+                }
+            }
+        }
+        private bool isThrowMode = false;
+        public Rigidbody CurrentThrowObject { get; private set; }
+        public Rigidbody throwObject;
+        public Transform throwStartPoint;
+
         public bool IsWalk
         {
             get => isWalk;
@@ -33,7 +60,7 @@ namespace TST
         private bool isWalk = false;
 
         public Animator animator;
-        public UnityEngine.CharacterController unityCharacterController;        
+        public UnityEngine.CharacterController unityCharacterController;
         public Transform cameraPivot;
         public Rigidbody[] ragdollRigidbodies;
 
@@ -47,6 +74,7 @@ namespace TST
         public RigBuilder rigBuilder;
         public Rig aimingRig;
         public Rig lefthandRig;
+        public Rig throwRig;
 
         public Vector3 offsetPosition;
         public Vector3 offsetRotation;
@@ -92,14 +120,8 @@ namespace TST
         {
             aimingRig.weight = 0f;
             lefthandRig.weight = 0f;
+            throwRig.weight = 0f;
             rigBuilder.Build();
-
-            StartCoroutine(DelayedActiveRagdoll());
-            IEnumerator DelayedActiveRagdoll()
-            {
-                yield return new WaitForSeconds(3f);
-                SetRagdollActive(true);
-            }
         }
 
         private void Update()
@@ -112,7 +134,7 @@ namespace TST
             animator.SetFloat("Armed", armedBlend);
             animator.SetFloat("Speed", speedBlend);
             animator.SetFloat("Horizontal", horizontal);
-            animator.SetFloat("Vertical", vertical);            
+            animator.SetFloat("Vertical", vertical);
         }
 
         private void LateUpdate()
@@ -122,6 +144,8 @@ namespace TST
 
             lefthandRigWeightBlend = Mathf.Lerp(lefthandRigWeightBlend, isArmedCompleted && !isReloading ? 1f : 0f, Time.deltaTime * 10f);
             lefthandRig.weight = lefthandRigWeightBlend;
+
+            throwRig.weight = isThrowMode ? 1f : 0f;
         }
 
         private float targetRotation = 0f;
@@ -176,14 +200,34 @@ namespace TST
 
         public void Shoot()
         {
-            if (IsArmed && isArmedCompleted)
+            if (isThrowMode)
             {
-                bool isFireSuccess = weapon.Fire();
-                if (!isFireSuccess && weapon.CurrentAmmo <= 0)
+                Throw();
+            }
+            else
+            {
+                if (IsArmed && isArmedCompleted)
                 {
-                    Reload();
+                    bool isFireSuccess = weapon.Fire();
+                    if (!isFireSuccess && weapon.CurrentAmmo <= 0)
+                    {
+                        Reload();
+                    }
                 }
             }
+        }
+
+        private void Throw()
+        {
+            if (!isThrowMode)
+                return;
+
+            isThrowMode = false;
+            animator.SetTrigger("Throw Trigger");
+            CurrentThrowObject.transform.SetParent(null);
+            CurrentThrowObject.transform.position = throwStartPoint.position;
+            CurrentThrowObject.isKinematic = false;
+            CurrentThrowObject.AddForce(transform.forward * 10, ForceMode.Impulse);
         }
 
         public void Reload()

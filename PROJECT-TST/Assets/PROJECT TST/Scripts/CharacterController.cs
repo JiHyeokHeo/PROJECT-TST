@@ -11,6 +11,7 @@ namespace TST
         public CharacterBase linkedCharacter;
         public LayerMask aimingLayer;
 
+        public LineRenderer trajectoryRenderer;
 
         private void Awake()
         {
@@ -57,6 +58,26 @@ namespace TST
                 for (int i = 0; i < currentInteractables.Count; i++)
                 {
                     currentInteractables[i].Interact();
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                linkedCharacter.IsThrowMode = !linkedCharacter.IsThrowMode;
+            }
+
+            if (linkedCharacter.IsThrowMode)
+            {
+                List<Vector3> simulationResult = SimulationSystem.Instance.Simulate(
+                    linkedCharacter.CurrentThrowObject, 
+                    linkedCharacter.throwStartPoint.position, 
+                    linkedCharacter.transform.forward * 10, 
+                    ForceMode.Impulse);
+
+                trajectoryRenderer.positionCount = simulationResult.Count;
+                for (int i = 0; i < simulationResult.Count; i++)
+                {
+                    trajectoryRenderer.SetPosition(i, simulationResult[i]);
                 }
             }
 
