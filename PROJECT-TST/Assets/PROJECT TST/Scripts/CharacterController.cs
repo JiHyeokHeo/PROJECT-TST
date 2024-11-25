@@ -10,6 +10,7 @@ namespace TST
         public Transform cameraPivot;
 
         public LayerMask aimingLayer;
+        public LineRenderer trajectoryRenderer;
 
         private void Awake()
         {
@@ -38,26 +39,21 @@ namespace TST
 
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                linkedCharacter.CharacterSocket = ECharacterSocket.Gun;
                 linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
             }
 
             if (Input.GetKeyDown(KeyCode.Alpha2))
             {
-                linkedCharacter.CharacterSocket = ECharacterSocket.Pistol;
                 linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
             }
 
             if (Input.GetKeyDown(KeyCode.Alpha3))
             {
-                linkedCharacter.CharacterSocket = ECharacterSocket.Knife;
                 linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
             }
 
             if (Input.GetKeyDown(KeyCode.Alpha4))
             {
-                linkedCharacter.CharacterSocket = ECharacterSocket.Grenade;
-                linkedCharacter.ThrowReady();
                 linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
             }
 
@@ -76,29 +72,18 @@ namespace TST
                 linkedCharacter.IsWalk = !linkedCharacter.IsWalk;
             }
 
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                linkedCharacter.Reload();
+            }
+
             if (Input.GetMouseButton(0))
             {
-                switch (linkedCharacter.CharacterSocket)
-                {
-                    case ECharacterSocket.Gun:
-                        linkedCharacter.Shoot();
-                        break;
-                    case ECharacterSocket.Pistol:
-                        linkedCharacter.Shoot();
-                        break;
-                    case ECharacterSocket.Knife:
-                        linkedCharacter.MeleeAttack();
-                        break;
-                    case ECharacterSocket.Grenade:
-                        break;
-                }
+                linkedCharacter.Shoot();
             }
 
             if (Input.GetMouseButtonUp(0))
             {
-                if (linkedCharacter.CharacterSocket == ECharacterSocket.Grenade)
-                    linkedCharacter.Throw();
-
                 linkedCharacter.ShootFinished();
             }
 
@@ -122,6 +107,26 @@ namespace TST
                 for (int i = 0; i < currentInteractables.Count; i++)
                 {
                     currentInteractables[i].Interact(linkedCharacter.gameObject);
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                linkedCharacter.IsThrowMode = !linkedCharacter.IsThrowMode;
+            }
+
+            if (linkedCharacter.IsThrowMode)
+            {
+                List<Vector3> simulationResult = SimulationSystem.Instance.Simulate(
+                    linkedCharacter.CurrentThrowObject,
+                    linkedCharacter.throwStartPoint.position,
+                    linkedCharacter.transform.forward * 50,
+                    ForceMode.Impulse);
+
+                trajectoryRenderer.positionCount = simulationResult.Count;
+                for (int i = 0; i < simulationResult.Count; i++)
+                {
+                    trajectoryRenderer.SetPosition(i, simulationResult[i]);
                 }
             }
 

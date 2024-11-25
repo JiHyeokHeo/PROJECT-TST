@@ -11,15 +11,6 @@ using UnityEngine.Animations.Rigging;
 
 namespace TST
 {
-    public enum ECharacterSocket
-    {
-        Gun,
-        Pistol,
-        Grenade,
-        Knife,
-        None,
-    }
-
     public class CharacterBase : MonoBehaviour
     {
         public Vector3 AimingPosition
@@ -28,65 +19,46 @@ namespace TST
             set => aimingPoint.position = value;
         }
 
-        private ECharacterSocket eLastEquippedSocket;
-        public bool IsArmed 
+
+        public bool IsArmed
         {
             get => isArmed;
             set
             {
-                // 만약 내가 장착중인 상태에서 다른 장비로 변경을 한다면?
                 isArmed = value;
-
-                if (eLastEquippedSocket != eCurrentCharacterSocket && eLastEquippedSocket == ECharacterSocket.None)
-                    SetEquipWeapon(isArmed);
-                else
-                {
-                    // 마지막에 낀 친구를 일단 홀스터에 넣고
-                    SetAnimatorArmedType(eLastEquippedSocket);
-                    SetEquipWeapon(false);
-
-                    // 최근에 장착한 친구를 장착
-                    SetAnimatorArmedType(eCurrentCharacterSocket);
-                    SetEquipWeapon(true);
-                    isArmed = true;
-                }
-
-                // 장착식 다 끝났고 IsArmed = false면 소켓 해제
-                if (IsArmed == false)
-                    eCurrentCharacterSocket = ECharacterSocket.None;
+                SetEquipWeapon(isArmed);
             }
-        }
-
-        public ECharacterSocket CharacterSocket
-        {
-            get => eCurrentCharacterSocket;
-            set
-            {
-                // 과거에 꼈던 장비 기억
-                if (eCurrentCharacterSocket != value)
-                    eLastEquippedSocket = eCurrentCharacterSocket;
-
-                eCurrentCharacterSocket = value;
-                SetAnimatorArmedType(eCurrentCharacterSocket);
-            }
-        }
-
-        private void SetAnimatorArmedType(ECharacterSocket socket)
-        {
-            switch (socket)
-            {
-                case ECharacterSocket.Gun:
-                    animator.SetFloat("Armed Type", 0.0f);
-                    break;
-                case ECharacterSocket.Grenade:
-                    animator.SetFloat("Armed Type", 1.0f);
-                    break;
-            };
         }
 
         private bool isArmed = false;
         private bool isArmedCompleted = false;
-        private bool isGrenadeArmedComplete = false;
+
+
+        public bool IsThrowMode
+        {
+            get => isThrowMode;
+            set
+            {
+                isThrowMode = value;
+                animator.SetBool("IsThrowMode", isThrowMode);
+
+                if (isThrowMode)
+                {
+                    Transform handTransform = animator.GetBoneTransform(HumanBodyBones.LeftHand);
+                    CurrentThrowObject = Instantiate(throwObject, handTransform);
+                    CurrentThrowObject.transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
+                    CurrentThrowObject.gameObject.SetActive(true);
+                }
+                else
+                {
+                    Destroy(CurrentThrowObject);
+                }
+            }
+        }
+        private bool isThrowMode = false;
+        public Rigidbody CurrentThrowObject { get; private set; }
+        public Rigidbody throwObject;
+        public Transform throwStartPoint;
 
         public Animator animator;
         public UnityEngine.CharacterController unityCharacterController;
@@ -99,11 +71,11 @@ namespace TST
         public Transform weaponSocket;
         public Transform weaponHolder;
         public Transform aimingPoint;
-        ECharacterSocket eCurrentCharacterSocket = ECharacterSocket.None;
 
         public RigBuilder rigBuilder;
         public Rig aimingRig;
         public Rig lefthandRig;
+        public Rig throwRig;
 
         public Vector3 offsetPosition;
         public Vector3 offsetRotation;
@@ -200,6 +172,7 @@ namespace TST
         {
             aimingRig.weight = 0f;
             lefthandRig.weight = 0f;
+            throwRig.weight = 0f;
             rigBuilder.Build();
         }
 
@@ -223,11 +196,13 @@ namespace TST
 
         private void LateUpdate()
         {
-            aimingRigWeightBlend = Mathf.Lerp(aimingRigWeightBlend, (isArmedCompleted && !isRolling ) || isGrenadeArmedComplete ? 1f : 0f, Time.deltaTime * 10f);
+            aimingRigWeightBlend = Mathf.Lerp(aimingRigWeightBlend, (isArmedCompleted && !isRolling ) ? 1f : 0f, Time.deltaTime * 10f);
             aimingRig.weight = aimingRigWeightBlend;
 
-            lefthandRigWeightBlend = Mathf.Lerp(lefthandRigWeightBlend, isArmedCompleted && !isReloading && !isRolling && !isGrenadeArmedComplete ? 1f : 0f, Time.deltaTime * 10f);
+            lefthandRigWeightBlend = Mathf.Lerp(lefthandRigWeightBlend, isArmedCompleted && !isReloading && !isRolling  ? 1f : 0f, Time.deltaTime * 10f);
             lefthandRig.weight = lefthandRigWeightBlend;
+
+            throwRig.weight = IsThrowMode ? 1f : 0f;
         }
 
         private float targetRotation = 0f;
@@ -266,6 +241,7 @@ namespace TST
                     movement = transform.forward * moveSpeed * Time.deltaTime;
                 }
 
+                targetSpeed = moveSpeed;
                 unityCharacterController.Move(movement);
             }
             else
@@ -376,19 +352,40 @@ namespace TST
             if (isRolling)
                 return;
 
-            if (IsArmed && isArmedCompleted)
-            {
-                bool isFireSuccess = gunWeapon.Fire();
-                if (!isFireSuccess && gunWeapon.CurrentAmmo <= 0)
-                {
-                    Reload();
-                    characterController.PauseRecoil();
-                    return;
-                }
 
-                if (isFireSuccess)
-                    characterController.AddRecoil();
+            if (isThrowMode)
+            {
+                Throw();
             }
+            else
+            {
+                if (IsArmed && isArmedCompleted)
+                {
+                    bool isFireSuccess = gunWeapon.Fire();
+                    if (!isFireSuccess && gunWeapon.CurrentAmmo <= 0)
+                    {
+                        Reload();
+                        characterController.PauseRecoil();
+                        return;
+                    }
+
+                    if (isFireSuccess)
+                        characterController.AddRecoil();
+                }
+            }
+        }
+
+        private void Throw()
+        {
+            if (!isThrowMode)
+                return;
+
+            isThrowMode = false;
+            animator.SetTrigger("Throw Trigger");
+            CurrentThrowObject.transform.SetParent(null);
+            CurrentThrowObject.transform.position = throwStartPoint.position;
+            CurrentThrowObject.isKinematic = false;
+            CurrentThrowObject.AddForce(transform.forward * 10, ForceMode.Impulse);
         }
 
         private void CheckRecoilSystem()
@@ -399,36 +396,6 @@ namespace TST
         public void MeleeAttack()
         {
 
-        }
-
-        private bool isThrowReady = false;
-        public void ThrowReady()
-        {
-            if (isThrowReady)
-            {
-                animator.SetFloat("Armed Type", 0.0f);
-                isThrowReady = false;
-                isGrenadeArmedComplete = false;
-                return;
-            }
-
-            isThrowReady = grenadeWeapon.ThrowReady();
-            animator.SetFloat("Armed Type", 1.0f);
-        }
-
-        public void Throw()
-        {
-            grenadeWeapon.Throw();
-            // 던졌으면 Armed 해제 Animator 적용 복구
-
-            // 조건이 추가적으로 더 붙을듯 TODO : 폭탄이 없다면? 0.0f 폭탄이 아직도 소지중이라면 1.0f
-            animator.SetFloat("Armed Type", 0.0f); // 임시로 일단 끄는 식으로
-            animator.SetTrigger("Throw Trigger");
-
-            // 임시 Animator로 관리 할 필요 있음
-            isArmed = false;
-            isArmedCompleted = false;
-            isGrenadeArmedComplete = false;
         }
 
         public void ShootFinished()
@@ -488,12 +455,6 @@ namespace TST
         public void SetArmedComplete(int flag)
         {
             isArmedCompleted = flag > 0;
-        }
-
-        public void SetGrenadeArmedComplete(int flag)
-        {
-            isArmedCompleted = flag > 0;
-            isGrenadeArmedComplete = flag > 0;
         }
     }
 }
