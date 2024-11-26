@@ -147,6 +147,10 @@ namespace TST
         private bool isWalk = false;
         private bool isRolling = false;
         private bool isZip = false;
+        private bool isCrouch = false;
+        [field: SerializeField] Vector3 crouchOffset;
+
+        private float targetRotation = 0f;
 
         private void Awake()
         {
@@ -204,8 +208,6 @@ namespace TST
 
             throwRig.weight = IsThrowMode ? 1f : 0f;
         }
-
-        private float targetRotation = 0f;
 
         public void Move(Vector2 input, float yAxisAngle)
         {
@@ -292,10 +294,6 @@ namespace TST
                 isRolling = true;
             }
         }
-
-        private bool isCrouch = false;
-        [SerializeField]
-        Vector3 crouchOffset;
 
         public void Crouch()
         {
@@ -388,9 +386,18 @@ namespace TST
             CurrentThrowObject.AddForce(transform.forward * 10, ForceMode.Impulse);
         }
 
-        private void CheckRecoilSystem()
+        public enum EInteractionType
         {
-            
+            Looting = 0,
+            Interaction = 1,
+            OpenDoor = 2,
+        }
+
+        public void SetInteractAnimation(EInteractionType interactType)
+        {
+            animator.SetFloat("Interaction Type", (float)interactType);
+
+            animator.SetTrigger("Interaction Trigger");
         }
 
         public void MeleeAttack()

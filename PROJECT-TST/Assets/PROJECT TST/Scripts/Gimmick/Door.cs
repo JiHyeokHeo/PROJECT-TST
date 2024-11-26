@@ -1,0 +1,51 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace TST
+{
+    public class Door : MonoBehaviour, IInteractable
+    {
+        public string Message => "문 상호작용";
+
+        public float openRotationMax = 60.0f;
+        public float closeRotation = 0.0f;
+
+        bool isOpen = false;
+
+        private Transform doorTransform;
+
+        Vector3 targetRotation;
+        void Awake()
+        {
+            doorTransform = GetComponent<Transform>();
+        }
+
+        public void Interact(GameObject go)
+        {
+            if (go.TryGetComponent(out CharacterBase playerComponent) == false)
+                return;
+            
+            // 열렸으면 닫혀야하고 닫혔으면 열려야한다 // 세상에 방향에 따라 또 달라야겠네?ㅋ
+            targetRotation = doorTransform.transform.rotation.eulerAngles;
+            targetRotation.y = isOpen ? closeRotation : openRotationMax;
+
+            Vector3 dir = playerComponent.transform.position - doorTransform.position; 
+            Vector3 doorForward = doorTransform.forward;
+            float dotResult = Vector3.Dot(doorForward, dir);
+
+            // 정면에 있다는 뜻 그게 아니라면 후면
+            if (dotResult < 0)
+                targetRotation.y *= -1;
+
+            isOpen = !isOpen;
+            playerComponent.SetInteractAnimation(CharacterBase.EInteractionType.OpenDoor);
+        }
+
+        private void Update()
+        {
+            doorTransform.transform.rotation = Quaternion.Lerp(doorTransform.transform.rotation, Quaternion.Euler(targetRotation), Time.deltaTime * 10.0f);
+        }
+
+    }
+}
