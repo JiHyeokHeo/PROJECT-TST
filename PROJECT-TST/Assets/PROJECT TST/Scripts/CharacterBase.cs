@@ -11,6 +11,13 @@ using UnityEngine.Animations.Rigging;
 
 namespace TST
 {
+    public enum EInteractionType
+    {
+        Looting = 0,
+        Interaction = 1,
+        OpenDoor = 2,
+    }
+
     public class CharacterBase : MonoBehaviour
     {
         public Vector3 AimingPosition
@@ -18,7 +25,6 @@ namespace TST
             get => aimingPoint.position;
             set => aimingPoint.position = value;
         }
-
 
         public bool IsArmed
         {
@@ -32,7 +38,6 @@ namespace TST
 
         private bool isArmed = false;
         private bool isArmedCompleted = false;
-
 
         public bool IsThrowMode
         {
@@ -131,7 +136,7 @@ namespace TST
             set
             {
                 // 자동 달리기 모드일 때만
-                if (IsAutoRunMode)
+                //if (IsAutoRunMode)
                     isWalk = value;
             }
         }
@@ -172,6 +177,17 @@ namespace TST
             unityCharacterController.enabled = !isActive;
         }
 
+        bool IKActive;
+        public void SetIKActive(bool isActive)
+        {
+            IKActive = isActive;
+            float value = isActive ? 1f : 0f;
+            aimingRig.weight = value;
+            lefthandRig.weight = value;
+            throwRig.weight = value;
+            rigBuilder.Build();
+        }
+
         private void Start()
         {
             aimingRig.weight = 0f;
@@ -200,10 +216,10 @@ namespace TST
 
         private void LateUpdate()
         {
-            aimingRigWeightBlend = Mathf.Lerp(aimingRigWeightBlend, (isArmedCompleted && !isRolling ) ? 1f : 0f, Time.deltaTime * 10f);
+            aimingRigWeightBlend = Mathf.Lerp(aimingRigWeightBlend, (isArmedCompleted && !isRolling) ? 1f : 0f, Time.deltaTime * 10f);
             aimingRig.weight = aimingRigWeightBlend;
 
-            lefthandRigWeightBlend = Mathf.Lerp(lefthandRigWeightBlend, isArmedCompleted && !isReloading && !isRolling  ? 1f : 0f, Time.deltaTime * 10f);
+            lefthandRigWeightBlend = Mathf.Lerp(lefthandRigWeightBlend, isArmedCompleted && !isReloading && !isRolling ? 1f : 0f, Time.deltaTime * 10f);
             lefthandRig.weight = lefthandRigWeightBlend;
 
             throwRig.weight = IsThrowMode ? 1f : 0f;
@@ -243,7 +259,7 @@ namespace TST
                     movement = transform.forward * moveSpeed * Time.deltaTime;
                 }
 
-                targetSpeed = moveSpeed;
+                targetSpeed = isWalk? 0.0f : moveSpeed;
                 unityCharacterController.Move(movement);
             }
             else
@@ -386,13 +402,6 @@ namespace TST
             CurrentThrowObject.AddForce(transform.forward * 10, ForceMode.Impulse);
         }
 
-        public enum EInteractionType
-        {
-            Looting = 0,
-            Interaction = 1,
-            OpenDoor = 2,
-        }
-
         public void SetInteractAnimation(EInteractionType interactType)
         {
             animator.SetFloat("Interaction Type", (float)interactType);
@@ -462,6 +471,12 @@ namespace TST
         public void SetArmedComplete(int flag)
         {
             isArmedCompleted = flag > 0;
+        }
+
+        public void SetIKWeight(int flag)
+        {
+            bool boolFlag = Convert.ToBoolean(flag);
+            SetIKActive(boolFlag);
         }
     }
 }

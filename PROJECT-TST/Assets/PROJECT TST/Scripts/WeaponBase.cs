@@ -66,49 +66,5 @@ namespace TST
         {
             currentAmmo = clipSize;
         }
-
-        #region Grenade
-        // 수류탄 추후 클래스 분할 리팩토링 필요해보임
-        public BombProjectile throwReadyGrenade;
-        public bool ThrowReady()
-        {
-            if (Time.time - lastFireTime >= fireRate)
-            {
-                lastFireTime = Time.time;
-                //currentAmmo--;
-
-                // 수류탄 발사
-
-                Vector3 offset = new Vector3(0, 60, 0); // 추가하고 싶은 오프셋 (X, Y, Z 각도 단위)
-                Quaternion originalRotation = bombHoldPoint.transform.rotation; // 원래 회전
-                Quaternion offsetRotation = Quaternion.Euler(offset); // 오프셋을 Quaternion으로 변환
-
-                // 원래 회전에 오프셋 적용
-                Quaternion finalRotation = originalRotation * offsetRotation;
-
-                throwReadyGrenade = Instantiate(bombProjectilePrefab, bombHoldPoint.transform.position + offSet, finalRotation);
-                throwReadyGrenade.gameObject.SetActive(true);
-                throwReadyGrenade.gameObject.transform.SetParent(bombHoldPoint);
-                throwReadyGrenade.ThrowReady();
-
-                return true;
-            }
-
-            return false;
-        }
-
-        public bool Throw()
-        {
-            if (throwReadyGrenade == null)
-                return false;
-
-            // 앞으로 날라가도록
-            throwReadyGrenade.Throw();
-            throwReadyGrenade.gameObject.transform.SetParent(null);
-            return true;
-        }
-        #endregion
-
-        
     }
 }

@@ -1,5 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace TST
@@ -11,11 +14,11 @@ namespace TST
         public float openRotationMax = 60.0f;
         public float closeRotation = 0.0f;
 
-        bool isOpen = false;
+        private bool isOpen = false;
 
         private Transform doorTransform;
+        private Vector3 targetRotation;
 
-        Vector3 targetRotation;
         void Awake()
         {
             doorTransform = GetComponent<Transform>();
@@ -25,8 +28,8 @@ namespace TST
         {
             if (go.TryGetComponent(out CharacterBase playerComponent) == false)
                 return;
-            
-            // 열렸으면 닫혀야하고 닫혔으면 열려야한다 // 세상에 방향에 따라 또 달라야겠네?ㅋ
+
+            // 열렸으면 닫혀야하고 닫혔으면 열려야한다 // 세상에 방향에 따라 달라야함 
             targetRotation = doorTransform.transform.rotation.eulerAngles;
             targetRotation.y = isOpen ? closeRotation : openRotationMax;
 
@@ -34,12 +37,12 @@ namespace TST
             Vector3 doorForward = doorTransform.forward;
             float dotResult = Vector3.Dot(doorForward, dir);
 
-            // 정면에 있다는 뜻 그게 아니라면 후면
+            // 후면에 있으면 y값만 변경
             if (dotResult < 0)
                 targetRotation.y *= -1;
 
             isOpen = !isOpen;
-            playerComponent.SetInteractAnimation(CharacterBase.EInteractionType.OpenDoor);
+            playerComponent.SetInteractAnimation(EInteractionType.OpenDoor);
         }
 
         private void Update()
