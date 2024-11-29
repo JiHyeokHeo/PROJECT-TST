@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -7,6 +8,8 @@ namespace TST
 {
     public class LootAnimation : MonoBehaviour, IInteractable
     {
+        private const int ERRORNUM = -999999;
+
         public enum ELootState
         {
             Start,
@@ -37,6 +40,9 @@ namespace TST
                     case ELootState.End:
                         playerComponent.SetLootInteractAnimation(ELootState.End);
                         break;
+                    case ELootState.None:
+                        playerComponent.SetLootInteractAnimation(ELootState.None);
+                        break;
                     default:
                         break;
 
@@ -45,15 +51,13 @@ namespace TST
         }
 
         private ELootState lootState = ELootState.None;
-        public int stateCount = 0;
+        public int lootType = ERRORNUM;
         public string Message => $" {this.name} Loot Start";
 
         public float sqrInteractRange = 5f;
 
-        public float startFinishTime;
         public float keepFinishTime;
         public float loopFinishTime;
-        public float endFinishTime;
 
         CharacterBase playerComponent;
         public void Interact(GameObject go)
@@ -71,21 +75,27 @@ namespace TST
             if (sqrDistMagnitude > sqrInteractRange)
                 return;
 
-
             this.playerComponent = playerComponent;
 
-            lootState = ELootState.Start;
-            playerComponent.SetLootInteractAnimation(ELootState.Start);
-
+            playerComponent.SetLootType(lootType);
+            // 버그 생성지점
+            LootState = ELootState.Start;
+            playerComponent.SetInteractAnimation(EInteractionType.Looting); 
             Debug.Log($"<b><color=red> {Message}!</color></b>");
         }
 
         public void Update()
         {
-            // 매번 검사하는거 흠냐.. 찜찜하구만
+            if (lootState == ELootState.None)
+                return;
+
             if (playerComponent == null)
                 return;
 
+            // 최대한 여기서 애니메이터 파라미터를 받아와서 작업하는게 좋아보이는데에...흐음
+            float moveMagnitude = playerComponent.animator.GetFloat("Magnitude");
+            if (moveMagnitude > 0.1f)
+                LootState = ELootState.None;
             switch (lootState)
             {
                 case ELootState.Start:
@@ -106,36 +116,48 @@ namespace TST
 
         }
 
+        AnimatorStateInfo stateInfo;
         void LootStart()
         {
-            AnimatorStateInfo stateInfo = playerComponent.animator.GetCurrentAnimatorStateInfo(0);
-            float animPlayTime = stateInfo.normalizedTime;
+            stateInfo = playerComponent.animator.GetCurrentAnimatorStateInfo(0);
+            float currentTime = stateInfo.normalizedTime * stateInfo.length;
 
-            //if (animPlayTime > startFinishTime)
-
+            if (currentTime >= stateInfo.length)
+                LootState = ELootState.Keep;
         }
 
         void LootKeep()
         {
-
+            stateInfo = playerComponent.animator.GetCurrentAnimatorStateInfo(0);
+            float currentTime = stateInfo.normalizedTime * stateInfo.length;
+            
+            if (currentTime > keepFinishTime)
+                LootState = ELootState.Loop;
         }
 
         void LootLoop()
         {
+            stateInfo = playerComponent.animator.GetCurrentAnimatorStateInfo(0);
+            float currentTime = stateInfo.normalizedTime * stateInfo.length;
 
+            if (currentTime > loopFinishTime)
+                LootState = ELootState.End;
         }
 
         void LootEnd()
         {
+            stateInfo = playerComponent.animator.GetCurrentAnimatorStateInfo(0);
 
+            // 다 끝내면 그냥 자동으로 탈출 해주니
+            LootState = ELootState.None;
         }
 
         // state 갯수 체크용
         private void OnValidate()
         {
-            if (stateCount ==  0)
+            if (lootType == ERRORNUM)
             {
-                Debug.LogError("Loot Animation State Count Check Needed!", this);
+                Debug.LogError("Loot Animation LootType Check Needed!", this);
             }
         }
     }

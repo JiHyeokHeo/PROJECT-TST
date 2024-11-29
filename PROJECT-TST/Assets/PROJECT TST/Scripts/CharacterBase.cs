@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
@@ -12,16 +13,12 @@ using static TST.LootAnimation;
 
 namespace TST
 {
-    public enum ELootingType
-    {
-
-    }
-
     public enum EInteractionType
     {
         Looting = 0,
         Interaction = 1,
         OpenDoor = 2,
+        None,
     }
 
     public class CharacterBase : MonoBehaviour
@@ -183,15 +180,13 @@ namespace TST
             unityCharacterController.enabled = !isActive;
         }
 
-        bool IKActive;
+        
         public void SetIKActive(bool isActive)
         {
-            IKActive = isActive;
             float value = isActive ? 1f : 0f;
-            aimingRig.weight = value;
-            lefthandRig.weight = value;
+            aimingRigWeightBlend = value;
+            lefthandRigWeightBlend = value;
             throwRig.weight = value;
-            rigBuilder.Build();
         }
 
         private void Start()
@@ -230,14 +225,13 @@ namespace TST
 
             throwRig.weight = IsThrowMode ? 1f : 0f;
 
-            SetIKActive(IKChange);
+            // 문 여닫이 IK 관련
+            if (isDoorOpening)
+                SetIKActive(IKWeightValue);
         }
 
         public void Move(Vector2 input, float yAxisAngle)
         {
-            if (isRolling)
-                return;
-
             if (isZip)
             {
                 animator.SetFloat("Magnitude", 0.0f);
@@ -312,6 +306,9 @@ namespace TST
 
         public void Roll()
         {
+            if (BehaviorExceptionCheck())
+                return;
+            
             if (!isRolling)
             {
                 animator.SetTrigger("Roll Trigger");
@@ -321,6 +318,9 @@ namespace TST
 
         public void Crouch()
         {
+            if (BehaviorExceptionCheck())
+                return;
+
             // 카메라 위치를 조금 낮춥시다
             if (!isCrouch)
             {
@@ -334,6 +334,16 @@ namespace TST
             }
 
             isCrouch = !isCrouch;
+        }
+
+        private bool BehaviorExceptionCheck()
+        {
+            if (isLoot)
+                return true;
+            if (isZip)
+                return true;
+
+            return false;
         }
 
         public bool Rotate(Vector3 targetPoint)
@@ -371,9 +381,10 @@ namespace TST
 
         public void Shoot()
         {
+            if (isLoot)
+                return;
             if (isRolling)
                 return;
-
 
             if (isThrowMode)
             {
@@ -399,6 +410,8 @@ namespace TST
 
         private void Throw()
         {
+            if (isLoot)
+                return;
             if (!isThrowMode)
                 return;
 
@@ -410,9 +423,16 @@ namespace TST
             CurrentThrowObject.AddForce(transform.forward * 10, ForceMode.Impulse);
         }
 
+        public bool isLoot = false;
+        public void SetLootType(float lootType)
+        {
+            animator.SetFloat("Loot Type", lootType);
+        }
+
         public void SetLootInteractAnimation(ELootState state)
         {
-            SetInteractAnimation(EInteractionType.Looting);
+            isLoot = state != ELootState.None ? true : false;
+
             animator.SetFloat("Loot State", (float)state);
         }
 
@@ -435,6 +455,9 @@ namespace TST
 
         public void Reload()
         {
+            if (isLoot)
+                return;
+
             if (!isReloading && gunWeapon.CurrentAmmo != gunWeapon.clipSize)
             {
                 isReloading = true;
@@ -487,10 +510,17 @@ namespace TST
             isArmedCompleted = flag > 0;
         }
 
-        public bool IKChange = false;
+        bool IKWeightValue = false;
+        bool isDoorOpening = false;
         public void SetIKWeight(int flag)
         {
-            IKChange = flag > 0; 
+            if (isArmed)
+            {
+                IKWeightValue = flag > 0;
+                isDoorOpening = flag < 1;
+            }
+
+            
         }
     }
 }

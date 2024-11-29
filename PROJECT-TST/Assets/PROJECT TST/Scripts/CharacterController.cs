@@ -87,11 +87,6 @@ namespace TST
                 linkedCharacter.ShootFinished();
             }
 
-            if (Input.GetKeyDown(KeyCode.R))
-            {
-                linkedCharacter.Reload();
-            }
-
             if (Input.GetKeyDown(KeyCode.V))
             {
                 linkedCharacter.Roll();
