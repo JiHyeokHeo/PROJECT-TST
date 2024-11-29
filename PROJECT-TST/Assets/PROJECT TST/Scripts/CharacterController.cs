@@ -18,8 +18,39 @@ namespace TST
             linkedCharacter = GetComponent<CharacterBase>();
         }
 
+        private void Start()
+        {
+            transform.position = UserDataModel.Singleton.IngamePlayerData.playerPosition;
+            transform.rotation = UserDataModel.Singleton.IngamePlayerData.playerRotation;
+        }
+
         private void Update()
         {
+            if (Input.GetKeyDown(KeyCode.F1))
+            {
+                UIManager.Show<PopupA_UI>(UIList.PopupA_UI);
+            }
+
+            if (Input.GetKeyDown(KeyCode.F2))
+            {
+                UIManager.Show<PopupB_UI>(UIList.PopupB_UI);
+            }
+
+            if (Input.GetKeyDown(KeyCode.F3))
+            {
+                UIManager.Hide<PopupA_UI>(UIList.PopupA_UI);
+            }
+
+            if (Input.GetKeyDown(KeyCode.F4))
+            {
+                UIManager.Hide<PopupB_UI>(UIList.PopupB_UI);
+            }
+
+            if (Input.GetKeyDown(KeyCode.F5))
+            {
+                UserDataModel.Singleton.SaveIngamePlayerData(transform.position, transform.rotation);
+            }
+
             float inputX = Input.GetAxis("Horizontal");
             float inputY = Input.GetAxis("Vertical");
 
