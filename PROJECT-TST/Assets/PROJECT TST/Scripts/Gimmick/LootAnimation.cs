@@ -122,6 +122,7 @@ namespace TST
             stateInfo = playerComponent.animator.GetCurrentAnimatorStateInfo(0);
             float currentTime = stateInfo.normalizedTime * stateInfo.length;
 
+            // stateInfo If문 내에서 한번만 가져오도록 할 수 있을 듯함 매 프레임 찾을 필요X
             if (currentTime >= stateInfo.length)
                 LootState = ELootState.Keep;
         }
@@ -147,9 +148,10 @@ namespace TST
         void LootEnd()
         {
             stateInfo = playerComponent.animator.GetCurrentAnimatorStateInfo(0);
-
-            // 다 끝내면 그냥 자동으로 탈출 해주니
-            LootState = ELootState.None;
+            float currentTime = stateInfo.normalizedTime * stateInfo.length;
+            
+            if (currentTime >= stateInfo.length)
+                LootState = ELootState.None;
         }
 
         // state 갯수 체크용

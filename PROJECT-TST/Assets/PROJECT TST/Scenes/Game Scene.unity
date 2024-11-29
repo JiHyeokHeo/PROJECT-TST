@@ -4749,7 +4749,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d267926e627e2f847bf981a038affd59, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lootType: 0
+  lootType: 1
   sqrInteractRange: 2
   keepFinishTime: 0
   loopFinishTime: 5
@@ -12397,7 +12397,6 @@ MonoBehaviour:
   isSprint: 0
   crouchOffset: {x: 0, y: -0.3, z: 0}
   isLoot: 0
-  IKChange: 0
 --- !u!4 &1740385998 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400326, guid: 8f0565f23a2b58541a475bd3c1393052, type: 3}
