@@ -16,6 +16,7 @@ namespace TST
 
         private bool isOpen = false;
 
+        public float sqrInteractRange = 5f;
         private Transform doorTransform;
         private Vector3 targetRotation;
 
@@ -27,6 +28,13 @@ namespace TST
         public void Interact(GameObject go)
         {
             if (go.TryGetComponent(out CharacterBase playerComponent) == false)
+                return;
+
+            Vector3 doorPos = this.gameObject.transform.position;
+            Vector3 playerPos = playerComponent.transform.position;
+
+            float sqrDistMagnitude = Vector3.SqrMagnitude(doorPos - playerPos);
+            if (sqrDistMagnitude > sqrInteractRange)
                 return;
 
             // 열렸으면 닫혀야하고 닫혔으면 열려야한다 // 세상에 방향에 따라 달라야함 

@@ -6,11 +6,17 @@ using System.Net;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using static TST.LootAnimation;
 
 
 
 namespace TST
 {
+    public enum ELootingType
+    {
+
+    }
+
     public enum EInteractionType
     {
         Looting = 0,
@@ -223,6 +229,8 @@ namespace TST
             lefthandRig.weight = lefthandRigWeightBlend;
 
             throwRig.weight = IsThrowMode ? 1f : 0f;
+
+            SetIKActive(IKChange);
         }
 
         public void Move(Vector2 input, float yAxisAngle)
@@ -402,6 +410,12 @@ namespace TST
             CurrentThrowObject.AddForce(transform.forward * 10, ForceMode.Impulse);
         }
 
+        public void SetLootInteractAnimation(ELootState state)
+        {
+            SetInteractAnimation(EInteractionType.Looting);
+            animator.SetFloat("Loot State", (float)state);
+        }
+
         public void SetInteractAnimation(EInteractionType interactType)
         {
             animator.SetFloat("Interaction Type", (float)interactType);
@@ -473,10 +487,10 @@ namespace TST
             isArmedCompleted = flag > 0;
         }
 
+        public bool IKChange = false;
         public void SetIKWeight(int flag)
         {
-            bool boolFlag = Convert.ToBoolean(flag);
-            SetIKActive(boolFlag);
+            IKChange = flag > 0; 
         }
     }
 }
