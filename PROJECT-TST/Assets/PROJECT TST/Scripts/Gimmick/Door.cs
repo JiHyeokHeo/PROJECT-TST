@@ -54,6 +54,7 @@ namespace TST
         }
 
         private void Update()
+
         {
             doorTransform.transform.rotation = Quaternion.Lerp(doorTransform.transform.rotation, Quaternion.Euler(targetRotation), Time.deltaTime * 10.0f);
         }
