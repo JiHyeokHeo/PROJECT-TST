@@ -28,7 +28,6 @@ namespace TST
             return null;
         }
 
-
         [field: SerializeField] public Camera UICamera { get; private set; } = null;
 
         private Dictionary<UIList, UIBase> panels = new Dictionary<UIList, UIBase>();

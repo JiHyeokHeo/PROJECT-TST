@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace TST
 {
+    // 이쪽을 리플랙션으로 살짝 변형 해봅시다
     public class UserDataModel : SingletonBase<UserDataModel>
     {
         [field: SerializeField] public IngamePlayerDataDTO IngamePlayerData { get; private set; } = new IngamePlayerDataDTO();

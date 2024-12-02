@@ -31,9 +31,12 @@ namespace TST
             // 필요한 기본 시스템 초기화
             UIManager.Singleton.Initialize();
             UserDataModel.Singleton.Initialize();
-
+            
             // TODO : 추가적인 작업이나 초기화 작업을 수행하고 싶다면 여기서 수행            
             // UIManager.Show<PopupA_UI>(UIList.PopupA_UI);
+            UIManager.Show<IndicatorUI>(UIList.Indicator_UI);
+            UIManager.Show<Minimap_UI>(UIList.Minimap_UI);
+            UIManager.Show<CrossHair_UI>(UIList.CrossHair_UI);
         }
     }
 }

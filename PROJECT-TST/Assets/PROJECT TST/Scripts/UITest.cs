@@ -8,16 +8,17 @@ namespace TST
 {
     public class UITest : MonoBehaviour, IPointerClickHandler
     {
-        public GameObject crossHair;
+        
         public event Action<PointerEventData> OnClickHandler;
 
         void OnEnable()
         {
             OnClickHandler += (evt) =>
             {
-                if (OptionManager.Instance.usingCrossHair != crossHair)
+                if (OptionManager.Instance.usingCrossHair.name != gameObject.name)
                 {
-                    OptionManager.Instance.ChangeCrossHair(crossHair);
+                    CrossHairType type = OptionManager.StringToEnum<CrossHairType>(gameObject.name);
+                    OptionManager.Instance.ChangeCrossHair(type);
                 }
             };
         }

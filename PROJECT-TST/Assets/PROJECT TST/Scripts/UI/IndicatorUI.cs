@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace TST
 {
-    public class IndicatorUI : MonoBehaviour
+    public class IndicatorUI : UIBase
     {
         public static IndicatorUI Instance { get; private set; }
 
@@ -14,6 +14,7 @@ namespace TST
         private void Awake()
         {
             Instance = this;
+
         }
 
         private void Update()

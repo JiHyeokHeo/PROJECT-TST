@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,7 +14,7 @@ namespace TST
     }
 
     [System.Serializable]
-    public class CrossHairData
+    public struct CrossHairData
     {
         public CrossHairType type;
         public GameObject prefab;
@@ -22,11 +23,11 @@ namespace TST
 
     public class OptionManager : MonoBehaviour
     {
+        public GameObject crossHairCanvas;
         public GameObject usingCrossHair;
         public static OptionManager Instance { get; private set; }
         public List<CrossHairData> crossHairContainer = new List<CrossHairData>();
         public GameObject UICanvas;
-
         public CrossHairBase usingCrossHairComponent;
 
         public bool IsGameStopped
@@ -46,34 +47,49 @@ namespace TST
 
         private bool isGameStopped = false;
 
+        public static T StringToEnum<T>(string e)
+        {
+            return (T)Enum.Parse(typeof(T), e);
+        }
+
         private void Start()
         {
             Instance = this;
             // 초기값 크로스헤어 A 
-            usingCrossHair = crossHairContainer[0].prefab;
-            usingCrossHairComponent = usingCrossHair.GetComponent<CrossHairBase>();
-            usingCrossHair.SetActive(true);
+            crossHairCanvas = UIManager.Show<CrossHair_UI>(UIList.CrossHair_UI).gameObject;
+
+            for (int i = 0; i < crossHairCanvas.transform.childCount; i++)
+            {
+                var childObj = crossHairCanvas.transform.GetChild(i);
+
+                CrossHairType type = StringToEnum<CrossHairType>(childObj.name);
+                CrossHairData data = new CrossHairData();
+                data.type = type;
+                data.prefab = childObj.gameObject;
+                data.UIButtonOrder = 0;
+                crossHairContainer.Add(data);
+            }
+
+            ChangeCrossHair(CrossHairType.CrossHair_A);
         }
 
         public GameObject ChangeCrossHair(CrossHairType crossHairType)
         {
             CrossHairData crossHairData = crossHairContainer.Find(x => x.type == crossHairType);
-            if (crossHairData == null) 
+            if (crossHairData.prefab == null) 
             {
                 Debug.LogError("CrossHair not found");
                 return null;
             }
 
-            GameObject crossHair = Instantiate(crossHairData.prefab);
-            crossHair.SetActive(true);
-            usingCrossHair = crossHair;
-
-            return crossHair;
+            return ChangeCrossHair(crossHairData.prefab) ? crossHairData.prefab : null;
         }
 
-        public bool ChangeCrossHair(GameObject crossHair)
+        private bool ChangeCrossHair(GameObject crossHair)
         {
-            usingCrossHair.SetActive(false);
+            if (usingCrossHair != null)
+                usingCrossHair.SetActive(false);
+
             usingCrossHair = crossHair.gameObject;
             usingCrossHairComponent = usingCrossHair.GetComponent<CrossHairBase>();
 
