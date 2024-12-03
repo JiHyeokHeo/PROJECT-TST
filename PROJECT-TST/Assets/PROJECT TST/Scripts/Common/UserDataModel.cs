@@ -13,6 +13,7 @@ namespace TST
             if (LoadData(out IngamePlayerDataDTO loadPlayerData))
             {
                 IngamePlayerData = loadPlayerData;
+                Debug.Log(IngamePlayerData.Position);
             }
             else // Editor 에서 저장한 데이터가 없을 때.
             {

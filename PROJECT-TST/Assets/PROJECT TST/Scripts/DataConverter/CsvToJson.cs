@@ -100,7 +100,7 @@ namespace TST
                 }
             };
 
-            string json = JsonConvert.SerializeObject(dict, Formatting.Indented);
+            string json = JsonConvert.SerializeObject(dict, Formatting.Indented, settings);
             File.WriteAllText(filePath, json);
 
             Debug.Log($"Convert Excel To Json : {filePath}");

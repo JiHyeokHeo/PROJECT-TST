@@ -34,6 +34,8 @@ namespace TST
     [System.Serializable]
     public class IngamePlayerDataDTO : UserDataDTO
     {
-        public string name;
+        public string Name;
+        public Vector3 Position;
+        public List<int> Skills;
     }
 }
