@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace TST
 {
-    // 이쪽을 리플랙션으로 살짝 변형 해봅시다
     public class UserDataModel : SingletonBase<UserDataModel>
     {
         [field: SerializeField] public IngamePlayerDataDTO IngamePlayerData { get; private set; } = new IngamePlayerDataDTO();
@@ -22,20 +21,20 @@ namespace TST
             }
         }
 
-        public void SaveIngamePlayerData(Vector3 position, Quaternion rotation)
-        {
-            IngamePlayerData.playerPosition = position;
-            IngamePlayerData.playerRotation = rotation;
+        //public void SaveIngamePlayerData(Vector3 position, Quaternion rotation)
+        //{
+        //    IngamePlayerData.PlayerPosition = position;
+        //    IngamePlayerData.PlayerRotation = rotation;
 
-            SaveData(IngamePlayerData);
-        }
+        //    SaveData(IngamePlayerData);
+        //}
 
         #region SAVE / LOAD Core Method
 
         public bool LoadData<T>(out T loadedData) where T : UserDataDTO
         {
 #if UNITY_EDITOR            
-            string path = $"Assets/PROJECT TST/Anothers/Editor Saved Data/{typeof(T).Name}.json";
+            string path = $"Assets/PROJECT TST/Anothers/Editor Saved Data/Json/{typeof(T).Name}.json";
 #else
             string path = $"{Application.persistentDataPath}/{typeof(T).Name}.json";
 #endif
@@ -46,13 +45,14 @@ namespace TST
             }
 
             loadedData = null;
+            Debug.Log($"Failed to Load Data {typeof(T).Name}");
             return false;
         }
 
         public void SaveData<T>(T newData) where T : UserDataDTO
         {
 #if UNITY_EDITOR
-            string path = $"Assets/PROJECT TST/Anothers/Editor Saved Data/{typeof(T).Name}.json";
+            string path = $"Assets/PROJECT TST/Anothers/Editor Saved Data/Json/{typeof(T).Name}.json";
 #else
             string path = $"{Application.persistentDataPath}/{typeof(T).Name}.json";
 #endif
