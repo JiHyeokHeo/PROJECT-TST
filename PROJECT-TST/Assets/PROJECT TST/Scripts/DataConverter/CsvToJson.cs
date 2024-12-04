@@ -70,10 +70,13 @@ namespace TST
                     }
 
                     // csv 파일에 & 데이터를 넣을 시 리스트형으로 변환 // 포지션이냐 rotation 키워드가 포함 될 시 
-                    if (header[j].Contains("position", StringComparison.OrdinalIgnoreCase) ||
-                        header[j].Contains("rotation", StringComparison.OrdinalIgnoreCase))
+                    if (header[j].Contains("position", StringComparison.OrdinalIgnoreCase))
                     {
-                        entry[header[j]] = ParseVectorOrQuaternion(value);
+                        entry[header[j]] = ParseVectorOrQuaternion(value, true);
+                    }
+                    else if (header[j].Contains("rotation", StringComparison.OrdinalIgnoreCase))
+                    {
+                        entry[header[j]] = ParseVectorOrQuaternion(value, false);
                     }
                     else if (value.Contains("&"))
                     {
@@ -113,7 +116,7 @@ namespace TST
             return list;
         }
 
-        private static object ParseVectorOrQuaternion(string value)
+        private static object ParseVectorOrQuaternion(string value, bool isVector)
         {
             // "x,y,z" 또는 "x,y,z,w" 형식인지 확인
             // () 삭제
@@ -139,7 +142,15 @@ namespace TST
             }
             else
             {
-                throw new FormatException($"Invalid format for Vector3 or Quaternion: {value}");
+                if (isVector)
+                {
+                    return Vector3.zero;
+                }
+                else
+                {
+                    return Quaternion.identity;
+                }
+                
             }
         }
 

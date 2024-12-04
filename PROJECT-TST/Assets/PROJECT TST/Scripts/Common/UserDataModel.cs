@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,37 +12,45 @@ using UnityEngine.InputSystem;
 
 namespace TST
 {
+    public interface ILoader<Key, Value>
+    {
+        public Dictionary<Key,Value> MakeDict();
+    }
+
+    [System.Serializable]
+    public class SaveLoadDataWrapper<T> : ILoader<int, T> where T : RootDataDTO
+    {
+        public List<T> Values;
+
+        public Dictionary<int, T> MakeDict()
+        {
+            Dictionary<int, T> dict = new Dictionary<int, T>();
+            foreach(T value in Values)
+                dict.Add(value.ID, value);
+            return dict;
+        }
+    }
+
     public class UserDataModel : SingletonBase<UserDataModel>
     {
-        [field: SerializeField] public Dictionary<string, IngamePlayerDataDTO> IngamePlayerData { get; private set; } = new Dictionary<string, IngamePlayerDataDTO> ();
+        [field: SerializeField] public Dictionary<int, IngamePlayerDataDTO> IngamePlayerData { get; private set; } = new Dictionary<int, IngamePlayerDataDTO> ();
 
         public void Initialize()
         {
             // 즨짜아아으아아아 머리아파 ㅠㅠㅋㅋ 
-            if (LoadData(out IngamePlayerDataDTO loadPlayerData))
-            {
-                for (int i = 0; i < loadPlayerData.Values.Count; i++)
-                {
-                    IngamePlayerData.Add(loadPlayerData.Values[i].Name, loadPlayerData.Values[i]);
-                }
-            }
-            else // Editor 에서 저장한 데이터가 없을 때.
-            {
-                //IngamePlayerData = new RootDTO<IngamePlayerDataDTO>();
-                //SaveData(IngamePlayerData);
-            }
+            IngamePlayerData = LoadData<IngamePlayerDataDTO>().MakeDict();
         }
 
         public void SaveIngamePlayerData(Vector3 position, Quaternion rotation)
         {
-            //IngamePlayerData.Position = position;
+            //IngamePlayerData["Tory"].Position = position;
 
             //SaveData(IngamePlayerData);
         }
 
         #region SAVE / LOAD Core Method
 
-        public bool LoadData<T>(out T loadedData)
+        public SaveLoadDataWrapper<T> LoadData<T>() where T : RootDataDTO
         {
 #if UNITY_EDITOR
             string path = $"Assets/PROJECT TST/Anothers/Editor Saved Data/Json/{typeof(T).Name}.json";
@@ -50,24 +59,17 @@ namespace TST
 #endif
             if (FileManager.ReadFileData(path, out string loadedEditorData))
             {
-                //var settings = new JsonSerializerSettings
-                //{
-                //    Converters = new List<JsonConverter>
-                //    {
-                //        new JsonConverterForInt() // 숫자 변환 처리기 추가
-                //    }
-                //};
+                // JSON 역직렬화
+                var wrapper = JsonConvert.DeserializeObject<SaveLoadDataWrapper<T>>(loadedEditorData);
 
-                loadedData = JsonConvert.DeserializeObject<T>(loadedEditorData);
-                return true;
+                return wrapper;
             }
-
-            loadedData = default(T);
+            
             Debug.Log($"Failed to Load Data {typeof(T).Name}");
-            return false;
+            return null;
         }
 
-        public void SaveData<T>(T newData)
+        public void SaveData<T>(Dictionary<string, T> newData) where T : RootDataDTO
         {
 #if UNITY_EDITOR
             string jsonPath = $"Assets/PROJECT TST/Anothers/Editor Saved Data/Json/{typeof(T).Name}.json";
@@ -78,8 +80,13 @@ namespace TST
 #endif
 
             // JSON 저장
-            string jsonData = JsonUtility.ToJson(newData, true);
-            FileManager.WriteFileFromString(jsonPath, jsonData);
+            string jsonData = "";
+            foreach (var dic in newData)
+            {
+                string key = dic.Key;
+                jsonData = JsonUtility.ToJson(newData[key], true);
+                FileManager.WriteFileFromString(jsonPath, jsonData);
+            }
             Debug.Log($"Save Data to JSON Success: {jsonData}");
 
             // CSV 저장
@@ -125,24 +132,6 @@ namespace TST
 
             // 파일 저장
             File.WriteAllText(filePath, csvBuilder.ToString());
-        }
-
-        public class JsonConverterForInt : JsonConverter
-        {
-            public override bool CanConvert(Type objectType)
-            {
-                return objectType == typeof(long) || objectType == typeof(int);
-            }
-
-            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-            {
-                return Convert.ToInt32(reader.Value);
-            }
-
-            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-            {
-                writer.WriteValue(value);
-            }
         }
         #endregion
 

@@ -6,10 +6,15 @@ using UnityEngine;
 namespace TST
 {
     [System.Serializable]
-    public class UserDataDTO<T>
+    public class RootDataDTO
     {
-        // 이름 항상 Values로 고정 // CsvToJson csv 컨버팅 관련쪽에서 이름 Values로 고정해놨음
-        public List<T> Values = new List<T>();
+        public int ID;
+    }
+
+    [System.Serializable]
+    public class UserDataDTO : RootDataDTO
+    {
+       
     }
 
     [System.Serializable]
@@ -37,10 +42,11 @@ namespace TST
     //}
 
     [System.Serializable]
-    public class IngamePlayerDataDTO : UserDataDTO<IngamePlayerDataDTO>
+    public class IngamePlayerDataDTO : UserDataDTO
     {
         public string Name;
         public Vector3 Position;
         public List<int> Skills;
     }
 }
+    
