@@ -19,7 +19,7 @@ namespace TST
 
         private void Start()
         {
-            //transform.position = UserDataModel.Singleton.IngamePlayerData.PlayerPosition;
+            //transform.position = UserDataModel.Singleton.IngamePlayerData.Values[0].Position;
             //transform.rotation = UserDataModel.Singleton.IngamePlayerData.PlayerRotation;
         }
 
@@ -47,7 +47,7 @@ namespace TST
 
             if (Input.GetKeyDown(KeyCode.F5))
             {
-                //UserDataModel.Singleton.SaveIngamePlayerData(transform.position, transform.rotation);
+                UserDataModel.Singleton.SaveIngamePlayerData(transform.position, transform.rotation);
             }
 
             float inputX = Input.GetAxis("Horizontal");

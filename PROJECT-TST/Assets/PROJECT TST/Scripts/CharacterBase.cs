@@ -415,12 +415,11 @@ namespace TST
             if (!isThrowMode)
                 return;
 
-            isThrowMode = false;
             animator.SetTrigger("Throw Trigger");
             CurrentThrowObject.transform.SetParent(null);
             CurrentThrowObject.transform.position = throwStartPoint.position;
             CurrentThrowObject.isKinematic = false;
-            CurrentThrowObject.AddForce(transform.forward * 10, ForceMode.Impulse);
+            CurrentThrowObject.AddForce(transform.forward * 50, ForceMode.Impulse);
         }
 
         public bool isLoot = false;

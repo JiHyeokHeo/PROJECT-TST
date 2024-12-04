@@ -15,7 +15,7 @@ namespace TST
 #if UNITY_EDITOR
         // Add a menu item named "Do Something" to MyMenu in the menu bar.
         [MenuItem("Data/CsvToJson %#K")]
-        public static void DataConvertToJson()
+        public static void CsvDataConvertToJson()
         {
             Read("IngamePlayerDataDTO");
         }
@@ -24,13 +24,14 @@ namespace TST
         static string LINE_SPLIT_RE = @"\r\n|\n\r|\n|\r";
         static char[] TRIM_CHARS = { '\"' };
 
-        public static Dictionary<string, object> Read(string fileName)
+        public static List<Dictionary<string, object>> Read(string fileName)
         {
             // 추후 데이터 이걸로 변경
             //persistentDataPath
+            var list = new List<Dictionary<string, object>>();
+
             string dataPath = $"Assets/PROJECT TST/Anothers/Editor Saved Data/Csv/{fileName}.csv";
 
-            var dict = new Dictionary<string, object>();
             TextAsset data = (TextAsset)AssetDatabase.LoadAssetAtPath(dataPath, typeof(TextAsset));
 
             if (data == null)
@@ -41,7 +42,7 @@ namespace TST
 
             var lines = Regex.Split(data.text, LINE_SPLIT_RE);
 
-            if (lines.Length <= 1) return dict;
+            if (lines.Length <= 1) return list;
 
             var header = Regex.Split(lines[0], SPLIT_RE);
             for (var i = 1; i < lines.Length; i++)
@@ -82,9 +83,8 @@ namespace TST
                     {
                         entry[header[j]] = finalvalue;
                     }
-                    dict.Add(header[j], entry[header[j]]);
                 }
-               
+                list.Add(entry);
             }
 
             string filePath = Application.dataPath;
@@ -100,12 +100,17 @@ namespace TST
                 }
             };
 
-            string json = JsonConvert.SerializeObject(dict, Formatting.Indented, settings);
+            var jsonObject = new Dictionary<string, object>
+            {
+                { "Values", list }
+            };
+
+            string json = JsonConvert.SerializeObject(jsonObject, Formatting.Indented, settings);
             File.WriteAllText(filePath, json);
 
             Debug.Log($"Convert Excel To Json : {filePath}");
 
-            return dict;
+            return list;
         }
 
         private static object ParseVectorOrQuaternion(string value)
