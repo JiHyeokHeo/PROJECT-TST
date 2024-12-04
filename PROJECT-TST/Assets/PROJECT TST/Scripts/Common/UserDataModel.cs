@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,10 +18,11 @@ namespace TST
         public Dictionary<Key,Value> MakeDict();
     }
 
+    // 만약 string으로 해야한다면 다시 하나 더 팝시다.. 슈ㅜ...뷰ㅠㅠㅠㅠ 힘드렁뉴ㅜ로ㅓ뮤 ㅇ러ㅗㅁㄴㅇㄹ
     [System.Serializable]
     public class SaveLoadDataWrapper<T> : ILoader<int, T> where T : RootDataDTO
     {
-        public List<T> Values;
+        public List<T> Values = new List<T>();
 
         public Dictionary<int, T> MakeDict()
         {
@@ -37,15 +39,17 @@ namespace TST
 
         public void Initialize()
         {
-            // 즨짜아아으아아아 머리아파 ㅠㅠㅋㅋ 
+            // 즨짜아아으아아아 머리아파 ㅠㅠㅋㅋ                      
             IngamePlayerData = LoadData<IngamePlayerDataDTO>().MakeDict();
+            
         }
 
         public void SaveIngamePlayerData(Vector3 position, Quaternion rotation)
         {
-            //IngamePlayerData["Tory"].Position = position;
+            // ID : 1001번
+            IngamePlayerData[1001].Position = position;
 
-            //SaveData(IngamePlayerData);
+            SaveData(IngamePlayerData);
         }
 
         #region SAVE / LOAD Core Method
@@ -69,7 +73,7 @@ namespace TST
             return null;
         }
 
-        public void SaveData<T>(Dictionary<string, T> newData) where T : RootDataDTO
+        public void SaveData<T>(Dictionary<int, T> newData) where T : RootDataDTO
         {
 #if UNITY_EDITOR
             string jsonPath = $"Assets/PROJECT TST/Anothers/Editor Saved Data/Json/{typeof(T).Name}.json";
@@ -78,63 +82,197 @@ namespace TST
             string jsonPath = $"{Application.persistentDataPath}/{typeof(T).Name}.json";
             string csvPath = $"{Application.persistentDataPath}/{typeof(T).Name}.csv";
 #endif
-
             // JSON 저장
-            string jsonData = "";
+            SaveLoadDataWrapper<T> wrapper = new SaveLoadDataWrapper<T>();
             foreach (var dic in newData)
             {
-                string key = dic.Key;
-                jsonData = JsonUtility.ToJson(newData[key], true);
-                FileManager.WriteFileFromString(jsonPath, jsonData);
+                wrapper.Values.Add(newData[dic.Key]);
             }
+
+            var settings = new JsonSerializerSettings
+            {
+                ContractResolver = new ParentFirstContractResolver(),
+                Converters = new List<JsonConverter>
+                {
+                    new Vector3Converter(),
+                    new QuaternionConverter()
+                },
+                Formatting = Formatting.Indented
+            };
+
+            var jsonData = JsonConvert.SerializeObject(wrapper, settings);
+            FileManager.WriteFileFromString(jsonPath, jsonData);
             Debug.Log($"Save Data to JSON Success: {jsonData}");
 
             // CSV 저장
-            SaveToCsv(newData, csvPath);
+            SaveToCsv(wrapper.Values, csvPath);
             Debug.Log($"Save Data to CSV Success: {csvPath}");
         }
 
-        public static void SaveToCsv<T>(T data, string filePath)
+        public static void SaveToCsv<T>(IEnumerable<T> dataCollection, string filePath) where T : RootDataDTO
         {
-            var properties = typeof(T).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            if (dataCollection == null || !dataCollection.Any())
+            {
+                Debug.LogError("Data collection is null or empty.");
+                return;
+            }
+
             var csvBuilder = new StringBuilder();
+
+            // 부모 클래스부터 순차적으로 속성 추출
+            var properties = GetPropertiesInHierarchy(typeof(T));
 
             // 헤더 생성
             csvBuilder.AppendLine(string.Join(",", properties.Select(p => p.Name)));
 
             // 데이터 추가
-            var values = properties.Select(p =>
+            foreach (var data in dataCollection)
             {
-                var value = p.GetValue(data);
+                var values = properties.Select(p =>
+                {
+                    var value = p.GetValue(data);
 
-                if (value is IEnumerable enumerable && !(value is string))
-                {
-                    return $"\"{string.Join("&", enumerable.Cast<object>())}\""; // 리스트는 '&'로 구분, 큰따옴표로 감싸기
-                }
-                // Vector3 처리
-                else if (value is Vector3 vector)
-                {
-                    return $"\"({vector.x},{vector.y},{vector.z})\""; // x, y, z 형식을 큰따옴표로 감싸기
-                }
-                // Quaternion 처리
-                else if (value is Quaternion quaternion)
-                {
-                    return $"\"({quaternion.x},{quaternion.y},{quaternion.z},{quaternion.w})\""; // x, y, z, w 형식
-                }
-                // 일반 데이터
-                else
-                {
-                    return value?.ToString()?.Replace(",", " ").Replace("\"", "\"\""); // 쉼표 제거 및 큰따옴표 이스케이프
-                }
-            });
+                    if (value == null)
+                        return ""; // Null 값을 빈 문자열로 처리
 
-            csvBuilder.AppendLine(string.Join(",", values));
+                    if (value is IEnumerable enumerable && !(value is string))
+                    {
+                        return $"\"{string.Join("&", enumerable.Cast<object>())}\""; // 리스트는 '&'로 구분
+                    }
+                    else if (value is Vector3 vector)
+                    {
+                        return $"\"({vector.x},{vector.y},{vector.z})\""; // Vector3 형식
+                    }
+                    else if (value is Quaternion quaternion)
+                    {
+                        return $"\"({quaternion.x},{quaternion.y},{quaternion.z},{quaternion.w})\""; // Quaternion 형식
+                    }
+                    else
+                    {
+                        return value?.ToString()?.Replace(",", " ").Replace("\"", "\"\""); // 쉼표와 큰따옴표 이스케이프
+                    }
+                });
+
+                csvBuilder.AppendLine(string.Join(",", values));
+            }
 
             // 파일 저장
             File.WriteAllText(filePath, csvBuilder.ToString());
+            Debug.Log($"CSV Saved to {filePath}");
+        }
+
+        // 부모 클래스부터 속성 추출
+        private static List<FieldInfo> GetPropertiesInHierarchy(Type type)
+        {
+            var properties = new List<FieldInfo>();
+            var types = new List<Type>();
+
+            while (type != null && type != typeof(object))
+            {
+                types.Add(type);
+                type = type.BaseType; // 부모 클래스로 이동
+            }
+
+            // 부모부터 돌도록
+            types.Reverse();
+
+            for (int i = 0; i < types.Count; i++)
+            {
+                properties.AddRange(types[i].GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly));
+            }
+
+            return properties;
         }
         #endregion
 
+        public class ParentFirstContractResolver : DefaultContractResolver
+        {
+            protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
+            {
+                var properties = base.CreateProperties(type, memberSerialization);
 
+                // 부모 클래스의 속성을 먼저 정렬
+                return properties
+                    .OrderBy(p => GetInheritanceDepth(p.DeclaringType)) // 상속 깊이에 따라 정렬
+                    .ThenBy(p => p.Order ?? int.MaxValue) // JsonProperty(Order) 속성 적용
+                    .ToList();
+            }
+
+            private int GetInheritanceDepth(Type type)
+            {
+                int depth = 0;
+                while (type.BaseType != null)
+                {
+                    depth++;
+                    type = type.BaseType;
+                }
+                return depth;
+            }
+        }
+
+        public class Vector3Converter : JsonConverter
+        {
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                var vector = (Vector3)value;
+                writer.WriteStartObject();
+                writer.WritePropertyName("x");
+                writer.WriteValue(vector.x);
+                writer.WritePropertyName("y");
+                writer.WriteValue(vector.y);
+                writer.WritePropertyName("z");
+                writer.WriteValue(vector.z);
+                writer.WriteEndObject();
+            }
+
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                var obj = JObject.Load(reader);
+                return new Vector3(
+                    (float)obj["x"],
+                    (float)obj["y"],
+                    (float)obj["z"]
+                );
+            }
+
+            public override bool CanConvert(Type objectType)
+            {
+                return objectType == typeof(Vector3);
+            }
+        }
+
+        public class QuaternionConverter : JsonConverter
+        {
+            public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+            {
+                var quaternion = (Quaternion)value;
+                writer.WriteStartObject();
+                writer.WritePropertyName("x");
+                writer.WriteValue(quaternion.x);
+                writer.WritePropertyName("y");
+                writer.WriteValue(quaternion.y);
+                writer.WritePropertyName("z");
+                writer.WriteValue(quaternion.z);
+                writer.WritePropertyName("w");
+                writer.WriteValue(quaternion.w);
+                writer.WriteEndObject();
+            }
+
+            public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+            {
+                var obj = JObject.Load(reader);
+                return new Quaternion(
+                    (float)obj["x"],
+                    (float)obj["y"],
+                    (float)obj["z"],
+                    (float)obj["w"]
+                );
+            }
+
+            public override bool CanConvert(Type objectType)
+            {
+                return objectType == typeof(Quaternion);
+            }
+        }
     }
 }

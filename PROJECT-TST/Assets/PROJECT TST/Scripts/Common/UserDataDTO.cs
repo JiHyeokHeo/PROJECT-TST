@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ namespace TST
     [System.Serializable]
     public class RootDataDTO
     {
+        [JsonProperty(Order = 0)]
         public int ID;
     }
 
