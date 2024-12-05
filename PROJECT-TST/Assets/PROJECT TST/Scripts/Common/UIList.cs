@@ -8,7 +8,8 @@ namespace TST
     {
         UI_PANEL_START,
 
-
+        LoadingUI,
+        TitleUI,
 
         UI_PANEL_END,
         UI_POPUP_START,
