@@ -45,11 +45,6 @@ namespace TST
             //    UIManager.Hide<PopupB_UI>(UIList.PopupB_UI);
             //}
 
-            if (Input.GetKeyDown(KeyCode.F5))
-            {
-                UserDataModel.Singleton.SaveIngamePlayerData(transform.position, transform.rotation);
-            }
-
             float inputX = Input.GetAxis("Horizontal");
             float inputY = Input.GetAxis("Vertical");
 

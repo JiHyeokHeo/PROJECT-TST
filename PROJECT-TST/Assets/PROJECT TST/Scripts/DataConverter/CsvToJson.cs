@@ -17,9 +17,11 @@ namespace TST
         [MenuItem("Data/CsvToJson %#K")]
         public static void CsvDataConvertToJson()
         {
+            // TODO : CSV 파일 추가 될때마다 추가
             Read("IngamePlayerDataDTO");
         }
 
+        #region Simple CSV Reader
         static string SPLIT_RE = @",(?=(?:[^""]*""[^""]*"")*(?![^""]*""))";
         static string LINE_SPLIT_RE = @"\r\n|\n\r|\n|\r";
         static char[] TRIM_CHARS = { '\"' };
@@ -69,12 +71,12 @@ namespace TST
                         finalvalue = f;
                     }
 
-                    // csv 파일에 & 데이터를 넣을 시 리스트형으로 변환 // 포지션이냐 rotation 키워드가 포함 될 시 
-                    if (header[j].Contains("position", StringComparison.OrdinalIgnoreCase))
+                    // csv 파일에 & 데이터를 넣을 시 리스트형으로 변환 // 포지션이냐 rotation 키워드가 포함 될 시  이걸 추후 Vec이나 Qua 이라는 키워드로 변경 하는 것도 좋을듯
+                    if (header[j].Contains("Vec", StringComparison.OrdinalIgnoreCase))
                     {
                         entry[header[j]] = ParseVectorOrQuaternion(value, true);
                     }
-                    else if (header[j].Contains("rotation", StringComparison.OrdinalIgnoreCase))
+                    else if (header[j].Contains("Quat", StringComparison.OrdinalIgnoreCase))
                     {
                         entry[header[j]] = ParseVectorOrQuaternion(value, false);
                     }
@@ -153,6 +155,7 @@ namespace TST
                 
             }
         }
+        #endregion
 
 #endif
     }

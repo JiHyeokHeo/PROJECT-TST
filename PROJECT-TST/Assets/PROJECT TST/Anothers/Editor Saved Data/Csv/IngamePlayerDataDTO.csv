@@ -1,2 +1,3 @@
-ID,Name,Position,Skills
-1001,Tory,"(-1.171021,9.995699E-05,0.9708989)",
+﻿ID,Name,Hp,AttackPower,Speed,SkillData,VecPosition,QuatRotation,Equipments
+1001,Tory,100,1,5,"2000&2001&2002","(-1.845231,9.995699E-05,0.6977095)","(0,-0.6952859,0,0.7187333)","Rifle&Grenade"
+1002,Ji,80,2,5,,"(0,0,0)","(0,0,0,1)",

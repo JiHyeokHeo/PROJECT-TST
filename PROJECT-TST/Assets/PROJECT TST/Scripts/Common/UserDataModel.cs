@@ -36,25 +36,61 @@ namespace TST
     public class UserDataModel : SingletonBase<UserDataModel>
     {
         [field: SerializeField] public Dictionary<int, IngamePlayerDataDTO> IngamePlayerData { get; private set; } = new Dictionary<int, IngamePlayerDataDTO> ();
+        [field: SerializeField] public Dictionary<int, IngameMonsterDataDTO> ingameMonsterData { get; private set; } = new Dictionary<int, IngameMonsterDataDTO> ();
 
         public void Initialize()
         {
             // 즨짜아아으아아아 머리아파 ㅠㅠㅋㅋ                      
             IngamePlayerData = LoadData<IngamePlayerDataDTO>().MakeDict();
-            
+            //ingameMonsterData = LoadData<IngameMonsterDataDTO>().MakeDict();
         }
 
-        public void SaveIngamePlayerData(Vector3 position, Quaternion rotation)
+        public void ChangeData<T>(int id, T data) where T : RootDataDTO
         {
-            // ID : 1001번
-            IngamePlayerData[1001].Position = position;
+            var dictionary = GetDictionaryForType<T>();
+            if (dictionary != null)
+            {
+                dictionary[id] = null;
+                dictionary[id] = data;
+                Debug.Log($"Saved data for ID {id} of type {typeof(T).Name}");
+            }
+            else
+            {
+                Debug.LogError($"Unsupported type: {typeof(T).Name}");
+            }
+        }
+  
+        // 함수 계속 추가해야함
+        private Dictionary<int, T> GetDictionaryForType<T>() where T : RootDataDTO
+        {
+            if (typeof(T) == typeof(IngamePlayerDataDTO))
+            {
+                return IngamePlayerData as Dictionary<int, T>;
+            }
+            else if (typeof(T) == typeof(IngameMonsterDataDTO))
+            {
+                return ingameMonsterData as Dictionary<int, T>;
+            }
 
+            return null;
+        }
+
+        private void SaveAllInGameData()
+        {
+            // TODO : Dictionary 멤버 추가될때마다 늘어나야함
             SaveData(IngamePlayerData);
+            //SaveData(ingameMonsterData);
+        }
+
+        private void OnDisable()
+        {
+            // 데이터 저장 용도
+            SaveAllInGameData();
         }
 
         #region SAVE / LOAD Core Method
 
-        public SaveLoadDataWrapper<T> LoadData<T>() where T : RootDataDTO
+        private SaveLoadDataWrapper<T> LoadData<T>() where T : RootDataDTO
         {
 #if UNITY_EDITOR
             string path = $"Assets/PROJECT TST/Anothers/Editor Saved Data/Json/{typeof(T).Name}.json";
@@ -73,7 +109,7 @@ namespace TST
             return null;
         }
 
-        public void SaveData<T>(Dictionary<int, T> newData) where T : RootDataDTO
+        private void SaveData<T>(Dictionary<int, T> newData) where T : RootDataDTO
         {
 #if UNITY_EDITOR
             string jsonPath = $"Assets/PROJECT TST/Anothers/Editor Saved Data/Json/{typeof(T).Name}.json";
@@ -105,16 +141,16 @@ namespace TST
             Debug.Log($"Save Data to JSON Success: {jsonData}");
 
             // CSV 저장
-            SaveToCsv(wrapper.Values, csvPath);
-            Debug.Log($"Save Data to CSV Success: {csvPath}");
+            if (SaveToCsv(wrapper.Values, csvPath))
+                Debug.Log($"Save Data to CSV Success: {csvPath}");
         }
 
-        public static void SaveToCsv<T>(IEnumerable<T> dataCollection, string filePath) where T : RootDataDTO
+        private static bool SaveToCsv<T>(IEnumerable<T> dataCollection, string filePath) where T : RootDataDTO
         {
             if (dataCollection == null || !dataCollection.Any())
             {
                 Debug.LogError("Data collection is null or empty.");
-                return;
+                return false;
             }
 
             var csvBuilder = new StringBuilder();
@@ -157,8 +193,17 @@ namespace TST
             }
 
             // 파일 저장
-            File.WriteAllText(filePath, csvBuilder.ToString());
-            Debug.Log($"CSV Saved to {filePath}");
+            try
+            {
+                FileManager.WriteFileFromString(filePath, csvBuilder.ToString());
+            }
+            catch (IOException ex)
+            {
+                Debug.LogError($"File is locked or cannot be accessed: {filePath}. Error: {ex.Message}");
+                return false;
+            }
+
+            return true;
         }
 
         // 부모 클래스부터 속성 추출
@@ -185,6 +230,7 @@ namespace TST
         }
         #endregion
 
+        #region Serialize & Deserialize & FindParentProperty
         public class ParentFirstContractResolver : DefaultContractResolver
         {
             protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
@@ -274,5 +320,6 @@ namespace TST
                 return objectType == typeof(Quaternion);
             }
         }
+        #endregion
     }
 }

@@ -20,34 +20,30 @@ namespace TST
     }
 
     [System.Serializable]
-    public class SkillDataDTO{ }
-
-    [System.Serializable]
-    public class IngamePlayerSkillDTO
+    public class MonsterDataDTO : RootDataDTO
     {
-        public int SkillDataId;
 
     }
-
-    //[System.Serializable]
-    //public class IngamePlayerDataDTO : UserDataDTO
-    //{
-    //    public int DataId;
-    //    public string Name;
-    //    public float Hp;
-    //    public float AttackPower;
-    //    public float Speed;
-    //    public List<int> SkillData;
-    //    public Vector3 PlayerPosition; 
-    //    public Quaternion PlayerRotation;
-    //    public List<string> Equipments;
-    //}
 
     [System.Serializable]
     public class IngamePlayerDataDTO : UserDataDTO
     {
         public string Name;
+        public float Hp;
+        public float AttackPower;
+        public float Speed;
+        public List<int> SkillData;
+        public Vector3 VecPosition;
+        public Quaternion QuatRotation;
+        public List<string> Equipments;
+    }
+
+    [System.Serializable]
+    public class IngameMonsterDataDTO : MonsterDataDTO
+    {
+        public string Name;
         public Vector3 Position;
+        public Quaternion Rotation;
         public List<int> Skills;
     }
 }
