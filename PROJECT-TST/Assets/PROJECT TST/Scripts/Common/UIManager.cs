@@ -112,6 +112,23 @@ namespace TST
             return (T)container[uiPrefabName];
         }
 
+        public void HideAllUI()
+        {
+            foreach (var panel in panels)
+            {
+                if (panel.Value != null)
+                {
+                    panel.Value.Hide();
+                }
+            }
 
+            foreach (var popup in popups)
+            {
+                if (popup.Value != null)
+                {
+                    popup.Value.Hide();
+                }
+            }
+        }
     }
 }

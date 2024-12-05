@@ -207,16 +207,14 @@ namespace TST
             // 일단 데이터 받기부터
             var ingameData = UserDataModel.Singleton.IngamePlayerData;
             // TODO : 추후 이걸 spawn 하는 풀링 클래스 or Object 관리 클래스에서 데이터 세팅 하는 방식으로 변경 해야함
-            var data = ingameData[1001];
-            transform.position = data.VecPosition;
-            transform.rotation = data.QuatRotation;
+            ingamePlayerData = ingameData[1001];
+            transform.position = ingamePlayerData.VecPosition;
+            transform.rotation = ingamePlayerData.QuatRotation;
         }
 
         public void OnApplicationQuit()
         {
             // 흠 이거는 추후 프로퍼티로 값이 변환이 생긴다면 데이터를 전송하는 식으로 변경 해야할듯?
-            ingamePlayerData = new IngamePlayerDataDTO();
-            ingamePlayerData = UserDataModel.Singleton.IngamePlayerData[1001];
             ingamePlayerData.VecPosition = transform.position;
             ingamePlayerData.QuatRotation = transform.rotation;
             // 플레이어 번호 ID

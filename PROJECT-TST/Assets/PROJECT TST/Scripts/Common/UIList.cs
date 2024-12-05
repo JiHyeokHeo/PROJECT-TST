@@ -10,6 +10,8 @@ namespace TST
 
         Minimap_UI,
         CrossHair_UI,
+        LoadingUI,
+        TitleUI,
 
         UI_PANEL_END,
         UI_POPUP_START,

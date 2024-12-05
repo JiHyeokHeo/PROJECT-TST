@@ -50,7 +50,6 @@ namespace TST
             var dictionary = GetDictionaryForType<T>();
             if (dictionary != null)
             {
-                dictionary[id] = null;
                 dictionary[id] = data;
                 Debug.Log($"Saved data for ID {id} of type {typeof(T).Name}");
             }
@@ -135,6 +134,9 @@ namespace TST
                 },
                 Formatting = Formatting.Indented
             };
+
+            if (wrapper == null || !wrapper.Values.Any())
+                return;
 
             var jsonData = JsonConvert.SerializeObject(wrapper, settings);
             FileManager.WriteFileFromString(jsonPath, jsonData);

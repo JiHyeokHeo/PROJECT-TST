@@ -206,7 +206,7 @@ namespace TST
 
         [SerializeField]
         private float recoilAmount = 10.0f; 
-        private float recoilSpeed = 10.0f; 
+        //private float recoilSpeed = 10.0f; 
         private float currentRecoil = 0.0f;
 
         private float recoilMaxThreshold = 20.0f;

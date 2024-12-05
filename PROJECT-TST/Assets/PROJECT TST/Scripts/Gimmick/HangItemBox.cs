@@ -6,7 +6,7 @@ namespace TST
 {
     public class HangItemBox : MonoBehaviour, IDamage
     {
-        private bool isHanging = true;
+        //private bool isHanging = true;
 
         public void ApplyDamage(float damage)
         {
@@ -14,7 +14,7 @@ namespace TST
             //{
                 Rigidbody boxRigid = GetComponentInChildren<Rigidbody>();
                 boxRigid.isKinematic = false;
-                isHanging = false;
+                //isHanging = false;
             //}
         }
     }
