@@ -11,7 +11,7 @@ namespace TST
         private static List<string> AutoBootStrapperScenes = new List<string>()
         {
             // 자동으로 BootStrapper를 실행할 씬들을 추가합니다.
-            "Game Scene",
+            "Ingame",
 
         };
 
@@ -30,14 +30,14 @@ namespace TST
         private static void InternalBoot()
         {
             // 필요한 기본 시스템 초기화
-            //UIManager.Singleton.Initialize();
-            //UserDataModel.Singleton.Initialize();
-            
+            UIManager.Singleton.Initialize();
+            UserDataModel.Singleton.Initialize();
+
             // TODO : 추가적인 작업이나 초기화 작업을 수행하고 싶다면 여기서 수행            
             // UIManager.Show<PopupA_UI>(UIList.PopupA_UI);
-            //UIManager.Show<IndicatorUI>(UIList.Indicator_UI);
-            //UIManager.Show<Minimap_UI>(UIList.Minimap_UI);
-            //UIManager.Show<CrossHair_UI>(UIList.CrossHair_UI);
+            UIManager.Show<IndicatorUI>(UIList.Indicator_UI);
+            UIManager.Show<Minimap_UI>(UIList.Minimap_UI);
+            UIManager.Show<CrossHair_UI>(UIList.CrossHair_UI);
         }
 
     }

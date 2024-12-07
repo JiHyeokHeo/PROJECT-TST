@@ -83,9 +83,11 @@ namespace TST
             {
                 case SceneType.Title:
                     ChangeScene<TitleScene>(SceneType.Title, onSceneLoadCompleted);
+                    currentScene = SceneType.Title;
                     break;
                 case SceneType.Ingame:
                     ChangeScene<IngameScene>(SceneType.Ingame, onSceneLoadCompleted);
+                    currentScene = SceneType.Ingame;
                     break;
             }
         }

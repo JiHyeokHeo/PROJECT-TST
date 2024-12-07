@@ -1,3 +1,51 @@
 ﻿{
-  "Values": []
+  "Values": [
+    {
+      "ID": 1001,
+      "Name": "Tory",
+      "Hp": 100.0,
+      "AttackPower": 1.0,
+      "Speed": 5.0,
+      "SkillData": [
+        2000,
+        2001,
+        2002
+      ],
+      "VecPosition": {
+        "x": -1.93205273,
+        "y": 9.995699E-05,
+        "z": -1.933094
+      },
+      "QuatRotation": {
+        "x": 0.0,
+        "y": 0.8137633,
+        "z": 0.0,
+        "w": -0.5811964
+      },
+      "Equipments": [
+        "Rifle",
+        "Grenade"
+      ]
+    },
+    {
+      "ID": 1002,
+      "Name": "Ji",
+      "Hp": 80.0,
+      "AttackPower": 2.0,
+      "Speed": 5.0,
+      "SkillData": null,
+      "VecPosition": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "QuatRotation": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0,
+        "w": 1.0
+      },
+      "Equipments": null
+    }
+  ]
 }
