@@ -68,20 +68,20 @@ namespace TST
                 linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
             }
 
-            if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
-            }
+            //if (Input.GetKeyDown(KeyCode.Alpha2))
+            //{
+            //    linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
+            //}
 
-            if (Input.GetKeyDown(KeyCode.Alpha3))
-            {
-                linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
-            }
+            //if (Input.GetKeyDown(KeyCode.Alpha3))
+            //{
+            //    linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
+            //}
 
-            if (Input.GetKeyDown(KeyCode.Alpha4))
-            {
-                linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
-            }
+            //if (Input.GetKeyDown(KeyCode.Alpha4))
+            //{
+            //    linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
+            //}
 
             if (Input.GetKeyDown(KeyCode.LeftShift))
             {
@@ -121,6 +121,11 @@ namespace TST
             if (Input.GetKeyDown(KeyCode.C))
             {
                 linkedCharacter.Crouch();
+            }
+
+            if (Input.GetKeyDown(KeyCode.H))
+            {
+                linkedCharacter.DroneSetting();
             }
 
             if (Input.GetKeyDown(KeyCode.F))

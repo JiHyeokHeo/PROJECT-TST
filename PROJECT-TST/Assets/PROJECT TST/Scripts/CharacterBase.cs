@@ -80,6 +80,8 @@ namespace TST
         public Transform weaponHolder;
         public Transform aimingPoint;
 
+        public Drone drone;
+
         public RigBuilder rigBuilder;
         public Rig aimingRig;
         public Rig lefthandRig;
@@ -465,6 +467,12 @@ namespace TST
             animator.SetFloat("Interaction Type", (float)interactType);
 
             animator.SetTrigger("Interaction Trigger");
+        }
+
+        public void DroneSetting()
+        {
+            drone.IsShowing = !drone.IsShowing;
+            drone.SetOwner(this.gameObject);
         }
 
         public void MeleeAttack()

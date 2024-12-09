@@ -11,8 +11,6 @@ namespace TST
         [SerializeField] private float _speed = 10;
         public Rigidbody Rb => _rb;
 
-
-
         void Update()
         {
             float x = Mathf.Sin(Time.time) * 20.0f;
