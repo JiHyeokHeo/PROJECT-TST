@@ -34,6 +34,7 @@ namespace TST
                 if (isShowing)
                     gameObject.SetActive(true);
 
+                isPlayed = false;
                 changeMovement = isShowing ? ShowMovement : HideMovement;
                 isChangingState = true;
             }
@@ -59,17 +60,17 @@ namespace TST
                 FollowOwner();
         }
 
+        bool isPlayed = false;
         private void ShowMovement()
         {
             if (isChangingState == false)
                 return;
 
-            if (CheckSqrDistance(startPoint.position) < 0.01f)
+            if (isPlayed == false)
             {
-                isChangingState = false;
+                StartParabolicMovement(endPoint.position, startPoint.position);
+                isPlayed = true;
             }
-
-            StartParabolicMovement(endPoint.position, startPoint.position);
         }
 
         private void HideMovement()
@@ -77,12 +78,11 @@ namespace TST
             if (isChangingState == false)
                 return;
 
-            if (CheckSqrDistance(endPoint.position) < 0.01f)
+            if (isPlayed == false)
             {
-                isChangingState = false;
+                StartParabolicMovement(startPoint.position, endPoint.position);
+                isPlayed = true;
             }
-
-            StartParabolicMovement(startPoint.position, endPoint.position);
         }
 
         private float CheckSqrDistance(Vector3 finalDestination)
@@ -101,17 +101,15 @@ namespace TST
         {
             Vector3 peak = (startPosition + endPosition) / 2 + Vector3.up * height; // 정점 위치
 
+            transform.DOKill();
             // 포물선 애니메이션
             transform.DOPath(new Vector3[] { startPosition, peak, endPosition }, duration, PathType.CatmullRom)
-                     .SetEase(isShowing ? Ease.OutQuad : Ease.OutQuad)
+                     .SetEase(Ease.OutQuad)
                      .OnComplete(() =>
                      {
-                         if (CheckSqrDistance(startPoint.position) < 0.01f)
-                         {
-                             transform.position = endPosition; // 최종 위치 보정
-                             isChangingState = false; // 상태 초기화
-                         }
+                         isChangingState = false;
                      });
+                    
         }
 
         public void SetOwner(GameObject owner)
