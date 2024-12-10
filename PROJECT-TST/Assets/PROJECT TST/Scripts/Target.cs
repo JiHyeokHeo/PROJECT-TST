@@ -13,23 +13,21 @@ namespace TST
 
         void Update()
         {
-            float x = Mathf.Sin(Time.time) * 20.0f;
-            Vector3 newPos = transform.position;
-            newPos.x = x;
-            transform.position = newPos;
+            // Å×½ºÆ®¿ë
+            //float x = Mathf.Sin(Time.time) * 20.0f;
+            //Vector3 newPos = transform.position;
+            //newPos.x = x;
+            //transform.position = newPos;
 
 
+            // »¹Áþ°Å¸® ÇÑ°ÅÀÓ Å°Áö¸¶ // ¸ô¶ó¼­ ³²°ÜµÒ
             //var dir = new Vector3(Mathf.Cos(Time.time * _speed) * _size, Mathf.Sin(Time.time * _speed) * _size);
-
             //_rb.velocity = dir;
         }
         
         public void ApplyDamage(float damage)
         {
-            if (damage > 100)
-            {
-                Destroy(gameObject);
-            }
+            Destroy(gameObject);
         }
     }
 }

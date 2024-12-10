@@ -1,14 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 namespace TST
 {
     public class BulletProjectile : ProjectileBase
     {
+        public bool isPlayerBullet = true;
+
         protected override void Init()
         {
-            rigid.AddForce(transform.forward * moveForce, ForceMode.Impulse);
+            if (isPlayerBullet)
+                rigid.AddForce(transform.forward * moveForce, ForceMode.Impulse);
+
+            // 플레이어꺼가 아닌 이상 생성가 동시에 rigid.addforce 를 거기서 주고 있음
+
             Destroy(gameObject, lifeTime);
         }
 

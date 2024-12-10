@@ -10,7 +10,9 @@ namespace TST
 {
     public enum EffectType
     {
+        Muzzle_1,
         Muzzle_6,
+        Muzzle_9,
 
 
         Impact_Brick,

@@ -32,8 +32,14 @@ namespace TST
         
         private void FixedUpdate()
         {
+            if (gameObject.activeSelf == false)
+                return;
+
+            // 진행만 시키도록 하고
             _rb.velocity = transform.forward * _speed;
 
+            if (_target == null)
+                return;
             // 정규화 a~b 0~1 value
             // 가까울 수록 편차가 줄고, 멀수록 편차가 커짐
             var leadTimePercentage = Mathf.InverseLerp(_minDistancePredict, _maxDistancePredict, Vector3.Distance(transform.position, _target.transform.position));
@@ -46,6 +52,11 @@ namespace TST
 
             // 로테이션
             RotateRocket();
+        }
+
+        public void SetTarget(Target target)
+        {
+            _target = target;
         }
 
         private void PredictMovement(float leadTimePercentage)
@@ -82,7 +93,7 @@ namespace TST
         {
             if (_explosionPrefab) Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
 
-            if (collision.transform.TryGetComponent<IDamage>(out var ex))
+            if (collision.transform.TryGetComponent<Target>(out var ex))
                 ex.ApplyDamage(1);
 
             //Destroy(gameObject);
