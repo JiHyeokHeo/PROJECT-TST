@@ -7228,25 +7228,29 @@ MonoBehaviour:
   missileFirePoint: {fileID: 974488779}
   missilePrefab: {fileID: 1294687583}
   skillDataList:
-  - skillType: 0
-    reloadRate: 3
-    reloadElapsedTime: 0
-    currentAmmo: 10
-    clipAmmo: 10
-    fireRate: 2
-    lastFireRate: 0
-  - skillType: 1
-    reloadRate: 10
-    reloadElapsedTime: 0
-    currentAmmo: 5
-    clipAmmo: 5
-    fireRate: 0.1
-    lastFireRate: 0
+    _serializedList:
+    - Key: 0
+      Value:
+        skillType: 0
+        currentAmmo: 10
+        clipAmmo: 10
+        fireRate: 1
+        reloadNeededTime: 20
+        reloadElapsedTime: 0
+        lastFireRate: 0
+    - Key: 1
+      Value:
+        skillType: 1
+        currentAmmo: 10
+        clipAmmo: 10
+        fireRate: 0.1
+        reloadNeededTime: 5
+        reloadElapsedTime: 0
+        lastFireRate: 0
   missileLifeTime: 5
   bulletLifeTime: 5
   bulletMoveForce: 1
   interactionRange: 30
-  currentTargetable: []
   startPoint: {fileID: 801827977}
   endPoint: {fileID: 1279702886}
   height: 1
@@ -7461,7 +7465,7 @@ GameObject:
   - component: {fileID: 1294687585}
   - component: {fileID: 1294687584}
   - component: {fileID: 1294687583}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Missile
   m_TagString: Untagged
   m_Icon: {fileID: 0}

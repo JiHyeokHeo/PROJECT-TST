@@ -115,6 +115,8 @@ namespace TST
                 enemyAIState = EEnemyAIState.Attack;
                 return;
             }
+
+            Debug.Log("AI ¿òÁ÷ÀÓ !");
         }
 
         private void Attack()
@@ -149,13 +151,14 @@ namespace TST
 
         private void MoveAnimator()
         {
-            IdleBlend = 1;  
+            IdleBlend = 1;
             speedBlend = Mathf.Lerp(speedBlend, targetSpeed, Time.deltaTime * 10.0f);
         }
 
         private void AttackAnimator()
         {
-
+            IdleBlend = 0;
+            targetSpeed = 0f;
         }
 
     }

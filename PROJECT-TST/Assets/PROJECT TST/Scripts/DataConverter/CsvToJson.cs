@@ -14,7 +14,7 @@ namespace TST
     {
 #if UNITY_EDITOR
         // Add a menu item named "Do Something" to MyMenu in the menu bar.
-        [MenuItem("Data/CsvToJson %#K")]
+        [MenuItem("TST/CsvToJson %#K")]
         public static void CsvDataConvertToJson()
         {
             // TODO : CSV 파일 추가 될때마다 추가
