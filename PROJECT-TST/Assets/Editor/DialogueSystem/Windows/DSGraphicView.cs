@@ -1,24 +1,31 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEditor.Experimental.GraphView;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace DS.Windows
 {
+    using Elements;
     // 눈에 보이는 요소들을 추가 시키는 클래스
     public class DSGraphicView : GraphView
     {
         public DSGraphicView()
         {
             AddManipulators();
-
             AddGridBackGround();
 
+            CreateNode();
+
             AddStyles();
+        }
+
+        private void CreateNode()
+        {
+            DSNode node = new DSNode();
+
+            node.Initialize();
+            node.Draw();
+
+            AddElement(node);
         }
 
         private void AddManipulators()
