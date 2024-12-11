@@ -1,3 +1,4 @@
+using AYellowpaper.SerializedCollections;
 using DG.Tweening;
 using System;
 using System.Collections;
@@ -91,15 +92,18 @@ namespace TST
         public class DroneSkillData
         {
             public EDroneSkillType skillType;
-            public float reloadRate;
-            public float reloadElapsedTime;
             public float currentAmmo;
             public float clipAmmo;
             public float fireRate;
+            public float reloadNeededTime;
+            [ReadOnly] 
+            public float reloadElapsedTime;
+            [ReadOnly]
             public float lastFireRate;
         }
 
-        public List<DroneSkillData> skillDataList = new List<DroneSkillData>();
+        [SerializedDictionary("EDroneSkillType", "DroneSkillData")]
+        public SerializedDictionary<EDroneSkillType, DroneSkillData> skillDataList = new SerializedDictionary<EDroneSkillType, DroneSkillData>();
 
         // 이것도 뭐 데이터에 넣으려면 넣자..
         public float missileLifeTime = 5f;
@@ -116,11 +120,11 @@ namespace TST
             // 미사일 먼저 쏘고 미사일 쐈으면 return
             // 미사일 쿨이면 스킵 때리고 Fire 버전 시작
             // Fire도 쿨이면 그냥 스킵 됨
-            if (skillDataList[0].currentAmmo > 0 && Time.time - skillDataList[0].lastFireRate >= skillDataList[0].fireRate)
+            if (skillDataList[EDroneSkillType.Missile].currentAmmo > 0 && Time.time - skillDataList[EDroneSkillType.Missile].lastFireRate >= skillDataList[EDroneSkillType.Missile].fireRate)
             {
-                skillDataList[0].currentAmmo--;
+                skillDataList[EDroneSkillType.Missile].currentAmmo--;
                 // 미사일은 굳이 뭐 방햑백터 같은거 설정 해줄 필요 없음 Homing Setting Script(Missile Script 참고)
-                skillDataList[0].lastFireRate = Time.time;
+                skillDataList[EDroneSkillType.Missile].lastFireRate = Time.time;
                 Rigidbody missile = GameObject.Instantiate(missilePrefab, missileFirePoint.position, missileFirePoint.rotation);
                 missile.gameObject.SetActive(true);
 
@@ -137,11 +141,11 @@ namespace TST
             }
 
             // 총알 1번
-            if (skillDataList[1].currentAmmo > 0 && Time.time - skillDataList[1].lastFireRate >= skillDataList[1].fireRate)
+            if (skillDataList[EDroneSkillType.Gun].currentAmmo > 0 && Time.time - skillDataList[EDroneSkillType.Gun].lastFireRate >= skillDataList[EDroneSkillType.Gun].fireRate)
             {
-                skillDataList[1].currentAmmo--;
+                skillDataList[EDroneSkillType.Gun].currentAmmo--;
                 // 총알은 target 목표에서부터 bullet 위치를 빼서 작업 해줘야 할듯 싶음
-                skillDataList[1].lastFireRate = Time.time;
+                skillDataList[EDroneSkillType.Gun].lastFireRate = Time.time;
                 Rigidbody bullet = GameObject.Instantiate(droneBulletPrefab, gunFirePoint.position, gunFirePoint.rotation);
                 bullet.gameObject.SetActive(true);
 
@@ -161,8 +165,8 @@ namespace TST
             if (target == null && forceReload == false)
                 return;
 
-            for (int i = 0; i < (int)EDroneSkillType.End; i++)
-                ReloadCoolDownCheck(skillDataList[i]);
+            for (EDroneSkillType type = 0; type < EDroneSkillType.End; type++)
+                ReloadCoolDownCheck(skillDataList[type]);
             // 하지만 타겟이 없을 때에만 리로드 하도록, Fire 중 리로드 강제 설정
 
             isFiring = false;
@@ -173,7 +177,7 @@ namespace TST
         {
             data.reloadElapsedTime += Time.deltaTime;
             
-            if (data.reloadElapsedTime >= data.reloadRate)
+            if (data.reloadElapsedTime >= data.reloadNeededTime)
             {
                 data.reloadElapsedTime = 0;
                 data.currentAmmo = data.clipAmmo;
@@ -183,7 +187,7 @@ namespace TST
         }
 
         public float interactionRange = 30.0f;
-        public List<Target> currentTargetable = new List<Target>();
+        private List<Target> currentTargetable = new List<Target>();
         private void FixedUpdate()
         {
             // 타겟이 가능한 친구 일단 넣어두고

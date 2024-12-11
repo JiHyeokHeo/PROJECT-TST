@@ -72,7 +72,7 @@ namespace TST
             //enemyAnimator.SetFloat("Armed", armedBlend);
 
             enemyAnimator.SetFloat("Speed", speedBlend);
-            enemyAnimator.SetFloat("IdleBlend", IdleBlend);
+            enemyAnimator.SetFloat("Idle Blend", IdleBlend);
             //enemyAnimator.SetFloat("Horizontal", horizontal);
             enemyAnimator.SetFloat("Vertical", vertical);
             //enemyAnimator.SetFloat("Crouch", crouchBlend);
@@ -130,6 +130,12 @@ namespace TST
                 enemyAIState = EEnemyAIState.Idle;
                 return;
             }
+
+            Vector3 direction = (target.transform.position - transform.position).normalized;
+
+            transform.position = transform.position;
+            targetRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime * 10.0f);
 
             Debug.Log("AI °ø°ÝÁß !");
         }
