@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 namespace DS.Elements
 {
     using Enumerations;
-    
+    using UnityEngine;
 
     public class DSNode : Node
     {
@@ -18,14 +18,16 @@ namespace DS.Elements
 
         public DSDialogueType DialogueType { get; set; }
 
-        public void Initialize()
+        public virtual void Initialize(Vector2 position)
         {
             DialogueName = "DialogueName";
             Choices = new List<string>();
             Text = "Dialogue text.";
+
+            SetPosition(new Rect(position, Vector2.zero));
         }
 
-        public void Draw()
+        public virtual void Draw()
         {
             /* 타이틀 컨테이너 Node 내부 자체 구현 */
             TextField dialougeNameTextField = new TextField()
@@ -63,7 +65,6 @@ namespace DS.Elements
 
             extensionContainer.Add(customDataContainer);
 
-            RefreshExpandedState();
         }
     } 
 }
