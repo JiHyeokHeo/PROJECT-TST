@@ -6,7 +6,7 @@ using UnityEngine.Animations.Rigging;
 
 namespace TST
 {
-    public class CharacterBase : MonoBehaviour
+    public class CharacterBase : MonoBehaviour, IDamage
     {
         public Vector3 AimingPosition
         {
@@ -96,6 +96,7 @@ namespace TST
         private float lefthandRigWeightBlend;
 
 
+        public event System.Action OnDamaged;
 
         private void Awake()
         {
@@ -280,6 +281,11 @@ namespace TST
         public void SetArmedComplete(int flag)
         {
             isArmedCompleted = flag > 0;
+        }
+
+        public void ApplyDamage(float damage)
+        {
+            OnDamaged?.Invoke();
         }
     }
 }
