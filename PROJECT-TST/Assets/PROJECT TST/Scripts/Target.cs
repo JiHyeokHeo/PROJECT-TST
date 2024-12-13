@@ -28,7 +28,7 @@ namespace TST
         public void ApplyDamage(float damage)
         {
             Debug.Log($"{gameObject.name} : 데미지를 입고 있습니다");
-            //Destroy(gameObject);
+            Destroy(gameObject);
         }
     }
 }

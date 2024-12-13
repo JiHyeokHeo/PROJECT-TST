@@ -84,8 +84,9 @@ namespace TST
         {
             // µµÂø ¹æÇâº¤ÅÍ
             var heading = _deviatedPrediction - transform.position;
-
+             
             var rotation = Quaternion.LookRotation(heading);
+        
             _rb.MoveRotation(Quaternion.RotateTowards(transform.rotation, rotation, _rotateSpeed * Time.deltaTime));
         }
 

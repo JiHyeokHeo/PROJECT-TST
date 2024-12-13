@@ -21,7 +21,7 @@ namespace TST
         None,
     }
 
-    public class CharacterBase : MonoBehaviour
+    public class CharacterBase : MonoBehaviour, IDamage
     {
         public Vector3 AimingPosition
         {
@@ -161,6 +161,10 @@ namespace TST
         [field: SerializeField] Vector3 crouchOffset;
 
         private float targetRotation = 0f;
+
+
+        // Action
+        public event System.Action OnDamaged;
 
         private void Awake()
         {
@@ -553,6 +557,11 @@ namespace TST
             }
 
             
+        }
+
+        public void ApplyDamage(float damage)
+        {
+            OnDamaged?.Invoke();
         }
     }
 }
