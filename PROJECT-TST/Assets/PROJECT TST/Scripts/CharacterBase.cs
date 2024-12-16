@@ -220,11 +220,13 @@ namespace TST
 
         public void OnApplicationQuit()
         {
-            // 흠 이거는 추후 프로퍼티로 값이 변환이 생긴다면 데이터를 전송하는 식으로 변경 해야할듯?
-            ingamePlayerData.VecPosition = transform.position;
-            ingamePlayerData.QuatRotation = transform.rotation;
-            // 플레이어 번호 ID
-            UserDataModel.Singleton.ChangeData<IngamePlayerDataDTO>(1001, ingamePlayerData);
+            // 일단 임시 잠거둠 AI 관련 위치로 인해 
+
+            //// 흠 이거는 추후 프로퍼티로 값이 변환이 생긴다면 데이터를 전송하는 식으로 변경 해야할듯?
+            //ingamePlayerData.VecPosition = transform.position;
+            //ingamePlayerData.QuatRotation = transform.rotation;
+            //// 플레이어 번호 ID
+            //UserDataModel.Singleton.ChangeData<IngamePlayerDataDTO>(1001, ingamePlayerData);
         }
 
 
