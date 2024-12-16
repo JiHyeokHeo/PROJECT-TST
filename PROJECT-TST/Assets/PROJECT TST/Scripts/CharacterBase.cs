@@ -5,6 +5,7 @@ using System.Data;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 using static TST.LootAnimation;
@@ -21,7 +22,7 @@ namespace TST
         None,
     }
 
-    public class CharacterBase : MonoBehaviour, IDamage
+    public class CharacterBase : MonoBehaviour, IDamage, IDetect
     {
         public Vector3 AimingPosition
         {
@@ -165,6 +166,8 @@ namespace TST
 
         // Action
         public event System.Action OnDamaged;
+        public event System.Action<GameObject> OnDetect;
+        public event System.Action<GameObject> OnIdle;
 
         private void Awake()
         {
@@ -173,6 +176,7 @@ namespace TST
             characterController = GetComponent<CharacterController>();
             ragdollRigidbodies = GetComponentsInChildren<Rigidbody>();
             SetRagdollActive(false);
+            
         }
 
         public void SetRagdollActive(bool isActive)
@@ -181,7 +185,7 @@ namespace TST
             {
                 rb.isKinematic = !isActive;
             }
-
+      
             animator.enabled = !isActive;
             unityCharacterController.enabled = !isActive;
         }
@@ -203,7 +207,8 @@ namespace TST
             throwRig.weight = 0f;
             rigBuilder.Build();
 
-            Initialize();
+            // 데이터 관련
+            //Initialize();
         }
 
         IngamePlayerDataDTO ingamePlayerData;
@@ -263,7 +268,7 @@ namespace TST
                 SetIKActive(IKWeightValue);
         }
 
-        public void Move(Vector2 input, float yAxisAngle)
+        public void Move(Vector3 input, float yAxisAngle)
         {
             if (isZip)
             {
@@ -275,7 +280,7 @@ namespace TST
             {
                 if (!IsArmed)
                 {
-                    Vector3 inputDirection = new Vector3(input.x, 0f, input.y);
+                    Vector3 inputDirection = input;
                     targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + yAxisAngle;
                     transform.rotation = Quaternion.Euler(0f, targetRotation, 0f);
                 }
@@ -294,7 +299,7 @@ namespace TST
                     movement = transform.forward * moveSpeed * Time.deltaTime;
                 }
 
-                targetSpeed = isWalk? 0.0f : moveSpeed;
+                targetSpeed = isWalk? 0.0f : 2.1f;
                 unityCharacterController.Move(movement);
             }
             else
@@ -557,11 +562,25 @@ namespace TST
                 IKWeightValue = flag > 0;
                 isDoorOpening = flag < 1;
             }
-
-            
         }
 
+        // 데미지를 입거나, Combat Range에 들어오면 전투
         public void ApplyDamage(float damage)
+        {
+            OnDamaged?.Invoke();
+        }
+
+        public void Detect(GameObject target)
+        {
+            OnDetect?.Invoke(target);
+        }
+
+        public void UnDetect(GameObject target)
+        {
+            OnIdle?.Invoke(target);
+        }
+
+        public void CombatDetect(GameObject target)
         {
             OnDamaged?.Invoke();
         }

@@ -9,5 +9,7 @@ namespace TST
         public abstract void Enter();
         public abstract void Update();
         public abstract void Exit();
+
+        public virtual void SetTarget(GameObject target) { }
     }
 }

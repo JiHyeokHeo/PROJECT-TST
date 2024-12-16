@@ -173,7 +173,7 @@ namespace TST
                 aimingPoint = screenCenterRay.GetPoint(1000f);
             }
             
-            linkedCharacter.Move(new Vector2(inputX, inputY), Camera.main.transform.eulerAngles.y);
+            linkedCharacter.Move(new Vector3(inputX, 0.0f, inputY), Camera.main.transform.eulerAngles.y);
             bool rotateSuccess = linkedCharacter.Rotate(aimingPoint);
             linkedCharacter.AimingPosition = rotateSuccess ? aimingPoint : screenCenterRay.GetPoint(1000f);
         }

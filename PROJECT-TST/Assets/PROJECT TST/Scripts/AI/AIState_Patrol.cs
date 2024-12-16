@@ -7,6 +7,7 @@ namespace TST
     public class AIState_Patrol : AIStateBase
     {
         private CharacterBase linkedCharacter;
+        private GameObject aiTarget;
 
         public AIState_Patrol(CharacterBase character)
         {
@@ -15,17 +16,22 @@ namespace TST
 
         public override void Enter()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public override void Exit()
         {
-            throw new System.NotImplementedException();
+            
         }
 
         public override void Update()
         {
-            throw new System.NotImplementedException();
+            
+        }
+
+        public override void SetTarget(GameObject target)
+        {
+            aiTarget = target;
         }
     }
 }
