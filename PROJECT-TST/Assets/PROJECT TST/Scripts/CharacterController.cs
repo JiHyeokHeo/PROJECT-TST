@@ -163,7 +163,7 @@ namespace TST
 
             Vector3 aimingPoint = Vector3.zero;
             Ray screenCenterRay = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-            Debug.DrawRay(screenCenterRay.origin, screenCenterRay.direction * 100.0f, Color.red);
+            Debug.DrawRay(screenCenterRay.origin, screenCenterRay.direction * 1000.0f, Color.red);
             if (Physics.Raycast(screenCenterRay, out RaycastHit hitInfo, 1000f, aimingLayer, QueryTriggerInteraction.Ignore))
             {
                 aimingPoint = hitInfo.point;
@@ -172,7 +172,7 @@ namespace TST
             {
                 aimingPoint = screenCenterRay.GetPoint(1000f);
             }
-
+            
             linkedCharacter.Move(new Vector2(inputX, inputY), Camera.main.transform.eulerAngles.y);
             bool rotateSuccess = linkedCharacter.Rotate(aimingPoint);
             linkedCharacter.AimingPosition = rotateSuccess ? aimingPoint : screenCenterRay.GetPoint(1000f);

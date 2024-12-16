@@ -52,9 +52,9 @@ namespace TST
 
                 Destroy(newBullet.gameObject, bulletLifeTime);
 
-
-                var effect = EffectManager.Instance.SpawnEffect(EffectType.Muzzle_6);
-                effect.transform.SetPositionAndRotation(firePoint.position, firePoint.rotation);
+                // ¿·Ω√ ≤®µŒ±‚
+                //var effect = EffectManager.Instance.SpawnEffect(EffectType.Muzzle_6);
+                //effect.transform.SetPositionAndRotation(firePoint.position, firePoint.rotation);
 
                 return true;
             }
