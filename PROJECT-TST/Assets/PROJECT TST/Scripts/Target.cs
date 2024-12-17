@@ -7,8 +7,8 @@ namespace TST
     public class Target : MonoBehaviour, IDamage
     {
         [SerializeField] private Rigidbody _rb;
-        [SerializeField] private float _size = 10;
-        [SerializeField] private float _speed = 10;
+        //[SerializeField] private float _size = 10;
+        //[SerializeField] private float _speed = 10;
         public Rigidbody Rb => _rb;
 
         void Update()
@@ -25,7 +25,7 @@ namespace TST
             //_rb.velocity = dir;
         }
         
-        public void ApplyDamage(float damage)
+        public void ApplyDamage(float damage, GameObject target)
         {
             Debug.Log($"{gameObject.name} : 데미지를 입고 있습니다");
             Destroy(gameObject);

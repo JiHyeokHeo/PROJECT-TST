@@ -8,7 +8,9 @@ using System.Text.RegularExpressions;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
+using UnityEngine.Windows;
 using static TST.LootAnimation;
+using static UnityEngine.Rendering.DebugUI;
 
 
 
@@ -39,6 +41,8 @@ namespace TST
                 SetEquipWeapon(isArmed);
             }
         }
+
+        public bool IsArmedCompleted => isArmedCompleted;
 
         private bool isArmed = false;
         private bool isArmedCompleted = false;
@@ -164,11 +168,15 @@ namespace TST
         private float targetRotation = 0f;
 
 
-        // Action
-        public event System.Action OnDamaged;
+        // FOR AI // 클래스 분할 필요할듯?
+        // Action 
+        public event System.Action<GameObject> OnDamaged;
         public event System.Action<GameObject> OnDetect;
+        public event System.Action<GameObject> OnCombatDetect;
         public event System.Action<GameObject> OnIdle;
 
+        public Vector3 aiSpawnPosition;
+        //
         private void Awake()
         {
             animator = GetComponent<Animator>();
@@ -176,7 +184,9 @@ namespace TST
             characterController = GetComponent<CharacterController>();
             ragdollRigidbodies = GetComponentsInChildren<Rigidbody>();
             SetRagdollActive(false);
-            
+
+            // AI 관련코드 이거 추후에 클래스 나누는 리팩토링 작업이 필요할듯함
+            aiSpawnPosition = gameObject.transform.position;
         }
 
         public void SetRagdollActive(bool isActive)
@@ -268,10 +278,18 @@ namespace TST
                 SetIKActive(IKWeightValue);
         }
 
-        public void Move(Vector3 input, float yAxisAngle)
+        // 이것도 virtual 키워드로 바꿔야할듯
+        public void AIMove(bool isMove)
+        {
+            float result = isMove ? 1.0f : 0.0f;
+            animator.SetFloat("Magnitude", result);
+        }
+
+        public void Move(Vector2 input, float yAxisAngle)
         {
             if (isZip)
             {
+                targetSpeed = isWalk ? 0.0f : 2.1f;
                 animator.SetFloat("Magnitude", 0.0f);
                 return;
             }
@@ -280,7 +298,7 @@ namespace TST
             {
                 if (!IsArmed)
                 {
-                    Vector3 inputDirection = input;
+                    Vector3 inputDirection = new Vector3(input.x, 0, input.y);
                     targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + yAxisAngle;
                     transform.rotation = Quaternion.Euler(0f, targetRotation, 0f);
                 }
@@ -415,6 +433,31 @@ namespace TST
             }
 
             return true;
+        }
+
+        public void AIShoot()
+        {
+            if (isLoot)
+                return;
+            if (isRolling)
+                return;
+
+            if (isThrowMode)
+            {
+                Throw();
+            }
+            else
+            {
+                if (IsArmed && isArmedCompleted)
+                {
+                    bool isFireSuccess = gunWeapon.Fire();
+                    if (!isFireSuccess && gunWeapon.CurrentAmmo <= 0)
+                    {
+                        Reload();
+                        return;
+                    }
+                }
+            }
         }
 
         public void Shoot()
@@ -565,9 +608,9 @@ namespace TST
         }
 
         // 데미지를 입거나, Combat Range에 들어오면 전투
-        public void ApplyDamage(float damage)
+        public void ApplyDamage(float damage, GameObject target)
         {
-            OnDamaged?.Invoke();
+            OnDamaged?.Invoke(target);
         }
 
         public void Detect(GameObject target)
@@ -582,7 +625,7 @@ namespace TST
 
         public void CombatDetect(GameObject target)
         {
-            OnDamaged?.Invoke();
+            OnCombatDetect?.Invoke(target);
         }
     }
 }

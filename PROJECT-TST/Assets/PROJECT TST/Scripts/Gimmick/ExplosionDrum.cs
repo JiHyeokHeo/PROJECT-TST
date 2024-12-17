@@ -14,7 +14,7 @@ namespace TST
             explosionEffect.gameObject.SetActive(false);
         }
 
-        public void ApplyDamage(float damage)
+        public void ApplyDamage(float damage, GameObject target)
         {
             drumHP -= damage;
 

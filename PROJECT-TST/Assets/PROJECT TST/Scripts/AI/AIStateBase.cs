@@ -1,15 +1,19 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace TST
 {
+    [Serializable]
     public abstract class AIStateBase 
     {
+        protected NavMeshAgent agent;
         public abstract void Enter();
         public abstract void Update();
         public abstract void Exit();
 
-        public virtual void SetTarget(GameObject target) { }
+        public abstract void SetTarget(GameObject target);
     }
 }

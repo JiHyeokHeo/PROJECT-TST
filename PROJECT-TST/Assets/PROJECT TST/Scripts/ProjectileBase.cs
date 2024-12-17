@@ -7,6 +7,8 @@ namespace TST
 {
     public abstract class ProjectileBase : MonoBehaviour
     {
+        public GameObject owner;
+
         public Rigidbody rigid;
         public Transform startPosition;
 

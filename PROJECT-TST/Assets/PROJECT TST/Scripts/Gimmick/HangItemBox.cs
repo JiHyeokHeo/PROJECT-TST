@@ -8,7 +8,7 @@ namespace TST
     {
         //private bool isHanging = true;
 
-        public void ApplyDamage(float damage)
+        public void ApplyDamage(float damage, GameObject target)
         {
             //if (isHanging)
             //{

@@ -6,6 +6,6 @@ namespace TST
 {
     public interface IDamage  
     {
-        public void ApplyDamage(float damage);
+        public void ApplyDamage(float damage, GameObject owner);
     }
 }

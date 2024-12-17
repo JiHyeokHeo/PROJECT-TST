@@ -42,7 +42,7 @@ namespace TST
 
             if (collision.transform.root.TryGetComponent(out IDamage damageInterface))
             {
-                damageInterface.ApplyDamage(10);
+                damageInterface.ApplyDamage(10, owner);
             }
 
             Destroy(gameObject);

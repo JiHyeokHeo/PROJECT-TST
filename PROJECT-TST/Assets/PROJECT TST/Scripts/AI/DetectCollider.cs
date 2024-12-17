@@ -6,11 +6,13 @@ namespace TST
 {
     public class DetectCollider : MonoBehaviour
     {
+        public CharacterBase characterBase;
+
         private void OnTriggerEnter(Collider other)
         {
             if (other.TryGetComponent(out IDetect detectInterface))
             {
-                detectInterface.Detect(other.gameObject);
+                detectInterface.Detect(characterBase.gameObject);
             }
         }
 
@@ -19,7 +21,7 @@ namespace TST
             // ≈ª√‚«œ∏È UNDECT
             if (other.TryGetComponent(out IDetect detectInterface))
             {
-                detectInterface.UnDetect(other.gameObject);
+                detectInterface.UnDetect(characterBase.gameObject);
             }
         }
     }

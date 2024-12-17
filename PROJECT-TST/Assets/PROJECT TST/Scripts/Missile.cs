@@ -95,7 +95,7 @@ namespace TST
             if (_explosionPrefab) Instantiate(_explosionPrefab, transform.position, Quaternion.identity);
 
             if (collision.transform.TryGetComponent<Target>(out var ex))
-                ex.ApplyDamage(1);
+                ex.ApplyDamage(1, collision.gameObject);
 
             //Destroy(gameObject);
         }
