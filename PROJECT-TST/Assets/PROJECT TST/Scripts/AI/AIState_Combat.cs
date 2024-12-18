@@ -51,8 +51,8 @@ namespace TST
         private float rotationThreshold = 1.0f; // 각도 변경 임계값 (1도)
         public override void Update()
         {
-            // 총없으면 그냥 리턴 때려버리고
-            if (linkedCharacter.gunWeapon == null)
+            // 총없으면 그냥 리턴 때려버리고 or 총기 해제한 상태면 업데이트 스킵
+            if (linkedCharacter.gunWeapon == null || headTransform == null || linkedCharacter.IsArmed == false)
                 return;
 
             // Ray 시작 위치를 머리 높이로 설정

@@ -24,11 +24,11 @@ namespace TST
 
         public override void Enter()
         {
-            if (linkedCharacter.IsArmedCompleted)
-            {
-                FollowTarget();
-                linkedCharacter.AIMove(true);
-            }
+            //if (linkedCharacter.IsArmedCompleted)
+            //{
+            //    FollowTarget();
+            linkedCharacter.AIMove(true);
+            //}
         }
 
         public override void Exit()
@@ -59,6 +59,20 @@ namespace TST
                 Debug.Log("ai Target Issue");
                 return;
             }
+
+            // 총 빼면서 움직이는거 방지하기 위해서
+            if (linkedCharacter.IsArmed == false && linkedCharacter.IsArmedCompleted == true)
+            {
+                agent.ResetPath();
+                return;
+            }
+            // 반대 버전
+            if (linkedCharacter.IsArmed == true && linkedCharacter.IsArmedCompleted == false)
+            {
+                agent.ResetPath();
+                return;
+            }
+
             // 현재 캐릭터 위치를 기준으로 랜덤한 위치 계산
             Vector3 aiPosition = aiTarget.transform.position;
 
