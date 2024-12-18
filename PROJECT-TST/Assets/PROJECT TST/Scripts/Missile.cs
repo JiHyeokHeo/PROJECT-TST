@@ -29,7 +29,16 @@ namespace TST
 
         // 궁금한 점 : 미사일 타겟을 잡을 때 마우스 좌클릭을 실행하는 동시에 캐릭터 주변(CharacterBase or Controller) Phyiscs.OverlapSphere 같은 것을 활용해
         // Target이라는 스크립트를 갖고 있는 친구들을 찾아 거리 or 랜덤 으로 타겟을 설정시켜 쏘는 것이 좋을지 
-        
+        private float initLaunctTime = 0f;
+        private float initMaxLaunchTime = 1f; // 첫 1초간은 그냥 내가 시작점으로 붕 날라가도록
+
+        private void Start()
+        {
+            // Euler 각도를 Quaternion으로 변환하여 회전에 적용
+            Quaternion initialRotation = Quaternion.Euler(new Vector3(-40.0f, 66.0f, 0.0f));
+            transform.rotation = initialRotation;
+        }
+
         private void FixedUpdate()
         {
             if (gameObject.activeSelf == false)
@@ -38,7 +47,9 @@ namespace TST
             // 진행만 시키도록 하고
             _rb.velocity = transform.forward * _speed;
 
-            if (_target == null)
+            initLaunctTime += Time.fixedDeltaTime;
+
+            if (_target == null || initLaunctTime >= initMaxLaunchTime)
                 return;
             // 정규화 a~b 0~1 value
             // 가까울 수록 편차가 줄고, 멀수록 편차가 커짐
@@ -97,7 +108,7 @@ namespace TST
             if (collision.transform.TryGetComponent<Target>(out var ex))
                 ex.ApplyDamage(1, collision.gameObject);
 
-            //Destroy(gameObject);
+            Destroy(gameObject);
         }
 
         private void OnDrawGizmos()

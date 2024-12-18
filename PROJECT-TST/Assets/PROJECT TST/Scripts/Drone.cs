@@ -135,26 +135,26 @@ namespace TST
                 Destroy(missile.gameObject, missileLifeTime);
 
                 // 추후 이펙트 추가
-                var effect = EffectManager.Instance.SpawnEffect(EffectType.Muzzle_1);
-                effect.transform.SetPositionAndRotation(missileFirePoint.position, missileFirePoint.rotation);
+                //var effect = EffectManager.Instance.SpawnEffect(EffectType.Muzzle_1);
+                //effect.transform.SetPositionAndRotation(missileFirePoint.position, missileFirePoint.rotation);
                 return;
             }
 
-            // 총알 1번
-            if (skillDataList[EDroneSkillType.Gun].currentAmmo > 0 && Time.time - skillDataList[EDroneSkillType.Gun].lastFireRate >= skillDataList[EDroneSkillType.Gun].fireRate)
-            {
-                skillDataList[EDroneSkillType.Gun].currentAmmo--;
-                // 총알은 target 목표에서부터 bullet 위치를 빼서 작업 해줘야 할듯 싶음
-                skillDataList[EDroneSkillType.Gun].lastFireRate = Time.time;
-                Rigidbody bullet = GameObject.Instantiate(droneBulletPrefab, gunFirePoint.position, gunFirePoint.rotation);
-                bullet.gameObject.SetActive(true);
+            //// 총알 1번
+            //if (skillDataList[EDroneSkillType.Gun].currentAmmo > 0 && Time.time - skillDataList[EDroneSkillType.Gun].lastFireRate >= skillDataList[EDroneSkillType.Gun].fireRate)
+            //{
+            //    skillDataList[EDroneSkillType.Gun].currentAmmo--;
+            //    // 총알은 target 목표에서부터 bullet 위치를 빼서 작업 해줘야 할듯 싶음
+            //    skillDataList[EDroneSkillType.Gun].lastFireRate = Time.time;
+            //    Rigidbody bullet = GameObject.Instantiate(droneBulletPrefab, gunFirePoint.position, gunFirePoint.rotation);
+            //    bullet.gameObject.SetActive(true);
 
-                targetLookDir = target.transform.position - bullet.transform.position;
-                bullet.AddForce(targetLookDir * bulletMoveForce, ForceMode.Impulse);
+            //    targetLookDir = target.transform.position - bullet.transform.position;
+            //    bullet.AddForce(targetLookDir * bulletMoveForce, ForceMode.Impulse);
 
-                Destroy(bullet.gameObject, bulletLifeTime);
-                return;
-            }
+            //    Destroy(bullet.gameObject, bulletLifeTime);
+            //    return;
+            //}
 
             // 타겟을 갖고 있으면 강제 리로드
             Reload(true);
