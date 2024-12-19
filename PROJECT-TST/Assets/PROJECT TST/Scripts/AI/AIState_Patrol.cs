@@ -21,13 +21,12 @@ namespace TST
         {
             linkedCharacter = character;
             base.agent = agent;
-            agent.speed = 1.0f; // 임시로 하드코딩
         }
 
         public override void Enter()
         {
             UpdatePatrolDestination();
-            linkedCharacter.AIMove(true);
+            //linkedCharacter.AIMove(true);
         }
 
         public override void Exit()
@@ -35,7 +34,7 @@ namespace TST
             // Exit 시 필요한 로직이 있을 경우 추가
             // 나갈때 한번만 애니메이터 끄는 용으로
             agent.ResetPath();
-            linkedCharacter.AIMove(false);
+            //linkedCharacter.AIMove(false);
         }
 
         public override void Update()
@@ -43,13 +42,13 @@ namespace TST
             if (Time.time - lastPatrolTime > patrolInterval)
             {
                 UpdatePatrolDestination();
-                linkedCharacter.AIMove(true);
+                //linkedCharacter.AIMove(true);
             }
 
             if (agent != null && !agent.pathPending && agent.remainingDistance < 0.01f)
             {
                 // 움직이면 1.0f // 안움직이면 0.0f
-                linkedCharacter.AIMove(false);
+                //linkedCharacter.AIMove(false);
             }
         }
 

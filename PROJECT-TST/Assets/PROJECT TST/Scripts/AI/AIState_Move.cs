@@ -27,7 +27,7 @@ namespace TST
             //if (linkedCharacter.IsArmedCompleted)
             //{
             //    FollowTarget();
-            linkedCharacter.AIMove(true);
+            //linkedCharacter.AIMove(true);
             //}
         }
 
@@ -35,7 +35,7 @@ namespace TST
         {
             // NavMesh 쓰고 있었다면 탈출과 동시에 Path 서칭 취소
             agent.ResetPath();
-            linkedCharacter.AIMove(false);
+            //linkedCharacter.AIMove(false);
         }
 
         public override void Update()
@@ -43,7 +43,7 @@ namespace TST
             if (agent != null && !agent.pathPending && agent.remainingDistance < 0.01f)
             {
                 FollowTarget();
-                linkedCharacter.AIMove(true);
+                //linkedCharacter.AIMove(true);
             }
         }
 

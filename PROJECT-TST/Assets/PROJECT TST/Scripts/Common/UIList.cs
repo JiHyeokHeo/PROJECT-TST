@@ -13,13 +13,15 @@ namespace TST
         LoadingUI,
         TitleUI,
 
+        IngameUI,
+
         UI_PANEL_END,
         UI_POPUP_START,
 
         PopupA_UI,
         PopupB_UI,
         Indicator_UI,
-        
+        InventoryUI,
 
 
         UI_POPUP_END,
