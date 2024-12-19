@@ -34,7 +34,6 @@
 {
 	background-color: transparent;
 	border-color transparent;
-
 }
 
 .ds-node__textfield__hidden > .unity-text-field__input:focus
