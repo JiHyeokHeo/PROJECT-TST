@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -95,11 +96,8 @@ namespace TST
         public Vector3 offsetPosition;
         public Vector3 offsetRotation;
 
-        public float walkSpeed = 1f;
-        public float moveSpeed = 2f;
-        public float runSpeed = 2.1f;
-        public float sprintSpeed = 5f;
-        public float rotateSpeed = 5f;
+        [Title("Character Stat")]
+        public CharacterStat characterStat;
 
         private float horizontal;
         private float vertical;
@@ -309,12 +307,12 @@ namespace TST
                 {
                     targetHorizontal = input.x;
                     targetVertical = input.y;
-                    movement = (transform.forward * input.y + transform.right * input.x) * moveSpeed * Time.deltaTime;
+                    movement = (transform.forward * input.y + transform.right * input.x) * characterStat.moveSpeed * Time.deltaTime;
                 }
                 else
                 {
                     targetVertical = 1f;
-                    movement = transform.forward * moveSpeed * Time.deltaTime;
+                    movement = transform.forward * characterStat.moveSpeed * Time.deltaTime;
                 }
 
                 targetSpeed = isWalk? 0.0f : 2.1f;
