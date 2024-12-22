@@ -16,16 +16,17 @@ namespace TST
     [Serializable]
     public class AIState_Combat : AIStateBase
     {
+        private AICharacterController linkedCharacterController;
         private CharacterBase linkedCharacter;
 
         // 애니메이터 본으로 몸이나 머리 부위 쏘는거 퍼센트로 랜덤하게 쏘면 될듯하다
         private Transform headTransform;
         private Transform gunFirePoint;
         private GameObject aiTarget;
-        public AIState_Combat(CharacterBase character, NavMeshAgent agent)
+        public AIState_Combat(AICharacterController aiController)
         {
-            linkedCharacter = character;
-            base.agent = agent;
+            linkedCharacterController = aiController;
+            linkedCharacter = linkedCharacterController.LinkedCharacter;
         }
 
         public override void Enter()
@@ -33,6 +34,9 @@ namespace TST
             // 전투 상태 진입에 따른 초기화 작업.
             linkedCharacter.IsArmed = true;
             gunFirePoint = linkedCharacter.gunWeapon.firePoint;
+
+            // 진입 했을 시 길찾기 정보 끊기
+            linkedCharacterController.NavAgent.ResetPath();
 
             // 추후에 enum 으로 관리하는게 좋을듯 // 둘 중 어느게 더 자주 쓰이는지 물어봅시다. 
             //LayerMask mask = LayerMask.GetMask("Monster") | LayerMask.GetMask("Wall") / 이런 기능도 있다고함 이 친구도 비트를 가져오는 역할이지만 Preference는 모르기에

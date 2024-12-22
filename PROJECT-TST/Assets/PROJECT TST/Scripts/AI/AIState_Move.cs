@@ -12,38 +12,30 @@ namespace TST
     public class AIState_Move : AIStateBase
     {
         private CharacterBase linkedCharacter;
-        private AICharacterController controller;
+        private AICharacterController linkedCharacterController;
         private GameObject aiTarget;
 
-        public AIState_Move(CharacterBase character, NavMeshAgent agent)
+        public AIState_Move(AICharacterController aiController)
         {
-            linkedCharacter = character;
-            base.agent = agent;
-            controller = character.gameObject.GetComponent<AICharacterController>();
+            linkedCharacter = aiController.LinkedCharacter;
+            linkedCharacterController = aiController;
         }
 
         public override void Enter()
         {
-            //if (linkedCharacter.IsArmedCompleted)
-            //{
-            //    FollowTarget();
-            linkedCharacter.AIMove(true);
-            //}
+
         }
 
         public override void Exit()
         {
             // NavMesh 쓰고 있었다면 탈출과 동시에 Path 서칭 취소
-            agent.ResetPath();
-            linkedCharacter.AIMove(false);
         }
 
         public override void Update()
         {
-            if (agent != null && !agent.pathPending && agent.remainingDistance < 0.01f)
+            if (linkedCharacterController.NavAgent.pathPending == false && linkedCharacterController.NavAgent.remainingDistance < 0.01f)
             {
                 FollowTarget();
-                linkedCharacter.AIMove(true);
             }
         }
 
@@ -63,13 +55,13 @@ namespace TST
             // 총 빼면서 움직이는거 방지하기 위해서
             if (linkedCharacter.IsArmed == false && linkedCharacter.IsArmedCompleted == true)
             {
-                agent.ResetPath();
+                linkedCharacterController.NavAgent.ResetPath();
                 return;
             }
             // 반대 버전
             if (linkedCharacter.IsArmed == true && linkedCharacter.IsArmedCompleted == false)
             {
-                agent.ResetPath();
+                linkedCharacterController.NavAgent.ResetPath();
                 return;
             }
 
@@ -77,10 +69,7 @@ namespace TST
             Vector3 aiPosition = aiTarget.transform.position;
 
             // 목표 위치 설정
-            if (agent != null)
-            {
-                agent.SetDestination(aiPosition);
-            }
+            linkedCharacterController.SetDestination(aiPosition);
         }
     
 }

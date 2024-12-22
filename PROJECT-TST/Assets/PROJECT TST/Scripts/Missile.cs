@@ -17,9 +17,9 @@ namespace TST
 
         // 예측
         [Header("PREDICTION")]
-        [SerializeField] private float _maxDistancePredict = 100;
+        [SerializeField] private float _maxDistancePredict = 500;
         [SerializeField] private float _minDistancePredict = 5;
-        [SerializeField] private float _maxTimePrediction = 5;
+        [SerializeField] private float _maxTimePrediction = 10;
         private Vector3 _standardPrediction, _deviatedPrediction;
 
         // 편차

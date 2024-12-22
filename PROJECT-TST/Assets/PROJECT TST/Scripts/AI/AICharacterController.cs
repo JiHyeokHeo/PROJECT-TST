@@ -10,31 +10,39 @@ namespace TST
 {
     public class AICharacterController : MonoBehaviour
     {
+        public CharacterBase LinkedCharacter => characterBase;
+        public NavMeshAgent NavAgent
+        {
+            get
+            {
+                if (navAgent == null)
+                {
+                    Debug.Log("navAgent is Null");
+                }
+                return navAgent;
+            }
+        }
+
         [SerializeReference]
         public AIStateBase currentState;
 
         private CharacterBase characterBase;
+        private NavMeshAgent navAgent;
 
-        
-        private Dictionary<string, AIStateBase> states = new Dictionary<string, AIStateBase>();
         private void Awake()
         {
             characterBase = GetComponent<CharacterBase>();
+            navAgent = GetComponent<NavMeshAgent>();
+
+            navAgent.updatePosition = false;
+            navAgent.updateRotation = false;
         }
 
         private void Start()
         {
-            NavMeshAgent agent = GetComponent<NavMeshAgent>();
-
-            if (agent == null)
-            {
-                Debug.Log("Agent Missing");
-                return;
-            }
-
             // 상태 객체를 미리 생성해 둠
-            currentState = new AIState_Patrol(characterBase, agent);
-            characterBase.OnDamaged += (target) => SetState(new AIState_Combat(characterBase, agent));
+            currentState = new AIState_Patrol(this);
+            characterBase.OnDamaged += (target) => SetState(new AIState_Combat(this));
             characterBase.OnDamaged += (target) => SetTarget(target);
 
             // Sensor 스크립트 안에 있다면 Combat 스테이트로 진입
@@ -42,15 +50,15 @@ namespace TST
             //characterBase.OnDetect += (target) => SetState<GameObject>(new AIState_Move(characterBase, agent),
             //    beforeEnterEvent: (t) => SetTarget(target));
 
-            characterBase.OnDetect += (target) => SetState(new AIState_Move(characterBase, agent));
+            characterBase.OnDetect += (target) => SetState(new AIState_Move(this));
             characterBase.OnDetect += (target) => SetTarget(target);
                 
 
-            characterBase.OnCombatDetect += (target) => SetState(new AIState_Combat(characterBase, agent));
+            characterBase.OnCombatDetect += (target) => SetState(new AIState_Combat(this));
             characterBase.OnCombatDetect += (target) => SetTarget(target); 
 
             // Sensor 스크립트 탐지 범위 바깥으로 빠지면 Idle 상태로 진입
-            characterBase.OnIdle += (target) => SetState(new AIState_Idle(characterBase, agent));
+            characterBase.OnIdle += (target) => SetState(new AIState_Idle(this));
 
             // 결론 처음엔 Patrol 진입 하지만 센서로 인해 Combat or Idle 상태로 진입 // Idle 상태에서 특정 시간이 되면 다시 Patrol 진입
         }
@@ -58,7 +66,40 @@ namespace TST
         private void Update()
         {
             currentState.Update();
+
+            // NavAgent의 다음 위치 값을, 현재 위치로 설정
+            navAgent.nextPosition = transform.position;
+
+            if (navAgent.pathStatus == NavMeshPathStatus.PathComplete && RemainingDistance() <= navAgent.stoppingDistance)
+            {
+                // 도착 했을 때
+                characterBase.Move(Vector2.zero, transform.eulerAngles.y);
+            }
+            else // 아직 도착 XXX
+            {
+                if (navAgent.hasPath) // 경로가 있는 경우 => navAgent가 목적지로 이동 중인 경우
+                {
+                    Vector3 moveDirection = (navAgent.steeringTarget - transform.position).normalized;
+                    Vector2 input = new Vector2(moveDirection.x, moveDirection.z);
+                    characterBase.Move(input, 0);
+                }
+                else // 경로가 없는 경우 => NavAgent가 목적지로 이동하지 않는 경우엔 스탑
+                {
+                    characterBase.Move(Vector2.zero, 0);
+                }
+            }
+
             Debug.Log($"{currentState}");
+        }
+
+        public float RemainingDistance()
+        {
+            if (!navAgent.isOnNavMesh)
+                return float.MaxValue;
+            if (navAgent.pathPending)
+                return float.MaxValue;
+
+            return navAgent.remainingDistance;
         }
 
         public void SetState(AIStateBase newState)
@@ -80,6 +121,11 @@ namespace TST
         public void SetTarget(GameObject target)
         {
             currentState.SetTarget(target);
+        }
+
+        public void SetDestination(Vector3 destination)
+        {
+            navAgent.SetDestination(destination);
         }
     }
 }

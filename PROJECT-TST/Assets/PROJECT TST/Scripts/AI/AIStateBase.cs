@@ -9,7 +9,6 @@ namespace TST
     [Serializable]
     public abstract class AIStateBase 
     {
-        protected NavMeshAgent agent;
         public abstract void Enter();
         public abstract void Update();
         public abstract void Exit();
