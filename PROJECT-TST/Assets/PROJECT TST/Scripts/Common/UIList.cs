@@ -12,6 +12,7 @@ namespace TST
         CrossHair_UI,
         LoadingUI,
         TitleUI,
+        IngameUI,
 
         UI_PANEL_END,
         UI_POPUP_START,
@@ -19,7 +20,7 @@ namespace TST
         PopupA_UI,
         PopupB_UI,
         Indicator_UI,
-        
+        InventoryUI,
 
 
         UI_POPUP_END,
