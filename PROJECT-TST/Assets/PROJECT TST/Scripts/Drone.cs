@@ -111,29 +111,53 @@ namespace TST
         public float bulletMoveForce = 1f;
 
         private Vector3 targetLookDir;
+        private bool isKeepFiringMissile = false;
+        private bool isKeepFiringBullet = false;
+
         public void Fire()
         {
             if (target == null)
                 return;
 
             isFiring = true;
+
+            if (skillDataList[EDroneSkillType.Missile].currentAmmo <= 0)
+            {
+                isKeepFiringMissile = false;
+            }
+
+            if (skillDataList[EDroneSkillType.Gun].currentAmmo <= 0)
+            {
+                isKeepFiringBullet = false;
+            }
+
             // 미사일 먼저 쏘고 미사일 쐈으면 return
             // 미사일 쿨이면 스킵 때리고 Fire 버전 시작
             // Fire도 쿨이면 그냥 스킵 됨
             if (skillDataList[EDroneSkillType.Missile].currentAmmo > 0 && Time.time - skillDataList[EDroneSkillType.Missile].lastFireRate >= skillDataList[EDroneSkillType.Missile].fireRate)
             {
+                // 총알 계속 쏘는 중이라면 스킵
+                if (isKeepFiringBullet)
+                    return;
+
+                isKeepFiringMissile = true;
+
                 skillDataList[EDroneSkillType.Missile].currentAmmo--;
                 // 미사일은 굳이 뭐 방햑백터 같은거 설정 해줄 필요 없음 Homing Setting Script(Missile Script 참고)
                 skillDataList[EDroneSkillType.Missile].lastFireRate = Time.time;
                 Rigidbody missile = GameObject.Instantiate(missilePrefab, missileFirePoint.position, missileFirePoint.rotation);
                 missile.gameObject.SetActive(true);
 
+                Quaternion missileInitRotation = Quaternion.identity;
                 if (missile.TryGetComponent(out Missile missileComponent))
                 {
                     missileComponent.SetTarget(target);
+                    missileInitRotation = missileComponent.SetRotation(new Vector3(-40.0f, 66.0f, 0.0f));
                 }
                 Destroy(missile.gameObject, missileLifeTime);
 
+                targetLookDir = missileInitRotation.eulerAngles;
+                
                 // 추후 이펙트 추가
                 //var effect = EffectManager.Instance.SpawnEffect(EffectType.Muzzle_1);
                 //effect.transform.SetPositionAndRotation(missileFirePoint.position, missileFirePoint.rotation);
@@ -141,20 +165,25 @@ namespace TST
             }
 
             //// 총알 1번
-            //if (skillDataList[EDroneSkillType.Gun].currentAmmo > 0 && Time.time - skillDataList[EDroneSkillType.Gun].lastFireRate >= skillDataList[EDroneSkillType.Gun].fireRate)
-            //{
-            //    skillDataList[EDroneSkillType.Gun].currentAmmo--;
-            //    // 총알은 target 목표에서부터 bullet 위치를 빼서 작업 해줘야 할듯 싶음
-            //    skillDataList[EDroneSkillType.Gun].lastFireRate = Time.time;
-            //    Rigidbody bullet = GameObject.Instantiate(droneBulletPrefab, gunFirePoint.position, gunFirePoint.rotation);
-            //    bullet.gameObject.SetActive(true);
+            if (skillDataList[EDroneSkillType.Gun].currentAmmo > 0 && Time.time - skillDataList[EDroneSkillType.Gun].lastFireRate >= skillDataList[EDroneSkillType.Gun].fireRate)
+            {
+                if (isKeepFiringMissile)
+                    return;
 
-            //    targetLookDir = target.transform.position - bullet.transform.position;
-            //    bullet.AddForce(targetLookDir * bulletMoveForce, ForceMode.Impulse);
+                isKeepFiringBullet = true;
 
-            //    Destroy(bullet.gameObject, bulletLifeTime);
-            //    return;
-            //}
+                skillDataList[EDroneSkillType.Gun].currentAmmo--;
+                // 총알은 target 목표에서부터 bullet 위치를 빼서 작업 해줘야 할듯 싶음
+                skillDataList[EDroneSkillType.Gun].lastFireRate = Time.time;
+                Rigidbody bullet = GameObject.Instantiate(droneBulletPrefab, gunFirePoint.position, gunFirePoint.rotation);
+                bullet.gameObject.SetActive(true);
+
+                targetLookDir = target.transform.position - bullet.transform.position;
+                bullet.AddForce(targetLookDir * bulletMoveForce, ForceMode.Impulse);
+
+                Destroy(bullet.gameObject, bulletLifeTime);
+                return;
+            }
 
             // 타겟을 갖고 있으면 강제 리로드
             Reload(true);
@@ -300,15 +329,20 @@ namespace TST
 
                 // 랜덤 목표 회전 값 생성
 
-                if (!isFiring)
+                if (!isFiring && target == null)
                 {
                     Vector3 newRotation = new Vector3(Random.Range(-10.0f, 10.0f), Random.Range(-30.0f, 30.0f), 0.0f);
                     targetRotation = Quaternion.LookRotation(owner.transform.forward) * Quaternion.Euler(newRotation);
                 }
-                else
-                {
-                    targetRotation = Quaternion.LookRotation(targetLookDir);
-                }
+            }
+
+            if (isKeepFiringBullet)
+            {
+                targetRotation = Quaternion.LookRotation(targetLookDir);
+            }
+            else if (isKeepFiringMissile)
+            {
+                targetRotation = Quaternion.Euler(targetLookDir);
             }
 
             transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Time.deltaTime / 0.5f);

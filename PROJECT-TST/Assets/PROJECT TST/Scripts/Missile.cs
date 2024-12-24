@@ -34,9 +34,9 @@ namespace TST
 
         private void Start()
         {
-            // Euler 각도를 Quaternion으로 변환하여 회전에 적용
-            Quaternion initialRotation = Quaternion.Euler(new Vector3(-40.0f, 66.0f, 0.0f));
-            transform.rotation = initialRotation;
+            //// Euler 각도를 Quaternion으로 변환하여 회전에 적용
+            //Quaternion initialRotation = Quaternion.Euler(new Vector3(-40.0f, 66.0f, 0.0f));
+            //transform.rotation = initialRotation;
         }
 
         private void FixedUpdate()
@@ -68,6 +68,15 @@ namespace TST
         public void SetTarget(Target target)
         {
             _target = target;
+        }
+
+        public Quaternion SetRotation(Vector3 angle)
+        {
+            // Euler 각도를 Quaternion으로 변환하여 회전에 적용
+            Quaternion initialRotation = Quaternion.Euler(new Vector3(angle.x, angle.y, 0.0f));
+            transform.rotation = initialRotation;
+
+            return initialRotation;
         }
 
         private void PredictMovement(float leadTimePercentage)
