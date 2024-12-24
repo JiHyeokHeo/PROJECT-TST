@@ -68,7 +68,7 @@ namespace TST
 
         private void LateUpdate()
         {
-            RecoilStart();
+            //RecoilStart();
         }
 
         void CrossHairRecoilStart()
@@ -76,36 +76,36 @@ namespace TST
          
         }
 
-        void RecoilStart()
-        {
-            if (isFire)
-                return;
+        //void RecoilStart()
+        //{
+        //    if (isFire)
+        //        return;
             
-            timeElapsed += Time.deltaTime;
+        //    timeElapsed += Time.deltaTime;
 
-            noisePositionSet(timeElapsed);
-        }
+        //    noisePositionSet(timeElapsed);
+        //}
 
-        private float targetYaw;
-        private float targetPitch;
-        private float changeYaw = 5.0f;
-        private float changePitch = 5.0f;
-        private float bottomClampLimit = -80.0f;
-        private float topClampLimit = 80.0f;
-        void noisePositionSet(float timeElapsed)
-        {
-            //noiseComponent.m_NoiseProfile.OrientationNoise[0].X.Frequency = recoilSetting.frequencyX;   
-            //noiseComponent.m_NoiseProfile.OrientationNoise[0].X.Amplitude = Mathf.Lerp(noiseComponent.m_NoiseProfile.PositionNoise[0].X.Amplitude, isFire ? recoilSetting.positionXCurve.Evaluate(timeElapsed) : 0.0f, Time.deltaTime * 10.0f);
-            //noiseComponent.m_NoiseProfile.OrientationNoise[0].Y.Frequency = recoilSetting.frequencyY;
-            //noiseComponent.m_NoiseProfile.OrientationNoise[0].Y.Amplitude = Mathf.Lerp(noiseComponent.m_NoiseProfile.PositionNoise[0].Y.Amplitude, isFire ? recoilSetting.positionYCurve.Evaluate(timeElapsed) : 0.0f, Time.deltaTime * 10.0f);
-
-
-            changeYaw = ClampAngle(changeYaw + changeYaw, float.MinValue, float.MaxValue);
-            changePitch = ClampAngle(changePitch + changePitch, bottomClampLimit, topClampLimit);
+        //private float targetYaw;
+        //private float targetPitch;
+        //private float changeYaw = 5.0f;
+        //private float changePitch = 5.0f;
+        //private float bottomClampLimit = -80.0f;
+        //private float topClampLimit = 80.0f;
+        //void noisePositionSet(float timeElapsed)
+        //{
+        //    //noiseComponent.m_NoiseProfile.OrientationNoise[0].X.Frequency = recoilSetting.frequencyX;   
+        //    //noiseComponent.m_NoiseProfile.OrientationNoise[0].X.Amplitude = Mathf.Lerp(noiseComponent.m_NoiseProfile.PositionNoise[0].X.Amplitude, isFire ? recoilSetting.positionXCurve.Evaluate(timeElapsed) : 0.0f, Time.deltaTime * 10.0f);
+        //    //noiseComponent.m_NoiseProfile.OrientationNoise[0].Y.Frequency = recoilSetting.frequencyY;
+        //    //noiseComponent.m_NoiseProfile.OrientationNoise[0].Y.Amplitude = Mathf.Lerp(noiseComponent.m_NoiseProfile.PositionNoise[0].Y.Amplitude, isFire ? recoilSetting.positionYCurve.Evaluate(timeElapsed) : 0.0f, Time.deltaTime * 10.0f);
 
 
-            cameraPivot.rotation *= Quaternion.Euler(targetPitch, targetYaw, 0f);
-        }
+        //    changeYaw = ClampAngle(changeYaw + changeYaw, float.MinValue, float.MaxValue);
+        //    changePitch = ClampAngle(changePitch + changePitch, bottomClampLimit, topClampLimit);
+
+
+        //    cameraPivot.rotation *= Quaternion.Euler(targetPitch, targetYaw, 0f);
+        //}
 
         private static float ClampAngle(float angle, float min, float max)
         {

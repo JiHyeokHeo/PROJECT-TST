@@ -25,7 +25,7 @@ namespace TST
         None,
     }
 
-    public class CharacterBase : MonoBehaviour, IDamage, IDetect
+    public class CharacterBase : MonoBehaviour/*, IDamage, IDetect*/
     {
         public Vector3 AimingPosition
         {
@@ -168,10 +168,10 @@ namespace TST
 
         // FOR AI // 클래스 분할 필요할듯?
         // Action 
-        public event System.Action<GameObject> OnDamaged;
-        public event System.Action<GameObject> OnDetect;
-        public event System.Action<GameObject> OnCombatDetect;
-        public event System.Action<GameObject> OnIdle;
+        //public event System.Action<GameObject> OnDamaged;
+        //public event System.Action<GameObject> OnDetect;
+        //public event System.Action<GameObject> OnCombatDetect;
+        //public event System.Action<GameObject> OnIdle;
 
         public Vector3 aiSpawnPosition;
         //
@@ -605,25 +605,25 @@ namespace TST
             }
         }
 
-        // 데미지를 입거나, Combat Range에 들어오면 전투
-        public void ApplyDamage(float damage, GameObject target)
-        {
-            OnDamaged?.Invoke(target);
-        }
+        //// 데미지를 입거나, Combat Range에 들어오면 전투
+        //public void ApplyDamage(float damage, GameObject target)
+        //{
+        //    OnDamaged?.Invoke(target);
+        //}
 
-        public void Detect(GameObject target)
-        {
-            OnDetect?.Invoke(target);
-        }
+        //public void Detect(GameObject target)
+        //{
+        //    OnDetect?.Invoke(target);
+        //}
 
-        public void UnDetect(GameObject target)
-        {
-            OnIdle?.Invoke(target);
-        }
+        //public void UnDetect(GameObject target)
+        //{
+        //    OnIdle?.Invoke(target);
+        //}
 
-        public void CombatDetect(GameObject target)
-        {
-            OnCombatDetect?.Invoke(target);
-        }
+        //public void CombatDetect(GameObject target)
+        //{
+        //    OnCombatDetect?.Invoke(target);
+        //}
     }
 }

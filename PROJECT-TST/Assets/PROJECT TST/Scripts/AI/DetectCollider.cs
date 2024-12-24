@@ -6,23 +6,27 @@ namespace TST
 {
     public class DetectCollider : MonoBehaviour
     {
-        public CharacterBase characterBase;
+        //private void OnTriggerEnter(Collider other)
+        //{
+        //    if (other.TryGetComponent(out IDetect detectInterface))
+        //    {
+        //        if (this.gameObject.TryGetComponent(out AiSensor sensor))
+        //        {
+        //            if (sensor.IsInSight(other.gameObject))
+        //                detectInterface.CombatDetect(other.gameObject);
+        //            else
+        //                detectInterface.Detect(other.gameObject);
+        //        }
+        //    }
+        //}
 
-        private void OnTriggerEnter(Collider other)
-        {
-            if (other.TryGetComponent(out IDetect detectInterface))
-            {
-                detectInterface.Detect(characterBase.gameObject);
-            }
-        }
-
-        private void OnTriggerExit(Collider other)
-        {
-            // ≈ª√‚«œ∏È UNDECT
-            if (other.TryGetComponent(out IDetect detectInterface))
-            {
-                detectInterface.UnDetect(characterBase.gameObject);
-            }
-        }
+        //private void OnTriggerExit(Collider other)
+        //{
+        //    // ≈ª√‚«œ∏È UNDECT
+        //    if (other.TryGetComponent(out IDetect detectInterface))
+        //    {
+        //        detectInterface.UnDetect(other.gameObject);
+        //    }
+        //}
     }
 }

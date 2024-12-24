@@ -11,7 +11,6 @@ namespace TST
     public class AIState_Idle : AIStateBase
     {
         private CharacterBase linkedCharacter;
-        private AICharacterController linkedCharacterController;
         private float idleDuration = 5.0f; // 대기 시간
         private float idleStartTime;
 
@@ -45,11 +44,6 @@ namespace TST
             {
                 linkedCharacterController.SetState(new AIState_Patrol(linkedCharacterController));
             }
-        }
-
-        public override void SetTarget(GameObject target)
-        {
-
         }
     }
 }

@@ -127,7 +127,7 @@ namespace TST
             }
 
             if (skillDataList[EDroneSkillType.Gun].currentAmmo <= 0)
-            {
+            {  
                 isKeepFiringBullet = false;
             }
 
