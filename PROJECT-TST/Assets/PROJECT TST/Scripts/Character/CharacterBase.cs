@@ -507,6 +507,11 @@ namespace TST
             animator.SetFloat("Loot Type", lootType);
         }
 
+        public void SetLootisSucceed(bool isSucceed)
+        {
+            animator.SetBool("IsLootSucceed", isSucceed);
+        }
+
         public void SetLootInteractAnimation(ELootState state)
         {
             isLoot = state != ELootState.None ? true : false;
@@ -535,6 +540,12 @@ namespace TST
         public void ShootFinished()
         {
             characterController.PauseRecoil();
+        }
+
+        public void LootFinished()
+        {
+            SetLootType((float)ELootType.None);
+            SetLootisSucceed(false);
         }
 
         public void Reload()
