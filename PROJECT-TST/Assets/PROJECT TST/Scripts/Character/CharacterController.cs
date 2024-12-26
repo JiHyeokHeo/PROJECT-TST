@@ -184,6 +184,7 @@ namespace TST
 
         private void FixedUpdate()
         {
+            currentInteractables.Clear();
             Collider[] overlappedObjects = Physics.OverlapSphere(transform.position, interactionRange);
             for (int i = 0; i < overlappedObjects.Length; i++)
             {

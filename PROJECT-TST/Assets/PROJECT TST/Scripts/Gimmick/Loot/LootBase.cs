@@ -2,29 +2,20 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static TST.LootAnimation;
 
 namespace TST
 {
-    public enum ELootType
+    public abstract class LootBase : MonoBehaviour, IInteractable
     {
-        None = 0,
-        BackPack = 1,
-        End,
-    }
+        public string Message => message;
 
-    public class LootBackPack : MonoBehaviour, IInteractable
-    {
-        public string Message => "LootBackPack";
-
-        public float interactRange = 5.0f;
-
-        public float lootTime = 2.0f;
-
+        protected float interactRange = 5.0f;
+        protected float lootTime = 2.0f;
         private float timeElapsed = 0.0f;
 
+        protected string message;
         private event Action<bool> lootSucceed;
-        
+
         public void Update()
         {
             lootSuccessCheck();
@@ -57,11 +48,16 @@ namespace TST
             if (sqrDistMagnitude > interactRange * interactRange)
                 return;
 
-            playerComponent.SetLootType((float)ELootType.BackPack);
+            
+            SetInitialize();
+            SetInteractLootType(playerComponent);
             lootSucceed += playerComponent.SetLootisSucceed;
 
             playerComponent.SetInteractAnimation(EInteractionType.Looting);
             Debug.Log($"<b><color=red> {Message}!</color></b>");
         }
+
+        public abstract void SetInteractLootType(CharacterBase playerComponent);
+        public abstract void SetInitialize(); // 기본적인 세팅 
     }
 }
