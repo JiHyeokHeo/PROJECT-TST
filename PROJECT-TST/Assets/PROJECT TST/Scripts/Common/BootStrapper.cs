@@ -39,6 +39,8 @@ namespace TST
             UIManager.Show<Minimap_UI>(UIList.Minimap_UI);
             UIManager.Show<CrossHair_UI>(UIList.CrossHair_UI);
             UIManager.Show<IngameUI>(UIList.IngameUI);
+            UIManager.Show<InteractionUI>(UIList.InteractionUI);
+            UIManager.Show<InventoryUI>(UIList.InventoryUI);
         }
 
     }

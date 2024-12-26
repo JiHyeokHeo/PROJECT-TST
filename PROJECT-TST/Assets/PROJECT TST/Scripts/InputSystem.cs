@@ -4,8 +4,13 @@ using UnityEngine;
 
 namespace TST
 {
-    public class InputSystem : MonoBehaviour
+    public class InputSystem : SingletonBase<InputSystem>
     {
+        public System.Action OnInput_Jump;
+
+        public System.Action OnInput_HelpPopupToggle;
+
+
         private void Start()
         {
             SetCursorVisible(false);
@@ -27,6 +32,17 @@ namespace TST
 
         private void Update()
         {
+            if (Input.GetKeyDown(KeyCode.F1))
+            {
+                OnInput_HelpPopupToggle?.Invoke();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                OnInput_Jump?.Invoke();
+            }
+
+
             if (OptionManager.Instance.IsGameStopped)
             {
                 SetCursorVisible(true);

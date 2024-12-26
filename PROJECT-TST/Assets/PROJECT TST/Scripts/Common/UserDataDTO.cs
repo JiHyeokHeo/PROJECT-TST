@@ -46,5 +46,19 @@ namespace TST
         public Quaternion Rotation;
         public List<int> Skills;
     }
+
+    [System.Serializable]
+    public class UserItemDTO : UserDataDTO
+    {
+        [System.Serializable]
+        public class UserItemData
+        {
+            public int slotID;
+            public string itemID;
+            public int itemCount;
+        }
+
+        public List<UserItemData> Items = new List<UserItemData>();
+    }
 }
     

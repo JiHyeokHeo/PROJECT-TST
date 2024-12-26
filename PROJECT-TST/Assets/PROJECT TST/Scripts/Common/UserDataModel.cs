@@ -9,13 +9,14 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.InputSystem;
 
 namespace TST
 {
     public interface ILoader<Key, Value>
     {
-        public Dictionary<Key,Value> MakeDict();
+        public Dictionary<Key, Value> MakeDict();
     }
 
     // 만약 string으로 해야한다면 다시 하나 더 팝시다.. 슈ㅜ...뷰ㅠㅠㅠㅠ 힘드렁뉴ㅜ로ㅓ뮤 ㅇ러ㅗㅁㄴㅇㄹ
@@ -27,7 +28,7 @@ namespace TST
         public Dictionary<int, T> MakeDict()
         {
             Dictionary<int, T> dict = new Dictionary<int, T>();
-            foreach(T value in Values)
+            foreach (T value in Values)
                 dict.Add(value.ID, value);
             return dict;
         }
@@ -35,8 +36,15 @@ namespace TST
 
     public class UserDataModel : SingletonBase<UserDataModel>
     {
-        [field: SerializeField] public Dictionary<int, IngamePlayerDataDTO> IngamePlayerData { get; private set; } = new Dictionary<int, IngamePlayerDataDTO> ();
-        [field: SerializeField] public Dictionary<int, IngameMonsterDataDTO> ingameMonsterData { get; private set; } = new Dictionary<int, IngameMonsterDataDTO> ();
+        [field: SerializeField] public Dictionary<int, IngamePlayerDataDTO> IngamePlayerData { get; private set; } = new Dictionary<int, IngamePlayerDataDTO>();
+        [field: SerializeField] public Dictionary<int, IngameMonsterDataDTO> ingameMonsterData { get; private set; } = new Dictionary<int, IngameMonsterDataDTO>();
+
+        [field: SerializeField] public UserItemDTO UserItemData { get; private set; } = new UserItemDTO();
+
+
+
+
+        public event System.Action<UserItemDTO.UserItemData> OnUserItemChangedEvent;
 
         public void Initialize()
         {
@@ -58,7 +66,7 @@ namespace TST
                 Debug.LogError($"Unsupported type: {typeof(T).Name}");
             }
         }
-  
+
         // 함수 계속 추가해야함
         private Dictionary<int, T> GetDictionaryForType<T>() where T : RootDataDTO
         {
@@ -87,6 +95,55 @@ namespace TST
             SaveAllInGameData();
         }
 
+
+        public void AddItemToInventory(ItemData itemData)
+        {
+            // TODO : UserItemData에 먹은 아이템 추가
+            // TODO : 기존에 먹은 아이템이 있는가? 있으면 카운트만 증가, 없으면 새로 추가
+            // TODO : 기존에 먹은 아이템이 있지만, 해당 슬롯의 Count가 MaxCount 까지 넘어갔는가? 넘어갔으면 새로운 슬롯에 추가
+
+            UserItemDTO.UserItemData changedData = null;
+            int existedItemDataIndex = UserItemData.Items.FindLastIndex(x => x.itemID.Equals(itemData.ItemID));
+            if (existedItemDataIndex >= 0)
+            {
+                bool isExistGameData = GameDataModel.Singleton.GetItemData(itemData.ItemID, out var itemGameData);
+
+                // TODO : 아이템 게임 데이터가 없는것에 대한 예외처리
+                Assert.IsTrue(isExistGameData, $"ItemData {itemData.ItemID} is not exist in GameDataModel");
+
+                int limitStack = itemGameData.ItemMaxStack;
+                if (UserItemData.Items[existedItemDataIndex].itemCount + 1 <= limitStack)
+                {
+                    UserItemData.Items[existedItemDataIndex].itemCount += 1;
+                    changedData = UserItemData.Items[existedItemDataIndex];
+                }
+                else
+                {
+                    changedData = new UserItemDTO.UserItemData()
+                    {
+                        slotID = UserItemData.Items.Count,
+                        itemID = itemData.ItemID,
+                        itemCount = 1
+                    };
+                    UserItemData.Items.Add(changedData);
+                }                
+            }
+            else
+            {
+                changedData = new UserItemDTO.UserItemData()
+                {
+                    slotID = UserItemData.Items.Count,
+                    itemID = itemData.ItemID,
+                    itemCount = 1
+                };
+                UserItemData.Items.Add(changedData);
+            }
+
+            // TODO : 데이터 저장
+            // TODO : UserDataModel 의 OnUserItemChangedEvent 를 호출해주자.
+            OnUserItemChangedEvent?.Invoke(changedData);
+        }
+
         #region SAVE / LOAD Core Method
 
         private SaveLoadDataWrapper<T> LoadData<T>() where T : RootDataDTO
@@ -103,7 +160,7 @@ namespace TST
 
                 return wrapper;
             }
-            
+
             Debug.Log($"Failed to Load Data {typeof(T).Name}");
             return null;
         }
@@ -230,6 +287,7 @@ namespace TST
 
             return properties;
         }
+
         #endregion
 
         #region Serialize & Deserialize & FindParentProperty

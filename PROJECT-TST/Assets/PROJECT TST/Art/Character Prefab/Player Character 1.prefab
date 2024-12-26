@@ -546,7 +546,7 @@ Transform:
   m_GameObject: {fileID: 868316203083946181}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 24.3, y: -0.59, z: 0}
+  m_LocalPosition: {x: 13.83, y: -0.59, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -756,7 +756,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1182851077697299942}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0.392}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.01, y: 0.009999999, z: 0.009999999}
   m_ConstrainProportionsScale: 1
   m_Children:
@@ -765,7 +765,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -1.3169608, y: 10}
+  m_AnchoredPosition: {x: 0, y: 10}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &1979908953155023087
@@ -1450,7 +1450,7 @@ Transform:
   m_GameObject: {fileID: 1721898934212375788}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1, y: -1.13, z: 0}
+  m_LocalPosition: {x: 3.44, y: -1.13, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3915,7 +3915,7 @@ Transform:
   m_GameObject: {fileID: 5284620588527010966}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -1.3169608, y: 100, z: 0.392}
+  m_LocalPosition: {x: 0, y: 100, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5307,7 +5307,7 @@ GameObject:
   - component: {fileID: 7825068349338461829}
   - component: {fileID: 6830159438283845766}
   - component: {fileID: 7733925133398877327}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Player Character 1
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -5322,7 +5322,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7034745552357447305}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.3169608, y: 0, z: -13.52}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5391,11 +5391,7 @@ MonoBehaviour:
   throwRig: {fileID: 4377724749152900011}
   offsetPosition: {x: 0.0742, y: -0.034, z: 0.0147}
   offsetRotation: {x: 0, y: 90, z: 90}
-  walkSpeed: 1
-  moveSpeed: 2
-  runSpeed: 2.1
-  sprintSpeed: 5
-  rotateSpeed: 5
+  characterStat: {fileID: 11400000, guid: 1132916a7430cc347932d41a5e715ee3, type: 2}
   rollSpeed: 4
   rollSpeedCurve:
     serializedVersion: 2
@@ -5432,7 +5428,18 @@ MonoBehaviour:
     m_RotationOrder: 4
   isSprint: 1
   crouchOffset: {x: 0, y: -0.3, z: 0}
+  aiSpawnPosition: {x: 0, y: 0, z: 0}
   isLoot: 0
+  jumpHeight: 1.2
+  gravity: -15
+  jumpTimeout: 0.3
+  fallTimeout: 0.15
+  terminalVelocity: 53
+  groundedOffset: 0
+  groundedRadius: 0.28
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 513
 --- !u!143 &1559464058074145758
 CharacterController:
   m_ObjectHideFlags: 0
@@ -5456,7 +5463,7 @@ CharacterController:
   m_Radius: 0.25
   m_SlopeLimit: 45
   m_StepOffset: 0.3
-  m_SkinWidth: 0.08
+  m_SkinWidth: 0.01
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.9, z: 0}
 --- !u!54 &7825068349338461829
@@ -5524,10 +5531,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1
   trajectoryRenderer: {fileID: 0}
-  interactionRange: 2
   topClampLimit: 80
   bottomClampLimit: -80
   recoilAmount: 2
+  interactionRange: 2
 --- !u!1 &7062359641945337374
 GameObject:
   m_ObjectHideFlags: 0

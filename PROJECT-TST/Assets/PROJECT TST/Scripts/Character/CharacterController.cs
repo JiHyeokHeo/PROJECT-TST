@@ -12,6 +12,23 @@ namespace TST
         public LayerMask aimingLayer;
         public LineRenderer trajectoryRenderer;
 
+        public float topClampLimit = 80;
+        public float bottomClampLimit = -80;
+
+        private float threshold = 0.01f;
+        private float targetYaw;
+        private float targetPitch;
+
+        [SerializeField]
+        private float recoilAmount = 10.0f;
+        //private float recoilSpeed = 10.0f; 
+        private float currentRecoil = 0.0f;
+        private float recoilMaxThreshold = 20.0f;
+
+
+        public float interactionRange = 2f;
+        public List<IInteractable> currentInteractables = new List<IInteractable>();
+
         private void Awake()
         {
             linkedCharacter = GetComponent<CharacterBase>();
@@ -21,30 +38,42 @@ namespace TST
         {
             //transform.position = UserDataModel.Singleton.IngamePlayerData.Values[0].Position;
             //transform.rotation = UserDataModel.Singleton.IngamePlayerData.PlayerRotation;
+
+            InputSystem.Singleton.OnInput_HelpPopupToggle += OnExecuteHelpPopup;
+            InputSystem.Singleton.OnInput_Jump += OnExecuteJump;
+        }
+
+        void OnExecuteJump()
+        {
+            linkedCharacter.Jump();
+        }
+
+
+        private void OnDestroy()
+        {
+            InputSystem.Singleton.OnInput_HelpPopupToggle -= OnExecuteHelpPopup;
+        }
+
+        void OnExecuteHelpPopup()
+        {
+            var helpPopup = UIManager.Singleton.GetUI<PopupA_UI>(UIList.PopupA_UI);
+            OnHelpPopupToggle(!helpPopup.gameObject.activeSelf);
+        }
+
+        void OnHelpPopupToggle(bool isOn)
+        {
+            if (isOn)
+            {
+                UIManager.Show<PopupA_UI>(UIList.PopupA_UI);
+            }
+            else
+            {
+                UIManager.Hide<PopupA_UI>(UIList.PopupA_UI);
+            }
         }
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.F1))
-            {
-                UIManager.Show<PopupA_UI>(UIList.PopupA_UI);
-            }
-
-            //if (Input.GetKeyDown(KeyCode.F2))
-            //{
-            //    UIManager.Show<PopupB_UI>(UIList.PopupB_UI);
-            //}
-
-            if (Input.GetKeyDown(KeyCode.F3))
-            {
-                UIManager.Hide<PopupA_UI>(UIList.PopupA_UI);
-            }
-
-            //if (Input.GetKeyDown(KeyCode.F4))
-            //{
-            //    UIManager.Hide<PopupB_UI>(UIList.PopupB_UI);
-            //}
-
             float inputX = Input.GetAxis("Horizontal");
             float inputY = Input.GetAxis("Vertical");
 
@@ -136,6 +165,15 @@ namespace TST
                 }
             }
 
+            if (currentInteractables.Count > 0)
+            {
+                InteractionUI.Instance.ShowInteractionItem();
+            }
+            else
+            {
+                InteractionUI.Instance.HideInteractionItem();
+            }
+
             if (Input.GetKeyDown(KeyCode.G))
             {
                 linkedCharacter.IsThrowMode = !linkedCharacter.IsThrowMode;
@@ -179,11 +217,9 @@ namespace TST
         }
 
 
-        public float interactionRange = 2f;
-        public List<IInteractable> currentInteractables = new List<IInteractable>();
-
         private void FixedUpdate()
         {
+            currentInteractables.Clear();
             Collider[] overlappedObjects = Physics.OverlapSphere(transform.position, interactionRange);
             for (int i = 0; i < overlappedObjects.Length; i++)
             {
@@ -202,19 +238,6 @@ namespace TST
             CameraRotation();
         }
 
-        public float topClampLimit = 80;
-        public float bottomClampLimit = -80;
-
-        private float threshold = 0.01f;
-        private float targetYaw;
-        private float targetPitch;
-
-        [SerializeField]
-        private float recoilAmount = 10.0f; 
-        //private float recoilSpeed = 10.0f; 
-        private float currentRecoil = 0.0f;
-
-        private float recoilMaxThreshold = 20.0f;
         public void AddRecoil()
         {
             if (linkedCharacter.IsArmed && linkedCharacter.gunWeapon.CurrentAmmo > 0)

@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;
@@ -27,6 +28,16 @@ namespace TST
 
     public class CharacterBase : MonoBehaviour, IDamage, IDetect
     {
+
+        void OnDrawGizmos()
+        {
+            Color transparentRed = new Color(1f, 0f, 0f, 0.3f);
+            Gizmos.color = transparentRed;
+            Gizmos.DrawSphere(
+                new Vector3(transform.position.x, transform.position.y - groundedOffset, transform.position.z), 
+                groundedRadius);
+        }
+
         public Vector3 AimingPosition
         {
             get => aimingPoint.position;
@@ -245,6 +256,11 @@ namespace TST
 
         private void Update()
         {
+            JumpAndGravity();
+            FreeFall();
+            CheckGround();
+
+
             armedBlend = Mathf.Lerp(armedBlend, IsArmed ? 1f : 0f, Time.deltaTime * 10f);
             speedBlend = Mathf.Lerp(speedBlend, targetSpeed, Time.deltaTime * 10f);
             horizontal = Mathf.Lerp(horizontal, targetHorizontal, Time.deltaTime * 10f);
@@ -292,6 +308,7 @@ namespace TST
                 return;
             }
 
+            Vector3 movement = Vector3.zero;
             if (input.magnitude > 0f)   
             {
                 if (!IsArmed)
@@ -300,8 +317,6 @@ namespace TST
                     targetRotation = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg + yAxisAngle;
                     transform.rotation = Quaternion.Euler(0f, targetRotation, 0f);
                 }
-
-                Vector3 movement = Vector3.zero;
 
                 if (IsArmed)
                 {
@@ -315,8 +330,8 @@ namespace TST
                     movement = transform.forward * characterStat.moveSpeed * Time.deltaTime;
                 }
 
+                
                 targetSpeed = isWalk? 0.0f : 2.1f;
-                unityCharacterController.Move(movement);
             }
             else
             {
@@ -342,6 +357,9 @@ namespace TST
             //    targetHorizontal = IsAutoRunMode ? targetHorizontal : 0f;
             //    targetVertical = IsAutoRunMode ? targetVertical : 0f;
             //}
+
+            movement.y += verticalVelocity * Time.deltaTime;
+            unityCharacterController.Move(movement);
 
             if (!isAutoRunMode)
                 animator.SetFloat("Magnitude", input.magnitude);
@@ -624,6 +642,95 @@ namespace TST
         public void CombatDetect(GameObject target)
         {
             OnCombatDetect?.Invoke(target);
+        }
+
+        public float jumpHeight = 1.2f;          // JumpHeight : 점프력 최대 올라갈 수 있는 높이.
+        public float gravity = -15.0f;           // Gravity : Rigidbody를 사용하지 않기 때문에, 별도 중력 값
+        public float jumpTimeout = 0.3f;         // JumpTimeout : 점프 후 - 다시 점프 입력을 받을 수 있는 텀[:시간]
+        public float fallTimeout = 0.15f;        // FallTimeout : 점프가 아닌, 절벽에서 떨어지는 경우, 떨어지는 중력을 적용받기까지의 텀[:시간]
+        public float terminalVelocity = 53.0f;   // terminalVelocity : 최대 속도 For 점프하는 가속도에 영향을 준다.
+
+        public float groundedOffset = -0.14f;
+        public float groundedRadius = 0.28f;
+        public LayerMask groundLayer;
+
+        private float jumpTimeoutDelta;
+        private float fallTimeoutDelta;
+        private float verticalVelocity;
+        private bool isJumping = false;
+        private bool isGrounded = false;
+
+        public void Jump()
+        {
+            if ((!isJumping && isGrounded))
+            {
+                isJumping = true;
+                animator.SetTrigger("Jump Trigger");
+            }
+        }
+
+        private void JumpAndGravity()
+        {
+            if (isGrounded)
+            {
+                if (verticalVelocity < 0f)
+                {
+                    verticalVelocity = -2f;
+                }
+
+                if (isJumping && jumpTimeoutDelta <= 0.0f)
+                {
+                    jumpTimeoutDelta = jumpTimeout;
+                    verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                    isJumping = false;
+                }
+
+                if (jumpTimeoutDelta >= 0f)
+                {
+                    jumpTimeoutDelta -= Time.deltaTime;
+                }
+            }
+            else
+            {
+                jumpTimeoutDelta = jumpTimeout;
+                isJumping = false;
+            }
+
+            if (verticalVelocity < terminalVelocity)
+            {
+                verticalVelocity += gravity * Time.deltaTime;
+            }
+        }
+
+        private void FreeFall()
+        {
+            if (isGrounded)
+            {
+                fallTimeoutDelta = fallTimeout;
+                animator.SetBool("IsFreeFall", false);
+            }
+            else
+            {
+                if (fallTimeoutDelta >= 0f)
+                {
+                    fallTimeoutDelta -= Time.deltaTime;
+                }
+                else
+                {
+                    if (false == animator.GetBool("IsFreeFall"))
+                    {
+                        animator.SetBool("IsFreeFall", true);
+                    }
+                }
+            }
+        }
+
+        private void CheckGround()
+        {
+            Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - groundedOffset, transform.position.z);
+            isGrounded = Physics.CheckSphere(spherePosition, groundedRadius, groundLayer, QueryTriggerInteraction.Ignore);
+
+            animator.SetBool("IsGrounded", isGrounded);
         }
     }
 }
