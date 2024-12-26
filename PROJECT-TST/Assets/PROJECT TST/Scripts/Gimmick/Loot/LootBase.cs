@@ -10,7 +10,7 @@ namespace TST
         public string Message => message;
 
         protected float interactRange = 5.0f;
-        protected float lootTime = 2.0f;
+        protected float lootTime = 5.0f;
         private float timeElapsed = 0.0f;
 
         protected string message;
@@ -27,7 +27,6 @@ namespace TST
                 return;
 
             timeElapsed += Time.deltaTime;
-
             if (timeElapsed > lootTime)
             {
                 timeElapsed = 0.0f;
@@ -48,7 +47,6 @@ namespace TST
             if (sqrDistMagnitude > interactRange * interactRange)
                 return;
 
-            
             SetInitialize();
             SetInteractLootType(playerComponent);
             lootSucceed += playerComponent.SetLootisSucceed;
