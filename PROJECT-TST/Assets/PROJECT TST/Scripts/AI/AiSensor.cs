@@ -6,6 +6,7 @@ using static UnityEngine.Rendering.HableCurve;
 
 namespace TST
 {
+    [ExecuteInEditMode]
     public class AiSensor : MonoBehaviour
     {
         public float distance = 10;
@@ -167,8 +168,6 @@ namespace TST
 
                 currentAngle += deltaAngle;
             }
-
-       
 
             for (int i = 0; i < numVertices; ++i)
             {

@@ -12,9 +12,53 @@ namespace TST
         public LayerMask aimingLayer;
         public LineRenderer trajectoryRenderer;
 
+        public float topClampLimit = 80;
+        public float bottomClampLimit = -80;
+
+        private float threshold = 0.01f;
+        private float targetYaw;
+        private float targetPitch;
+
+        [SerializeField]
+        private float recoilAmount = 10.0f;
+        //private float recoilSpeed = 10.0f; 
+        private float currentRecoil = 0.0f;
+
+        private float recoilMaxThreshold = 20.0f;
         private void Awake()
         {
             linkedCharacter = GetComponent<CharacterBase>();
+
+            InputSystem.Singleton.OnInput_HelpPopupToggle += OnExecuteHelpPopup;
+            InputSystem.Singleton.OnInput_Jump += OnExecuteJump;
+        }
+
+        void OnExecuteJump()
+        {
+            linkedCharacter.Jump();
+        }
+
+        private void OnDestroy()
+        {
+            InputSystem.Singleton.OnInput_HelpPopupToggle -= OnExecuteHelpPopup;
+        }
+
+        void OnExecuteHelpPopup()
+        {
+            var helpPopup = UIManager.Singleton.GetUI<PopupA_UI>(UIList.PopupA_UI);
+            OnHelpPopupToggle(!helpPopup.gameObject.activeSelf);
+        }
+
+        void OnHelpPopupToggle(bool isOn)
+        {
+            if (isOn)
+            {
+                UIManager.Show<PopupA_UI>(UIList.PopupA_UI);
+            }
+            else
+            {
+                UIManager.Hide<PopupA_UI>(UIList.PopupA_UI);
+            }
         }
 
         private void Start()
@@ -30,20 +74,6 @@ namespace TST
                 UIManager.Show<PopupA_UI>(UIList.PopupA_UI);
             }
 
-            //if (Input.GetKeyDown(KeyCode.F2))
-            //{
-            //    UIManager.Show<PopupB_UI>(UIList.PopupB_UI);
-            //}
-
-            if (Input.GetKeyDown(KeyCode.F3))
-            {
-                UIManager.Hide<PopupA_UI>(UIList.PopupA_UI);
-            }
-
-            //if (Input.GetKeyDown(KeyCode.F4))
-            //{
-            //    UIManager.Hide<PopupB_UI>(UIList.PopupB_UI);
-            //}
 
             float inputX = Input.GetAxis("Horizontal");
             float inputY = Input.GetAxis("Vertical");
@@ -128,6 +158,7 @@ namespace TST
                 linkedCharacter.DroneSetting();
             }
 
+
             if (Input.GetKeyDown(KeyCode.F))
             {
                 for (int i = 0; i < currentInteractables.Count; i++)
@@ -203,19 +234,7 @@ namespace TST
             CameraRotation();
         }
 
-        public float topClampLimit = 80;
-        public float bottomClampLimit = -80;
-
-        private float threshold = 0.01f;
-        private float targetYaw;
-        private float targetPitch;
-
-        [SerializeField]
-        private float recoilAmount = 10.0f; 
-        //private float recoilSpeed = 10.0f; 
-        private float currentRecoil = 0.0f;
-
-        private float recoilMaxThreshold = 20.0f;
+     
         public void AddRecoil()
         {
             if (linkedCharacter.IsArmed && linkedCharacter.gunWeapon.CurrentAmmo > 0)
