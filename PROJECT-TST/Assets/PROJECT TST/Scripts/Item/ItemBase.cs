@@ -16,7 +16,7 @@ namespace TST
             Debug.Log("<color=#FFFFFF>Item Interacted !!</color>");
 
             // TODO : æ∆¿Ã≈€ »πµÊ √≥∏Æ.
-            // UserDataModel.Singleton.AddItemToInventory();
+            UserDataModel.Singleton.AddItemToInventory(ItemData);
         }
     }
 }

@@ -21,7 +21,7 @@ namespace TST
         PopupB_UI,
         Indicator_UI,
         InventoryUI,
-
+        InteractionUI,
 
         UI_POPUP_END,
     }

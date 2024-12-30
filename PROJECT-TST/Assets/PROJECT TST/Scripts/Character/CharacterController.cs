@@ -113,6 +113,15 @@ namespace TST
             //    linkedCharacter.IsArmed = !linkedCharacter.IsArmed;
             //}
 
+            if (currentInteractables.Count > 0)
+            {
+                InteractionUI.Instance.ShowInteractionItem();
+            }
+            else
+            {
+                InteractionUI.Instance.HideInteractionItem();
+            }
+
             if (Input.GetKeyDown(KeyCode.LeftShift))
             {
                 linkedCharacter.IsSprint = !linkedCharacter.IsSprint;
