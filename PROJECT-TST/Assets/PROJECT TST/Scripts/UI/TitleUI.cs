@@ -8,12 +8,12 @@ namespace TST
     {
         public void OnClickGameStartButton()
         {
-            Main.Instance.ChangeScene(SceneType.Ingame);
+            Main.Singleton.ChangeScene(SceneType.Ingame);
         }
 
         public void OnClickQuitButton()
         {
-            Main.Instance.SystemQuit();
+            Main.Singleton.SystemQuit();
         }
     }
 }
